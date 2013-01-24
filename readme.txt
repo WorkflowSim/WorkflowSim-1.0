@@ -1,97 +1,62 @@
 Table of Contents
 -----------------
 
-1. Directory structure of the CloudSim Toolkit
+1. Directory structure of the WorkflowSim Toolkit
 2. Software requirements: Java version 1.6 or newer 
-3. Installation and running the CloudSim Toolkit
-4. Running the CloudSim examples
-5. Learning CloudSim
-6. Compiling CloudSim: using Ant
+3. Installation and running the WorkflowSim Toolkit
+4. Running the WorkflowSim examples
+5. Learning WorkflowSim
+6. Compiling WorkflowSim: using Ant
 
 
 
-1. Directory structure of the CloudSim Toolkit
+1. Directory structure of the WorkflowSim Toolkit
 ----------------------------------------------
 
-cloudsim/			-- top level CloudSim directory
-	docs/			-- CloudSim API Documentation
-	examples/		-- CloudSim examples
-	jars/			-- CloudSim jar archives
-	sources/		-- CloudSim source code
-	tests/			-- CloudSim unit tests
+workflowsim/			-- top level WorkflowSim directory
+	docs/			-- WorkflowSim API Documentation
+	examples/		-- WorkflowSim examples
+	lib/			-- WorkflowSim jar archives
+	sources/		-- WorkflowSim source code
 
 
 2. Software requirements: Java version 1.6 or newer
 ---------------------------------------------------
 
-CloudSim has been tested and ran on Sun's Java version 1.6.0 or newer.
-Older versions of Java are not compatible.
+WorkflowSim has been tested and ran on Sun's Java version 1.6.0 or newer.
 If you have non-Sun Java version, such as gcj or J++, they may not be compatible.
-You also need to install Ant to compile CloudSim (explained in more details later).
+You can use Eclipse, NetBeans, or Ant to compile and run WorkflowSim
 
-
-3. Installation and running the CloudSim Toolkit
+3. Installation and running the WorkflowSim Toolkit
 ------------------------------------------------
 
-You just need to unpack the CloudSim file to install.
-If you want to remove CloudSim, then remove the whole cloudsim directory.
-You do not need to compile CloudSim source code. The JAR files are
-provided to compile and to run CloudSim applications:
+You just need to unpack the WorkflowSim file to install. 
 
-  * jars/cloudsim-<VERSION>.jar						-- contains the CloudSim class files
-  * jars/cloudsim-<VERSION>-sources.jar				-- contains the CloudSim source code files
-  * jars/cloudsim-examples-<VERSION>.jar			-- contains the CloudSim examples class files
-  * jars/cloudsim-examples-<VERSION>-sources.jar	-- contains the CloudSim examples source code files
-
-
-4. Running the CloudSim examples
+4. Running the WorkflowSim examples
 --------------------------------
 
-Please read how to run the CloudSim examples in examples.txt
+First, checkout source codes from https://github.com/WorkflowSim/WorkflowSim-1.0. Second, create a java project with existing source codes in Eclipse or NetBeans. After that, set the main class to be examples.org.workflowsim.examples.WorkflowExample1.java and in the configuration please specify at least -p $WORKFLOWSIM/config/balanced/cybershake.txt
+In $WORKFLOWSIM/config/balanced/cybershake.txt, please replace dax.path to be the real path to a dax file, such as 
+dax.file=$WORKFLOWSIM/config/balanced/dax/Inspiral_1000.xml
+Now you can run it. 
+
+We have youtube videos to ease your installation.
 
 
-5. Learning CloudSim
+5. Learning WorkflowSim
 --------------------
 
-To understand how to use CloudSim, please go through the examples provided
+To understand how to use WorkflowSim, please go through the examples provided
 in the examples/ directory.
 
 
-6. Compiling CloudSim: using Ant
+6. Compiling WorkflowSim: using Ant
 --------------------------------
 
-This release contains a simple buildfile for compiling CloudSim classes.
-You need to have ant installed (http://ant.apache.org/).
-Ant can be used in both Windows and Unix/Linux environment.
-
-Usage:
-
-  * Being in the CloudSim root directory (cloudsim/), type 'ant' to compile all 
-    cloudsim source files, put them into the classes/ directory and to create 
-    a cloudsim-new.jar file in the jars/ directory
-    
-  * Being in the CloudSim root directory (cloudsim/), type 'ant clean' to delete 
-    all the compiled classes and the classes/ directory itself. The generated 
-    cloudsim-new.jar is not deleted.
-
-Note:
-
-  * You need to set up PATH for ant in Windows and/or Unix.
   
   
  7. Downloading and using external jars
 ---------------------------------------
 
-Some of the algorithms in the power package require Michael Thomas Flanagan's 
-Java Scientific Library. This library can be downloaded from
-
-http://www.ee.ucl.ac.uk/~mflanaga/java/
-
-Once the library is downloaded, copy it to the jars/ directory. If you are running 
-Linux, you can just run the ./install-flanagan.sh script, that will download the
-library and place it in the jars/ directory.
-
-Please, make sure that, by using such library, you are respecting the terms of use
-defined by the software's author.
 
 
