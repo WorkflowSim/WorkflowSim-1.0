@@ -1,0 +1,10 @@
+#!/bin/sh
+
+CURRENT=$PWD/$0
+#echo $0
+CURRENT=$0
+WFS=`echo $CURRENT|sed "s/\/bin\/wfs-start//g"`
+
+CLASSPATH=$WFS/dist/WorkflowSim.jar 
+java -Xmx512m -jar $CLASSPATH -p /Users/chenweiwei/NetBeansProjects/WorkflowSim/config/balanced/cybershake.txt  $@ |tail -n 8|head -n 1|awk '{print $7}'
+#java -Xmx512m -classpath $CLASSPATH edu.isi.pegasus.workflowsim.examples.WorkflowSimExample1 -p /Users/chenweiwei/NetBeansProjects/WorkflowSim/config/balanced/cybershake.txt  $@

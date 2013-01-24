@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Floodplain Mapping workflow (Figure 5 in Ramakrishnan and Gannon) -->
+<adag name="floodplain" jobCount="7" fileCount="0" childCount="5">
+	<job id="sin" namespace="floodplain" name="SWAN Inner North" runtime="14400" cores="160">
+		<uses file="swan_in.dat" link="input" size="35651584"/>
+		<uses file="son_out.dat" link="input" size="11974737"/>
+		<uses file="adcirc_out.dat" link="input" size="22572695552"/>
+		<uses file="sin_out.dat" link="output" size="4080218931"/>
+	</job>
+	<job id="ww3" namespace="floodplain" name="WaveWatchIII" runtime="3600" cores="256">
+		<uses file="ww3_in.dat" link="input" size="849346560"/>
+		<uses file="ww3_out.dat" link="output" size="2900361216"/>
+	</job>
+	<job id="sis" namespace="floodplain" name="SWAN Inner South" runtime="10800" cores="192">
+		<uses file="swan_in.dat" link="input" size="35651584"/>
+		<uses file="adcirc_out.dat" link="input" size="22572695552"/>
+		<uses file="sos_out.dat" link="input" size="14680064"/>
+		<uses file="sis_out.dat" link="output" size="4724464025"/>
+	</job>
+	<job id="adcirc2" namespace="floodplain" name="Adcirc" runtime="16200.0" cores="256">
+		<uses file="adcirc2_in.dat" link="input" size="559939584"/>
+		<uses file="sin_out.dat" link="input" size="4080218931"/>
+		<uses file="sis_out.dat" link="input" size="4724464025"/>
+		<uses file="adcirc2_out.dat" link="output" size="6816792576"/>
+	</job>
+	<job id="adcirc" namespace="floodplain" name="Adcirc" runtime="39600" cores="256">
+		<uses file="adcirc_in.dat" link="input" size="559939584"/>
+		<uses file="adcirc_out.dat" link="output" size="22572695552"/>
+	</job>
+	<job id="son" namespace="floodplain" name="SWAN Outer North" runtime="46800" cores="8">
+		<uses file="ww3_out.dat" link="input" size="2900361216"/>
+		<uses file="swan_in.dat" link="input" size="35651584"/>
+		<uses file="adcirc_out.dat" link="input" size="22572695552"/>
+		<uses file="son_out.dat" link="output" size="11974737"/>
+	</job>
+	<job id="sos" namespace="floodplain" name="SWAN Outer South" runtime="28800" cores="10">
+		<uses file="ww3_out.dat" link="input" size="2900361216"/>
+		<uses file="swan_in.dat" link="input" size="35651584"/>
+		<uses file="adcirc_out.dat" link="input" size="22572695552"/>
+		<uses file="sos_out.dat" link="output" size="14680064"/>
+	</job>
+	<child ref="sin">
+		<parent ref="adcirc"/>
+		<parent ref="son"/>
+	</child>
+	<child ref="sis">
+		<parent ref="sos"/>
+		<parent ref="adcirc"/>
+	</child>
+	<child ref="adcirc2">
+		<parent ref="sin"/>
+		<parent ref="sis"/>
+	</child>
+	<child ref="son">
+		<parent ref="adcirc"/>
+		<parent ref="ww3"/>
+	</child>
+	<child ref="sos">
+		<parent ref="adcirc"/>
+		<parent ref="ww3"/>
+	</child>
+</adag>

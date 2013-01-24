@@ -1,0 +1,33 @@
+package edu.isi.pegasus.workflowsim;
+
+/**
+ *
+ * @author Weiwei Chen
+ */
+public class TaskFile {
+    
+    private String name;
+    private String inout;
+    private double size;
+    
+    public TaskFile(
+            String name, 
+            String inout,
+            double size
+            ){
+        this.name = name;
+        this.inout = inout;
+        this.size = size;
+    }
+    
+    public String getName(){
+        return this.name;
+    }
+    public String getInout(){
+        return this.inout;
+    }
+    public double getSize(){
+        return this.size;
+    }
+    
+}

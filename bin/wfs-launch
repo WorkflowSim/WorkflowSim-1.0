@@ -1,0 +1,73 @@
+#!/bin/sh
+######################
+#Author: Weiwei Chen##
+#Date: Dec 17, 2012 ##
+######################
+function usage()
+{
+   echo "./bin/wfs-launch -j WorkflowSim.jar -d workflow.xml -c vch"
+   echo "\t -d --dax DAX file path"
+   echo "\t -c --code balanced methods"
+   echo "\t -j --jar WorkflowSim.jar"
+   echo "\t -p --properties Property.txt"
+   echo ""
+}
+while [[ $1 == -* ]];do
+   case $1 in 
+      -h | --help)
+         usage
+         exit
+         ;;
+      -d | --dax)
+         dax=$2
+         shift 2
+         ;;
+      -c | --code)
+         code=$2
+         shift 2
+         ;;
+      -j | --jar)
+         jar=$2
+         shift 2
+         ;;
+      -p | --properties)
+         prop=$2
+         shift 2
+         ;;
+      *)
+         echo "ERROR: unknown parameter \"$param\"" 1>&2
+         usage
+         exit 1
+         ;;
+      esac
+     
+done
+if [ $code == "" ] || [ $jar == "" ] || [ $dax == "" ] || [ $prop == "" ];then
+ echo "ERROR: Required parameters missing" 1>&2
+ exit 1
+fi
+if [ ! -f "$dax" ] || [ ! -f "$jar" ] || [ ! -f "$prop" ];then
+  echo "ERROR: Required files missing" 1>&2
+  exit 1
+fi
+
+jp=`which java`
+if [[ $jp == "" ]];then
+  echo "Java is not installed" 1>&2
+  exit 1
+fi
+#To std out
+if [[ $code != "" ]];then
+  output=`java -Xmx512m -jar "$jar" -p "$prop" -d "$dax" -c "$code"`
+else
+  output=`java -Xmx512m -jar "$jar" -p "$prop" -d "$dax"
+fi
+
+echo "$output"
+#Store such that Merge can use
+runtime=`echo "$output" |tail -n 8 |head -n 1|awk '{print $7}'`
+dax=`echo $dax|awk -F/ '{print $NF}'|sed 's/.xml//g'`
+filename="$dax"_"$code.rt"
+echo "$dax" "$code" "$runtime" > $filename
+
+

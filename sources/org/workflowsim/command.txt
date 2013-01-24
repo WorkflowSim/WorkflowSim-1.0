@@ -1,0 +1,5 @@
+for((i=1;i<=100;i++));do java -jar dist/WorkflowSim.jar -p config/montage/montage.txt |tail -n 8|head -n 1 |awk '{print $7}';done > 0.008.txt
+java -jar dist/WorkflowSim.jar -p config/montage/montage.txt |tail -n 8|head -n 1 |awk '{print $7}'
+awk '{total+=$1;count+=1}END{print total/count}'
+ls -al|awk '{print $9"\ "$5}' > ../size
+for i in `ls |grep out.000|grep chmod -v|awk 'BEGIN{FS="_"}{print $2}'|awk 'BEGIN{FS=".out"}{print $1}'`;do echo -n "$i " ; grep duration *$i.out.000|grep mainjob|awk 'BEGIN{FS="\""}{print $4}';done > ../runtime.txt

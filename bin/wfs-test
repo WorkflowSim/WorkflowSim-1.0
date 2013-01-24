@@ -1,0 +1,13 @@
+#!/bin/sh
+
+
+path=$1
+
+CURRENT=$PWD/$0
+WFS=`echo $CURRENT|sed "s/wfs-test/wfs-start/g"`
+codes=(   v c h vc vh cv ch hv hc vch vhc cvh chv hvc hcv)
+$WFS  -d $path
+for code in ${codes[@]} ;do
+#  echo $code
+   $WFS -c $code -d $path
+done
