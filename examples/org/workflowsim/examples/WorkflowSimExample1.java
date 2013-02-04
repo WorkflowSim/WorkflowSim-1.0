@@ -39,7 +39,7 @@ import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 public class WorkflowSimExample1 {
 
 /*
- * Make some changes
+ * Make some changes and push
  */
 	private static List<CondorVM> createVM(int userId, int vms) {
 
