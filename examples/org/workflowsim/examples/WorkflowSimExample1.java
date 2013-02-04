@@ -38,7 +38,9 @@ import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
  */
 public class WorkflowSimExample1 {
 
-
+/*
+ * Make some changes
+ */
 	private static List<CondorVM> createVM(int userId, int vms) {
 
 		//Creates a container to store VMs. This list is passed to the broker later
