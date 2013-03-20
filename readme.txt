@@ -30,8 +30,18 @@ You can use Eclipse, NetBeans, or Ant to compile and run WorkflowSim
 3. Installation and running the WorkflowSim Toolkit
 ------------------------------------------------
 
-You just need to unpack the WorkflowSim file to install. 
-
+ We have youtube videos to ease your installation.
+-
+Eclipse (EGit version)
+http://www.youtube.com/watch?v=MvpPzZpMDzg
+a. Install EGit
+b. Check out source codes from github
+c. Build a new java project
+d. Set the main class
+e. Change the arguments
+f. Run an example
+g. Commit your changes
+ 
 4. Running the WorkflowSim examples
 --------------------------------
 
