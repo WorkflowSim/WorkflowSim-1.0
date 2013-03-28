@@ -36,12 +36,20 @@ You just need to unpack the WorkflowSim file to install.
 --------------------------------
 
 First, checkout source codes from https://github.com/WorkflowSim/WorkflowSim-1.0. Second, create a java project with existing source codes in Eclipse or NetBeans. After that, set the main class to be examples.org.workflowsim.examples.WorkflowExample1.java and in the configuration please specify at least -p $WORKFLOWSIM/config/balanced/cybershake.txt
-In $WORKFLOWSIM/config/balanced/cybershake.txt, please replace dax.path to be the real path to a dax file, such as 
-dax.file=$WORKFLOWSIM/config/balanced/dax/Inspiral_1000.xml
+In $YOUR_WORKFLOWSIM_PATH/config/balanced/cybershake.txt, please replace dax.path to be the real path to a dax file, such as 
+dax.file=$YOUR_WORKFLOWSIM_PATH/config/balanced/dax/Inspiral_1000.xml
 Now you can run it. 
 
 We have youtube videos to ease your installation.
-
+Eclipse (EGit version)
+http://www.youtube.com/watch?v=MvpPzZpMDzg
+a. Install EGit
+b. Check out source codes from github
+c. Build a new java project
+d. Set the main class
+e. Change the arguments
+f. Run an example
+g. Commit your changes
 
 5. Learning WorkflowSim
 --------------------
