@@ -1,44 +1,36 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>WorkflowSim by WorkflowSim</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/main.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="WorkflowSim : Workflow Simulator for Scheduling, Clustering and Provisioing studies" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>WorkflowSim</title>
   </head>
+
   <body>
 
-      <header>
-        <h1>WorkflowSim</h1>
-        <p>Workflow Simulator for Scheduling, Clustering and Provisioing studies</p>
-      </header>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/WorkflowSim/WorkflowSim-1.0">View on GitHub</a>
 
-      <div id="banner">
-        <span id="logo"></span>
+          <h1 id="project_title">WorkflowSim</h1>
+          <h2 id="project_tagline">Workflow Simulator for Scheduling, Clustering and Provisioing studies</h2>
 
-        <a href="https://github.com/WorkflowSim/WorkflowSim-1.0" class="button fork"><strong>View On GitHub</strong></a>
-        <div class="downloads">
-          <span>Downloads:</span>
-          <ul>
-            <li><a href="https://github.com/WorkflowSim/WorkflowSim-1.0/zipball/master" class="button">ZIP</a></li>
-            <li><a href="https://github.com/WorkflowSim/WorkflowSim-1.0/tarball/master" class="button">TAR</a></li>
-          </ul>
-        </div>
-      </div><!-- end banner -->
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/WorkflowSim/WorkflowSim-1.0/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/WorkflowSim/WorkflowSim-1.0/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
 
-    <div class="wrapper">
-      <nav>
-        <ul></ul>
-      </nav>
-      <section>
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
         <h3>Welcome to WorkflowSim Pages.</h3>
 
 <p>WorkflowSim is a workflow simulator to support large-scale scheduling, clustering and provisioning studies. It is developed by Weiwei Chen, a Phd student from University of Southern California under the Apache License version 2.0. WorkflowSim is not yet fully completed and we welcome your contribution to this project. </p>
@@ -65,19 +57,36 @@
 
 <p>1.3 Check out your source codes</p>
 
-<pre><code>$ cd your_repo_root/repo_name
+<p>First, create a new java project called 'WorkflowSim' (it doesn't have to be 'WorkflowSim'). Right click your project, choose 'Import'. Click 'Git'-&gt;'Projects from Git'. Set the URL to be "<a href="https://github.com/chenww05/WorkflowSim-1.0.git">https://github.com/chenww05/WorkflowSim-1.0.git</a>". And then you will see a branch called 'master', tick it and continue. And you don't need import projects again so just cancel. </p>
 
+<p>Right click the project again and choose 'Properties'. Go to 'Java Build Path'. Link two source directories (your_repo_root/examples, your_repo_root/sources)to the source folders. Add two external JARs (your_repo_root/lib/flanagan.jar and your_repo_root/lib/jdom-2.0.0.jar) to the Libraries.  </p>
+
+<p>1.4 Set Main class and configuration</p>
+
+<p>Go to 'Run'-&gt;'Run Configurations'-&gt;'Java Application'-&gt;'WorkflowSimExample1'. Make sure the Main class is 'org.workflowsim.examples.WorkflowSimExample1' although by default Eclipse should set the main class for you automatically. </p>
+
+<p>Click the 'Arguments', in the 'Program arguments', please add</p>
+
+<pre><code>-p your_repo_root/config/balanced/cybershake.txt
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<p>In this case, we use cybershake workflow as an example. 
+Open your_repo_root/config/balanced/cybershake.txt, there is one line:</p>
 
-<h3>Designer Templates</h3>
+<pre><code>dax.path    = /Users/chenweiwei/ResearchAndTech/Research/balanced_clustering/generator/BharathiPaper/Inspiral_1000.xml
+</code></pre>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p>Replace it with </p>
 
-<h3>Rather Drive Stick?</h3>
+<pre><code>dax.path = your_repo_root/config/balanced/dax/CyberShake_100.xml. 
+</code></pre>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<p>CyberShake_100.xml is a dax file for cybershake workflow with 100 tasks in it. You can try other dax files provided under the same directory. 
+Other parameters would not cause an error but they have specified the simulation details. For details of these parameters, please refer to other pages. </p>
+
+<p>1.5 Run an Example</p>
+
+<p>After you have done all the changes, you can click 'Run' and the output contains the completion time of each job (if you use task clustering) or each task. </p>
 
 <h3>Authors and Contributors</h3>
 
@@ -87,12 +96,16 @@
 
 <p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
       </section>
-      <footer>
-        <p>Project maintained by <a href="https://github.com/WorkflowSim">WorkflowSim</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">WorkflowSim maintained by <a href="https://github.com/WorkflowSim">WorkflowSim</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+
               <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
@@ -103,6 +116,7 @@
             pageTracker._trackPageview();
             } catch(err) {}
           </script>
+
 
   </body>
 </html>
