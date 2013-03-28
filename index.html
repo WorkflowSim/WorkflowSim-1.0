@@ -63,9 +63,11 @@
 
 <p>First, create a new java project called 'WorkflowSim' (it doesn't have to be 'WorkflowSim'). Right click your project, choose 'Import'. Click 'Git'-&gt;'Projects from Git'. Set the URL to be "<a href="https://github.com/chenww05/WorkflowSim-1.0.git">https://github.com/chenww05/WorkflowSim-1.0.git</a>". And then you will see a branch called 'master', tick it and continue. And you don't need import projects again so just cancel. </p>
 
+<p>1.4 Import Source Files and Libraries</p>
+
 <p>Right click the project again and choose 'Properties'. Go to 'Java Build Path'. Link two source directories (your_repo_root/examples, your_repo_root/sources)to the source folders. Add two external JARs (your_repo_root/lib/flanagan.jar and your_repo_root/lib/jdom-2.0.0.jar) to the Libraries.  </p>
 
-<p>1.4 Set Main class and arguments</p>
+<p>1.5 Set Main class and arguments</p>
 
 <p>Go to 'Run'-&gt;'Run Configurations'-&gt;'Java Application'-&gt;'WorkflowSimExample1'. Make sure the Main class is 'org.workflowsim.examples.WorkflowSimExample1' although by default Eclipse should set the main class for you automatically. </p>
 
@@ -76,7 +78,7 @@
 
 <p>In this case, we use cybershake workflow as an example. </p>
 
-<p>1.5 Modify Config File</p>
+<p>1.6 Modify Config File</p>
 
 <p>Open your_repo_root/config/balanced/cybershake.txt, there is one line:</p>
 
@@ -91,7 +93,7 @@
 <p>CyberShake_100.xml is a dax file for cybershake workflow with 100 tasks in it. You can try other dax files provided under the same directory. 
 Other parameters would not cause an error but they have specified the simulation details. For details of these parameters, please refer to other pages. </p>
 
-<p>1.6 Run an Example</p>
+<p>1.7 Run an Example</p>
 
 <p>After you have done all the changes, you can click 'Run' and the output contains the completion time of each job (if you use task clustering) or each task. </p>
 
@@ -107,34 +109,54 @@ Other parameters would not cause an error but they have specified the simulation
 
 <p>Go to 'Teams'-&gt;'Available Plugins'. Search for 'Git' and install it. </p>
 
-<p>2.3 Check out your source codes
-First, create a new java project with Existing Sources called 'WorkflowSim' (it doesn't have to be 'WorkflowSim'). Right click this project and choose 'Set as Main Project' for convenience. 
+<p>2.3 Check out your source codes</p>
+
+<p>First, create a new java project with Existing Sources called 'WorkflowSim' (it doesn't have to be 'WorkflowSim'). Right click this project and choose 'Set as Main Project' for convenience. 
 Right click this project again and choose 'Versioning'-&gt;'Initialize Git Repository'. You don't need to change the root path, just click 'OK'. </p>
 
 <p>Right click the project and choose 'Git'-&gt;'Remote'-&gt;'Pull', set the 'Repository URL' to be '<a href="https://github.com/chenww05/WorkflowSim-1.0.git">https://github.com/chenww05/WorkflowSim-1.0.git</a>' and the 'Remote name' to be 'master'. Click 'OK' and you will see a branch called 'master', tick it and continue. </p>
 
+<p>2.4 Import Source Files and Libraries</p>
+
 <p>After a while the download is down, right click the project again and choose 'Project Properties'. Go to 'Sources', click 'Add Folder' and choose two folders (your_repo_root/examples and your_repo_root/sources). Go to 'Libraries', add two jars  (your_repo_root/lib/flanagan.jar and your_repo_root/lib/jdom-2.0.0.jar). </p>
 
-<p>2.4 Set Arguments
-Go to 'Run'-&gt;'Set Project Configuration'-&gt;'Customize'. Go to 'Run', and make sure the Main Class is 'org.workflowsim.examples.WorkflowSimExample1'. Set the 'Arguments' to be '-p your_repo_root/config/balanced/cybershake.txt'. </p>
+<p>2.5 Set Arguments</p>
 
-<p>2.5 Modify Config File
-The same to 1.5. </p>
+<p>Go to 'Run'-&gt;'Set Project Configuration'-&gt;'Customize'. Go to 'Run', and make sure the Main Class is 'org.workflowsim.examples.WorkflowSimExample1'. Set the 'Arguments' to be '-p your_repo_root/config/balanced/cybershake.txt'. </p>
 
-<p>2.6 Run an Example
-The same to 2.6. </p>
+<p>2.6 Modify Config File</p>
 
-<h3>3. Use WorkflowSim without GitHub</h3>
+<p>The same to 1.6. </p>
+
+<p>2.7 Run an Example</p>
+
+<p>The same to 2.7. </p>
+
+<h3>3. Use WorkflowSim with Eclipse but without GitHub</h3>
 
 <p>( If you don't want to contribute back to WorkflowSim with your codes, you can use WorkflowSim without GitHub. )</p>
 
+<p>3.1 Download Source Files. </p>
+
+<p>Skip 1.1 and 1.2. Different to 1.3, we download source files directly from <a href="https://github.com/WorkflowSim/WorkflowSim-1.0/archive/master.zip">https://github.com/WorkflowSim/WorkflowSim-1.0/archive/master.zip</a> and unzip it to your_repo_root. </p>
+
+<p>3.2 Switch to 1.4 and continue with the rest steps (1.5-1.7). </p>
+
+<h3>4. Use WorkflowSim with NetBeans but without GitHub</h3>
+
+<p>4.1 Download Source Files</p>
+
+<p>The same to 3.1. </p>
+
+<p>4.2 Switch to 2.4 and continue with the rest steps (2.5-2.7).</p>
+
 <h3>Authors and Contributors</h3>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p>This page is written by Weiwei Chen <a href="https://github.com/chenww05" class="user-mention">@chenww05</a>. For details or bug reports, please contact the author. </p>
 
 <h3>Support or Contact</h3>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<p>Please send an email to <a href="mailto:wchen@isi.edu">wchen@isi.edu</a></p>
       </section>
       <footer>
         <p>Project maintained by <a href="https://github.com/WorkflowSim">WorkflowSim</a></p>
