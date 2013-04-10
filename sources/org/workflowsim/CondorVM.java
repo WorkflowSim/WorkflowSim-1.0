@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,23 +16,35 @@
 
 package org.workflowsim;
 
-import org.workflowsim.utils.ReplicaCatalog;
-import org.workflowsim.utils.ReplicaCatalog.FileSystem;
 import org.cloudbus.cloudsim.CloudletScheduler;
 import org.cloudbus.cloudsim.Vm;
+import org.workflowsim.utils.ReplicaCatalog;
+import org.workflowsim.utils.ReplicaCatalog.FileSystem;
 
 /**
- * Condor Vm represents a VM: it runs inside a Host, sharing hostList with other VMs. It processes
- * cloudlets. This processing happens according to a policy, defined by the CloudletScheduler. Each
- * VM has a owner, which can submit cloudlets to the VM to be executed
+ * Condor Vm extends a VM: the difference is it has a locl storage system and it has a state
+ * to indicate whether it is busy or not
  * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class CondorVM extends Vm{
 
 	
-	/**
-	 * Creates a new VMCharacteristics object.
+	
+        /*
+         * The local storage system a vm has if file.system=LOCAL
+         */
+        private ClusterStorage storage;
+        /*
+         * The state of a vm. It should be either WorkflowSimTags.VM_STATUS_IDLE
+         * or VM_STATUS_READY (not used in workflowsim) or VM_STATUS_BUSY
+         */
+        private int state;
+        
+        /**
+	 * Creates a new CondorVM object.
 	 * 
 	 * @param id unique ID of the VM
 	 * @param userId ID of the VM's owner
@@ -53,8 +65,6 @@ public class CondorVM extends Vm{
 	 * @pre cloudletScheduler != null
 	 * @post $none
 	 */
-        private ClusterStorage storage;
-        private int state;
 	public CondorVM(
 			int id,
 			int userId,
@@ -66,49 +76,79 @@ public class CondorVM extends Vm{
 			String vmm,
 			CloudletScheduler cloudletScheduler) {
 		super(id, userId, mips, numberOfPes, ram, bw, size, vmm, cloudletScheduler);
+                /*
+                 * At the beginning all vm status is idle. 
+                 */
                 setState(WorkflowSimTags.VM_STATUS_IDLE);
+                /*
+                 * If the file.system is LOCAL, we should add a clusterStorage to vm. 
+                 */
                 if(ReplicaCatalog.getFileSystem()==FileSystem.LOCAL){
                     try{
                         storage = new ClusterStorage(Integer.toString(id),1e6);
                     }catch(Exception e){
-
                     }
                 }
 	}
         
+        /**
+        * Sets the state of the task
+        * 
+        * @param type the type
+        * @return $none
+        */
         public final void setState(int tag)
         {
             this.state = tag;
         }
         
+        /**
+        * Gets the state of the task
+        * 
+        * @return the state of the task
+        * @pre $none
+        * @post $none
+        */
         public final int getState()
         {
             return this.state;
         }
         /**
-         * We have implemented a local file system which stores all local files
-         * @param file 
+         * Adds a file to the local file system
+         * @param file to file to be added to the local 
+         * @pre $none
+         * @post $none
          */
-        public void addLocalFile(org.cloudbus.cloudsim.File file){
-            this.storage.addFile(file);//localStoredFiles.add(file);
-        }
-        public void removeLocalFile(org.cloudbus.cloudsim.File file){
-            this.storage.deleteFile(file);
-            /*if(hasLocalFile(file)){
-                this.localStoredFiles.remove(file);
-                return true;
+        public void addLocalFile(org.cloudbus.cloudsim.File file) {
+            if(this.storage !=null){
+                this.storage.addFile(file);
             }else{
-                return false;
-            }*/
+                
+            }
         }
+        /**
+         * Removes a file from the local file system
+         * @param file to file to be removed to the local 
+         * @pre $none
+         * @post $none
+         */
+        public void removeLocalFile(org.cloudbus.cloudsim.File file){
+            if(this.storage!=null){
+                this.storage.deleteFile(file);
+            }
+        }
+        /**
+         * Tells whether a file is in the local file system
+         * @return whether the file exists in the local file system
+         * @pre $none
+         * @post $none
+         */
         public boolean hasLocalFile(org.cloudbus.cloudsim.File file){
-            return this.storage.contains(file);
-            //return this.localStoredFiles.contains(file);
+            if(this.storage!=null){
+                return this.storage.contains(file);
+            }
+            return false;
             
         }
-        //public ArrayList<org.cloudbus.cloudsim.File> getLocalFiles(){
-            
-            //return this.localStoredFiles;
-        //}
 
 }
