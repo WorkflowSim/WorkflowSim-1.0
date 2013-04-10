@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,19 +15,6 @@
  */
 package org.workflowsim.clusering.balancing;
 
-import org.workflowsim.clusering.balancing.metrics.ImpactFactorVariance;
-import org.workflowsim.clusering.balancing.metrics.HorizontalRuntimeVariance;
-import org.workflowsim.clusering.balancing.metrics.PipelineRuntimeVariance;
-import org.workflowsim.clusering.balancing.methods.VerticalBalancing;
-import org.workflowsim.clusering.balancing.methods.HorizontalRuntimeBalancing;
-import org.workflowsim.clusering.balancing.methods.ChildAwareHorizontalClustering;
-import org.workflowsim.Task;
-import org.workflowsim.clusering.BasicClustering;
-import org.workflowsim.clusering.TaskSet;
-import org.workflowsim.clusering.balancing.methods.HorizontalImpactBalancing;
-import org.workflowsim.clusering.balancing.methods.HorizontalDistanceBalancing;
-import org.workflowsim.clusering.balancing.metrics.DistanceVariance;
-import org.workflowsim.utils.Parameters;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,36 +22,57 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.cloudbus.cloudsim.Log;
+import org.workflowsim.Task;
+import org.workflowsim.clusering.BasicClustering;
+import org.workflowsim.clusering.TaskSet;
+import org.workflowsim.clusering.balancing.methods.ChildAwareHorizontalClustering;
+import org.workflowsim.clusering.balancing.methods.HorizontalDistanceBalancing;
+import org.workflowsim.clusering.balancing.methods.HorizontalImpactBalancing;
+import org.workflowsim.clusering.balancing.methods.HorizontalRuntimeBalancing;
+import org.workflowsim.clusering.balancing.methods.VerticalBalancing;
+import org.workflowsim.clusering.balancing.metrics.DistanceVariance;
+import org.workflowsim.clusering.balancing.metrics.HorizontalRuntimeVariance;
+import org.workflowsim.clusering.balancing.metrics.ImpactFactorVariance;
+import org.workflowsim.clusering.balancing.metrics.PipelineRuntimeVariance;
+import org.workflowsim.utils.Parameters;
 
 /**
- *
+ * BalancedClustering is a clustering method that aims balancing task runtime and 
+ * data dependency. All BalancedClustering methods should extend it
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class BalancedClustering extends BasicClustering{
-    
-    private int clusterNum;
-    //private int clusterSize;
-    //private Map mDepth2Task;
 
+    
+    /** Number of clustered jobs per level. */
+    private int clusterNum;
+
+    /** Map from task to taskSet. */
     private Map<Task, TaskSet> mTask2TaskSet;
     
+    /** Map from taskSet to its depth. */
     private Map mTaskSet2Depth;
+    
+    /**
+     * Initialize a BalancedClustering method
+     * 
+     * @param clusterNum clusters.num
+     */
     public BalancedClustering(int clusterNum){
         super();
         this.clusterNum = clusterNum;
-        
-        //this.mDepth2Task = new HashMap<Integer, Map>();
         this.mTask2TaskSet = new HashMap<Task, TaskSet>();
-        //should clean each time
-        //start from 1?
         mTaskSet2Depth = new HashMap<TaskSet, Integer>();
 
     }
+    
     /**
-     * For existing mTask2TaskSet
+     * Clean the checked flag of a taskset
      * @return 
      */
-    
     public void cleanTaskSetChecked(){
         Collection sets = mTask2TaskSet.values();
         for(Iterator it = sets.iterator();it.hasNext();){
