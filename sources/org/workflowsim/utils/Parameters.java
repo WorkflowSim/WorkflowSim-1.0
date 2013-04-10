@@ -278,6 +278,16 @@ public class Parameters {
     public static int getVmNum(){
         return vmNum;
     }
+    
+    /**
+     * Sets the vm number
+     * @param vmNum
+     * @pre $none
+     * @post $none
+     */
+    public static void setVmNum(int num){
+        vmNum = num;
+    }
 
     /**
     * Gets the clustering parameters

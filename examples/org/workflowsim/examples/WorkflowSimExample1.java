@@ -1,28 +1,31 @@
-
+/**
+ *  Copyright 2012-2013 University Of Southern California
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
 
 package org.workflowsim.examples;
 
-import org.workflowsim.ClusterStorage;
-import org.workflowsim.WorkflowEngine;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletSchedulerSpaceShared;
-import org.workflowsim.CondorVM;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
 import org.cloudbus.cloudsim.Host;
-import org.workflowsim.Job;
-import org.workflowsim.WorkflowPlanner;
-import org.workflowsim.DatacenterExtended;
-import org.workflowsim.failure.FailureGenerator;
-import org.workflowsim.failure.FailureMonitor;
-import org.workflowsim.utils.Parameters;
-import org.workflowsim.utils.ArgumentParser;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.Pe;
 import org.cloudbus.cloudsim.Storage;
@@ -32,9 +35,23 @@ import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
+import org.workflowsim.ClusterStorage;
+import org.workflowsim.CondorVM;
+import org.workflowsim.DatacenterExtended;
+import org.workflowsim.Job;
+import org.workflowsim.WorkflowEngine;
+import org.workflowsim.WorkflowPlanner;
+import org.workflowsim.failure.FailureGenerator;
+import org.workflowsim.failure.FailureMonitor;
+import org.workflowsim.utils.ArgumentParser;
+import org.workflowsim.utils.Parameters;
 
 /**
  *a workflow engines, one planner two schedulers
+ * 
+ * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class WorkflowSimExample1 {
 
@@ -56,22 +73,9 @@ public class WorkflowSimExample1 {
 		CondorVM[] vm = new CondorVM[vms];
 
 		for(int i=0;i<vms;i++){
-                    double ratio = (i%2 + 1);
-                    //ratio /= 2;
-                    if(i<2)
-                    
-                        ratio = 1;
-                    
-                    else 
-                        ratio = 1;
-                    
-                    //Log.printLine(ratio);
+                    double ratio = 1.0;
                     vm[i] = new CondorVM(i, userId, mips * ratio, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared());
-                    
-			//for creating a VM with a space shared scheduling policy for cloudlets:
-			//vm[i] = Vm(i, userId, mips, pesNumber, ram, bw, size, priority, vmm, new CloudletSchedulerSpaceShared());
-
-			list.add(vm[i]);
+                    list.add(vm[i]);
 		}
 
 		return list;
@@ -99,6 +103,15 @@ public class WorkflowSimExample1 {
 			int num_user = 1;   // number of grid users
 			Calendar calendar = Calendar.getInstance();
 			boolean trace_flag = false;  // mean trace events
+                        
+                        /** Here we overwrites the vmNum set in config.txt. */
+                        /**
+                         * However, the exact number of vms may not necessarily be vmNum
+                         * If the data center or the host doesn't have sufficient resources
+                         * the exact vmNum would be smaller than that. Take care. 
+                         */
+                        int vmNum = 20;//number of vms;
+                        Parameters.setVmNum(vmNum);
 
 			// Initialize the CloudSim library
 			CloudSim.init(num_user, calendar, trace_flag);
@@ -110,11 +123,8 @@ public class WorkflowSimExample1 {
                         WorkflowPlanner planner = new WorkflowPlanner("planner_0", 2);
                         WorkflowEngine wfEngine = planner.getWorkflowEngine();
                         List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0),Parameters.getVmNum()); 
-                        //List<CondorVM> vmlist1 = createVM(wfEngine.getSchedulerId().get(1),14); 
                         
-                        //wfEngine.submitVmList(vmlist0);
                         wfEngine.submitVmList(vmlist0, 0);
-                        //wfEngine.submitVmList(vmlist1, 1);
                         
                         wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
                         wfEngine.bindSchedulerDatacenter(datacenter1.getId(), 1);

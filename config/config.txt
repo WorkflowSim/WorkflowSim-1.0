@@ -24,10 +24,8 @@ file.system	= LOCAL
 #ftc.monitor	= MONITOR_ALL
 #ftc.failure	= FAILURE_JOB
 #interval	= 5
-vm.num		= 20
 #Please replace it with your real physical path
-dax.path	= /Users/chenweiwei/ResearchAndTech/Research/balanced_clustering/generator/BharathiPaper/Inspiral_1000.xml
-#dax.path	= /Users/chenweiwei/ResearchAndTech/Research/balanced_clustering/generator/BharathiPaper/Epigenomics_997.xml
+dax.path 	= /Users/chenweiwei/NetBeansProjects/WorkflowSimTemp/config/dax/Montage_100.xml
 clusters.method = horizontal
 #reduce.method	= montage
 bandwidth	= 2e6

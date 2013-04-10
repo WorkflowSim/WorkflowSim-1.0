@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,15 +15,19 @@
  */
 package org.workflowsim;
 
-import org.workflowsim.utils.Parameters;
 import java.util.HashMap;
 import java.util.Map;
 import org.cloudbus.cloudsim.HarddriveStorage;
 import org.cloudbus.cloudsim.ParameterException;
+import org.workflowsim.utils.Parameters;
 
 /**
- *
+ * ClusterStorage is an extention of HarddriveStorage and it is used as a local 
+ * storage system of a vm
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class ClusterStorage extends HarddriveStorage{
     
