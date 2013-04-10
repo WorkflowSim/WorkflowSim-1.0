@@ -1,6 +1,6 @@
 /*
  * 
- *   Copyright 2007-2008 University Of Southern California
+ *   Copyright 2012-2013 University Of Southern California
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -17,16 +17,18 @@
  */
 package org.workflowsim.clusering.balancing.methods;
 
-import org.workflowsim.Task;
-import org.workflowsim.clusering.TaskSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import org.workflowsim.Task;
+import org.workflowsim.clusering.TaskSet;
 
 /**
  *
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class BalancingMethod {
     
