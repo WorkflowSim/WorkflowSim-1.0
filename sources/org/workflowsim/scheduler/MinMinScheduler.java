@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,18 +15,18 @@
  */
 package org.workflowsim.scheduler;
 
-import org.workflowsim.CondorVM;
-import org.workflowsim.Job;
-import org.workflowsim.WorkflowSimTags;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.Log;
+import org.workflowsim.CondorVM;
+import org.workflowsim.WorkflowSimTags;
 
 /**
- *
+ * MinMin algorithm. 
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class MinMinScheduler extends DefaultScheduler{
     
@@ -38,14 +38,10 @@ public class MinMinScheduler extends DefaultScheduler{
     
     @Override
     public void run(){
-        //FCFS
-        //need to change it to be MinMin
 
-//        Log.printLine("Schedulin Cycle");
         int size = getCloudletList().size();
         hasChecked.clear();
         for(int t= 0; t< size; t++){
-            boolean chk = false;
             hasChecked.add(false);
         }
         for(int i = 0; i < size; i ++){
@@ -111,8 +107,7 @@ public class MinMinScheduler extends DefaultScheduler{
 //            Log.printLine("Schedules " + minCloudlet.getCloudletId() + " with "
 //                    + minCloudlet.getCloudletLength() + " to VM " + firstIdleVm.getId() 
 //                    +" with " + firstIdleVm.getCurrentRequestedTotalMips());
-//            if(minCloudlet.getCloudletId()==10)
-//                Log.printLine();
+
 
             
         }
