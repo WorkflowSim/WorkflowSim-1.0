@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,43 +15,59 @@
  */
 package org.workflowsim.clusering;
 
-import org.workflowsim.Task;
-import org.workflowsim.utils.Parameters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import org.cloudbus.cloudsim.Log;
+import org.workflowsim.Task;
+import org.workflowsim.utils.Parameters;
 
 /**
- *
+ * VerticalClustering merges tasks at the same pipeline
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class VerticalClustering extends BasicClustering{
     
+    /* The maximum depth to explore. */
     private int mDepth;
+    
+    /* The checkpoint map. */
     private Map mHasChecked;
     
-
+    /**
+     * Initialize a VeriticalClustering object
+     * @param depth depth
+     */
     public VerticalClustering(int depth){
         super();
         this.mDepth      = depth;
         this.mHasChecked = new HashMap<Integer, Boolean>();
-        
 
     }
     
+    /**
+     * Sets the checkpoint of a task
+     * @param index id of a task
+     */
     private void setCheck(int index){
         
         if(mHasChecked.containsKey(index)){
             mHasChecked.remove(index);
         }
         mHasChecked.put(index, true);
-        
                 
     }
+    
+    /**
+     * Gets the checkpoint of a task
+     * @param index id of a task
+     * @return 
+     */
     private boolean getCheck(int index){
 
         if(mHasChecked.containsKey(index)){
@@ -60,12 +76,17 @@ public class VerticalClustering extends BasicClustering{
         return false;
     }
     
+    /**
+     * The main function
+     */
     @Override
     public void run()
  
     {
         if(mDepth >0 ){
-            
+            /**
+             * Specially for Montage workflow since it has duplicate edges
+             */
             if(Parameters.getReduceMethod().equals("montage")){
                 removeDuplicateMontage();
             }
@@ -143,7 +164,11 @@ public class VerticalClustering extends BasicClustering{
         addClustDelay();
     }
     
-        public void removeDuplicateMontage(){
+    /**
+     * Remove duplicate just for Montage
+     * Set in reducer.method
+     */
+    public void removeDuplicateMontage(){
 
         List jobList = this.getTaskList();
         for(int i = 0; i < jobList.size(); i++){
