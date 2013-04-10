@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,25 +16,27 @@
 package org.workflowsim.scheduler;
 
 import java.util.List;
-import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.Vm;
 
 /**
- *
+ * The Scheduler interface
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public interface SchedulerInterface {
     
+    /** Sets the job list. */
     public void setCloudletList(List list);
-    
+    /** Sets the vm list. */
     public void setVmList(List list);
-    
+    /** Gets the job list. */
     public List getCloudletList();
-    
+    /** Gets the vm list. */
     public List getVmList();
-    
+    /** the main function. */
     public void run();
-    
+    /** Gets the scheduled jobs. */
     public List getScheduledList();
 
 }
