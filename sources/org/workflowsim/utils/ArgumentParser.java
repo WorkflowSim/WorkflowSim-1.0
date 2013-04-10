@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,35 +15,42 @@
  */
 package org.workflowsim.utils;
 
-import org.workflowsim.utils.ClusteringParameters.ClusteringMethod;
-import org.workflowsim.utils.Parameters.*;
-import org.workflowsim.utils.ReplicaCatalog.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 import org.cloudbus.cloudsim.Log;
+import org.workflowsim.utils.ClusteringParameters.ClusteringMethod;
+import org.workflowsim.utils.Parameters.FTCFailure;
+import org.workflowsim.utils.Parameters.FTCMethod;
+import org.workflowsim.utils.Parameters.FTCMonitor;
+import org.workflowsim.utils.Parameters.SCHMethod;
+import org.workflowsim.utils.ReplicaCatalog.FileSystem;
 
 /**
- *
+ * This class implements ArgumentParser that parse arguments and set the parameters
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class ArgumentParser {
     
 
-//    private OverheadParameters op ;
 
-
-
+    /**
+     * This method initialize a ArgumentParser object
+     * 
+     * @param args argument set in WorkflowSim
+     */
     public ArgumentParser( String[] args ){
         
         int i = 0;
         String properties = null;
         String code = null;
         String dax = null;
-        String random = null;
-        String random1 = null;
+
         String clustering = null;
         while(i < args.length){
             switch (args[i].charAt(1)){
@@ -56,16 +63,10 @@ public class ArgumentParser {
                 case 'c':
                     code = args[++i];
                     break;
-                case 'r':
-                    random = args[++i];
-                    break;
-                case 'm':
-                    random1 = args[++i];
-                    break;
                 case 'k':
                     clustering = args[++i];
                 case 'h':
-                    //print help
+                    
                     break;
                 case 'v':
                     
@@ -79,12 +80,13 @@ public class ArgumentParser {
         try
         {
             if(properties == null){
-                throw new Exception("Properties File Not specified");
+                throw new Exception("Properties File Not specified. "
+                        + "Please add \"-p path_to_your_config_file\" to your arguments");
                 
             }
             File file = new File(properties);
             if(!file.exists() || !file.canRead()){
-                throw new Exception("Properties File Not Reachable");
+                throw new Exception("Properties File Not Reachable. Please use physical path");
                 
             }
             BufferedReader br = new BufferedReader(new FileReader(file));
@@ -97,7 +99,6 @@ public class ArgumentParser {
             String datasizePath     = null;
             String runtimePath      = null;
             String daxPath          = null;
-//            String scheduler        = null;
             String cMethod          = null;
             String rMethod          = null;
             FTCMethod ftc_method    = null;
@@ -136,8 +137,7 @@ public class ArgumentParser {
                 else if(key.equals("file.system")){
                     file_system = FileSystem.valueOf(value);
                 }
-//                else if(key.equals("scheduler"))
-//                    scheduler = value;
+
                 else if(key.equals("clusters.num")){
                     cNum = Integer.parseInt(value);
                 }
@@ -172,12 +172,17 @@ public class ArgumentParser {
                     bandwidth = Double.parseDouble(value);
                 }
                 else{
+                    /** Set overheads per level(depth) */
                     switch(key.charAt(0)){
                         case 'd':
                             int depth_d = Integer.parseInt(key.substring(1));
                             if(depth_d>=0){
                                 double delay = Double.parseDouble(value);
-                                WEDelay.put(depth_d, delay);
+                                if(delay>=0.0){
+                                    WEDelay.put(depth_d, delay);
+                                }else{
+                                    throw new Exception("Make sure workflow engine delay is >= 0.0");
+                                }
                             }
                             else{
                                 throw new Exception("Not Supported");
@@ -187,7 +192,11 @@ public class ArgumentParser {
                             int depth_q = Integer.parseInt(key.substring(1));
                             if(depth_q>=0){
                                 double delay = Double.parseDouble(value);
-                                QueueDelay.put(depth_q, delay);
+                                if(delay>=0.0){
+                                    QueueDelay.put(depth_q, delay);
+                                }else{
+                                    throw new Exception("Make sure queue delay is >= 0.0");
+                                }
                             }
                             else{
                                 throw new Exception("Not Supported");
@@ -198,7 +207,11 @@ public class ArgumentParser {
                             int depth_c = Integer.parseInt(key.substring(1));
                             if(depth_c>=0){
                                 double delay = Double.parseDouble(value);
-                                ClustDelay.put(depth_c, delay);
+                                if(delay>=0.0){
+                                    ClustDelay.put(depth_c, delay);
+                                }else{
+                                    throw new Exception("Make sure clustering delay is >= 0.0");
+                                }
                             }
                             else{
                                 throw new Exception("Not Supported");
@@ -209,7 +222,11 @@ public class ArgumentParser {
                             int depth_p = Integer.parseInt(key.substring(1));
                             if(depth_p>=0){
                                 double delay = Double.parseDouble(value);
-                                PostDelay.put(depth_p, delay);
+                                if(delay>=0.0){
+                                    PostDelay.put(depth_p, delay);
+                                }else{
+                                    throw new Exception("Make sure postscript delay is >= 0.0");
+                                }
                             }
                             else{
                                 throw new Exception("Not Supported");
@@ -220,7 +237,11 @@ public class ArgumentParser {
                             int depth_a = Integer.parseInt(key.substring(1));
                             if(depth_a>=0){
                                 double failure = Double.parseDouble(value);
-                                failureMap.put(depth_a, failure);
+                                if(failure >= 0.0 && failure <= 1.0){
+                                    failureMap.put(depth_a, failure);
+                                }else{
+                                    throw new Exception("Make sure task failure rate is between [0,1]" );
+                                }
                             }
                             else{
                                 throw new Exception("Not Supported");
@@ -242,33 +263,23 @@ public class ArgumentParser {
             }
             
             br.close();
-            double randomV = 0.0;
-            if(random == null){
-                randomV = -1.0;
-            }else{
-                randomV = Double.parseDouble(random);
-            }
-            double random1V= 0.0;
-            if(random1 == null){
-                random1V = 1.0;
-            }else{
-                random1V = Double.parseDouble(random1);
-            }
+            
+            /** Initialize a new OverheadParameters*/
             op = new OverheadParameters(interval, WEDelay, QueueDelay, PostDelay, 
-                    ClustDelay, bandwidth, randomV, random1V);
+                    ClustDelay, bandwidth);
             ClusteringMethod method = null;
             if(cMethod!=null){
                 method = ClusteringMethod.valueOf(cMethod.toUpperCase());
             }else{
+                /** By default it is no clustering*/
                 method = ClusteringMethod.NONE;
-                //throw new Exception("Clustering Method not specified");
             }
            if(clustering != null){
                method = ClusteringMethod.valueOf(clustering.toUpperCase());
            }
-
+           /**Initialize a new ClusteringParameters */
             cp = new ClusteringParameters(cNum , cSize, method, code);
-
+            /**Be default, task failure rates are 0.0*/
             if(!failureMap.containsKey((int)0)){
                 failureMap.put(0, 0.0);
             }
