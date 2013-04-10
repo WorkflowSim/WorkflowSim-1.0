@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package org.workflowsim;
 
-import org.workflowsim.utils.Parameters;
-import org.workflowsim.utils.ReplicaCatalog;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -33,12 +31,18 @@ import org.cloudbus.cloudsim.VmAllocationPolicy;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEvent;
+import org.workflowsim.utils.Parameters;
+import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- *
+ * DatacenterExtended extends Datacenter so as we can use CondorVM and other components
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class DatacenterExtended extends Datacenter{
+    
     public DatacenterExtended(String name,
 			DatacenterCharacteristics characteristics,
 			VmAllocationPolicy vmAllocationPolicy,
@@ -47,28 +51,30 @@ public class DatacenterExtended extends Datacenter{
         super (name, characteristics, vmAllocationPolicy, storageList, schedulingInterval);
         
     }
+    
     @Override
     protected void processOtherEvent(SimEvent ev) {
         
     }
-/**
-	 * Processes a Cloudlet submission.
-	 * 
-	 * @param ev a SimEvent object
-	 * @param ack an acknowledgement
-	 * @pre ev != null
-	 * @post $none
-	 */
+    
+    /**
+    * Processes a Cloudlet submission. The cloudlet is actually a job which can be cast
+    * to org.workflowsim.Job
+    * 
+    * @param ev a SimEvent object
+    * @param ack an acknowledgement
+    * @pre ev != null
+    * @post $none
+    */
     @Override
     protected void processCloudletSubmit(SimEvent ev, boolean ack) {
+        
             updateCloudletProcessing();
 
             try {
-                    // gets the Cloudlet object
+                    /** cl is actually a job but it is not necessary to cast it to a job */
                     Cloudlet cl = (Cloudlet) ev.getData();
-//                    if(cl.getCloudletId()==1)
-//                        Log.printLine(cl.getCloudletId());
-                    // checks whether this Cloudlet has finished or not
+                    
                     if (cl.isFinished()) {
                             String name = CloudSim.getEntityName(cl.getUserId());
                             Log.printLine(getName() + ": Warning - Cloudlet #" + cl.getCloudletId() + " owned by " + name
@@ -103,47 +109,22 @@ public class DatacenterExtended extends Datacenter{
 
                     int userId = cl.getUserId();
                     int vmId = cl.getVmId();
-                    //Stage-in file && Shared
-                    //if(isRealInputFile()){
+                    
+                    /** Stage-in file && Shared based on the file.system*/
+                    
                     if(cl.getClassType()==1){
                         stageInFile2FileSystem(cl);
                     }
 
-                    // time to transfer the files
+                    /** Add data transfer time (communication cost */
+                    /** Cast cl to task so as we can use its functions*/
                     Task task = (Task)cl;
                     
-                    if(cl.getClassType()!=1 ){
-                        double value = Parameters.getOverheadParams().getRandom();
-                        Random generator = new Random();
-                        //if(cl.getCloudletId()==1){
-                        Job job = (Job)task;
-                        double impact = 0.0;
-                        boolean flag = false;
-                        for(int i = 0; i < job.getTaskList().size();i++){
-                            Task t = job.getTaskList().get(i);
-                            if(i==0){
-                                impact = t.getImpact();
-                                
-                            }else{
-                                if(t.getImpact()!= impact){
-                                    flag = true;
-                                    break;
-                                }
-                            }
-                        }
-                        //if(flag){
-                        if(generator.nextDouble() < value){
-                            Log.printLine("Yes");
-                            long length = task.getCloudletLength();
-                            task.setCloudletLength((long) ((double)length*Parameters.getOverheadParams().getRandom1()));
-                        }
-                    }
+                    
                     
                     
                     double fileTransferTime = processDataStageIn(task.getFileList(), cl);
-                    //double fileTransferTime = predictFileTransferTime(cl.getRequiredFiles());
-                    //fileTransferTime = 1.0;
-                    //fileTransferTime = 0.0;
+
                     Host host = getVmAllocationPolicy().getHost(vmId, userId);
                     Vm vm = host.getVm(vmId, userId);
                     CloudletScheduler scheduler = vm.getCloudletScheduler();
@@ -151,7 +132,6 @@ public class DatacenterExtended extends Datacenter{
 
                     // if this cloudlet is in the exec queue
                     if (estimatedFinishTime > 0.0 && !Double.isInfinite(estimatedFinishTime)) {
-                            //estimatedFinishTime += fileTransferTime;
                             send(getId(), estimatedFinishTime, CloudSimTags.VM_DATACENTER_EVENT);
                     }else{
                         Log.printLine("Error here");
@@ -163,7 +143,6 @@ public class DatacenterExtended extends Datacenter{
                             data[1] = cl.getCloudletId();
                             data[2] = CloudSimTags.TRUE;
 
-                            // unique tag = operation tag
                             int tag = CloudSimTags.CLOUDLET_SUBMIT_ACK;
                             sendNow(cl.getUserId(), tag, data);
                     }
@@ -177,69 +156,42 @@ public class DatacenterExtended extends Datacenter{
 
             checkCloudletCompletion();
     }
-
+    
+    /**
+    * Stage in files for a stage-in job. For a local file system (such as condor-io)
+    * add files to the local storage; For a shared file system (such as NFS) add 
+    * files to the shared storage
+    * 
+    * @param cl, the job
+    * @pre  $none
+    * @post $none
+    */
     private void stageInFile2FileSystem(Cloudlet cl){
         Task t1 = (Task)cl;
         List fList = t1.getFileList();
 
         for(Iterator it = fList.iterator(); it.hasNext();){
             org.cloudbus.cloudsim.File file = (org.cloudbus.cloudsim.File)it.next();
-            if(true){//in generating this stage-in file we have checked it
-            //if(isRealInputFile( fList, file)){//has no output data
-              switch (ReplicaCatalog.getFileSystem()){
+            
+            switch (ReplicaCatalog.getFileSystem()){
+                /** For local file system, add it to local storage */
                 case LOCAL:
-                    //not sure
-                     ReplicaCatalog.addStorageList(file.getName(), this.getName());
-                     ClusterStorage storage = (ClusterStorage)getStorageList().get(0);
-                     //not sure
-                     storage.addFile(file);
-                     break;
+
+                    ReplicaCatalog.addStorageList(file.getName(), this.getName());
+                    ClusterStorage storage = (ClusterStorage)getStorageList().get(0);
+                    storage.addFile(file);
+                    break;
+                /** For shared file system, add it to the shared storage */
                 case SHARED:
                      ReplicaCatalog.addStorageList(file.getName(), this.getName());
                      break;
                 default:
                 break;
               }
-            }
+           
         }
     }
-    /**
-     * Predict file transfer time.
-     * 
-     * @param requiredFiles the required files (both input and output
-     * @return the double
-     */
-    /*
-    protected double predictFileTransferTime(List<String> requiredFiles) {
-            double time = 0.0;
-
-            Iterator<String> iter = requiredFiles.iterator();
-            while (iter.hasNext()) {
-                    String fileName = iter.next();
-                    //tempStorage is what the data center has
-                    ClusterStorage tempStorage = (ClusterStorage)getStorageList().get(0);
-                    File tempFile = (File)WorkflowPlanner.FileName2File.get(fileName);
-                    //Input File
-                    if(tempFile.getType() ==1 ){
-                        //File tempFile = tempStorage.getFile(fileName);
-                        List siteList = (List)WorkflowPlanner.ReplicaCatalog.get(fileName);
-                        double maxBwth = 0.0;
-                        for(Iterator it = siteList.iterator(); it.hasNext();)
-                        {
-                            //site is where one replica of this data is located at
-                            String site = (String)it.next();
-                            double bwth = tempStorage.getMaxTransferRate(site);
-                            if(bwth > maxBwth){
-                                maxBwth = bwth;
-                            }
-                        }
-
-                        time += tempFile.getSize() / maxBwth;
-                        //        break;
-                    }
-            }
-            return time;
-    }*/
+    
     /**
      * If a input file has an output file it does not need stage-in
      * For workflows, we have a rule that a file is written once and 
@@ -247,12 +199,17 @@ public class DatacenterExtended extends Datacenter{
      * is generated within this job and then used by another task 
      * within the same job (or other jobs maybe)
      * This is useful when we perform horizontal clustering
+     * @param list, the list of all files
+     * @param file, the file to be examined 
+     * @pre  $none
+     * @post $none
      */
     private boolean isRealInputFile(List<File> list, File file){
         if(file.getType() == 1)//input file
         {
             for(File another: list){
                 if(another.getName().equals(file.getName()) 
+                        /** if another file is output file */
                         && another.getType()==2){
                     return false;
                 }
@@ -262,7 +219,11 @@ public class DatacenterExtended extends Datacenter{
         return false;
     }
     /*
-     * Stage in for a single job
+     * Stage in for a single job (both stage-in job and compute job)
+     * @param requiredFiles, all files to be stage-in
+     * @param cl, the job to be processed
+     * @pre  $none
+     * @post $none
      */
     protected double processDataStageIn(List<File> requiredFiles, Cloudlet cl) throws Exception{
             double time = 0.0;
@@ -273,7 +234,7 @@ public class DatacenterExtended extends Datacenter{
                     File file = iter.next();
                     ClusterStorage tempStorage = (ClusterStorage)getStorageList().get(0);
                     
-                    //Input File
+                    //The input file is not an output File 
                     if(isRealInputFile( requiredFiles, file) ){
                         double maxBwth = 0.0;
                         List siteList = ReplicaCatalog.getStorageList(file.getName());
@@ -321,7 +282,8 @@ public class DatacenterExtended extends Datacenter{
                                 Vm vm = host.getVm(vmId, userId);
                                 CondorVM condorVm = (CondorVM)vm;
                                 /**
-                                 * Storage is too small?
+                                 * For the case when storage is too small
+                                 * it is not handled here
                                  */
                                 //condorVm.addLocalFile(file);
                                 ReplicaCatalog.addStorageList(file.getName(), Integer.toString(vmId));
@@ -337,8 +299,8 @@ public class DatacenterExtended extends Datacenter{
             
             return time;
     }
-    
-    @Override
+     
+        @Override
     	protected void updateCloudletProcessing() {
 		// if some time passed since last processing
 		// R: for term is to allow loop at simulation start. Otherwise, one initial
@@ -369,13 +331,13 @@ public class DatacenterExtended extends Datacenter{
 	}
     
     
-	/**
-	 * Verifies if some cloudlet inside this PowerDatacenter already finished. If yes, send it to
-	 * the User/Broker
-	 * 
-	 * @pre $none
-	 * @post $none
-	 */
+    /**
+     * Verifies if some cloudlet inside this PowerDatacenter already finished. If yes, send it to
+     * the User/Broker
+     * 
+     * @pre $none
+     * @post $none
+     */
     @Override
     protected void checkCloudletCompletion() {
             List<? extends Host> list = getVmAllocationPolicy().getHostList();
@@ -393,7 +355,11 @@ public class DatacenterExtended extends Datacenter{
             }
     }
     /*
-     * Stage-out for a single job
+     * Register a file to the storage if it is an output file
+     * @param requiredFiles, all files to be stage-in
+     * @param cl, the job to be processed
+     * @pre  $none
+     * @post $none
      */
     private void register(Cloudlet cl)
     {
@@ -412,14 +378,9 @@ public class DatacenterExtended extends Datacenter{
                         int vmId = cl.getVmId();
                         int userId = cl.getUserId();
                         Host host = getVmAllocationPolicy().getHost(vmId, userId);
+                        /** Left here for future work */
                         CondorVM vm = (CondorVM)host.getVm(vmId, userId);
-                        //should you add it to the local list? it is implemented 
-                        //it is implemented in condorvm
-                        /*
-                         * Constraint
-                         */
-                        //vm.addLocalFile(file);
-                        //another approach for storing global path
+
                         ReplicaCatalog.addStorageList(file.getName(), Integer.toString(vmId));
                         break;
                 }
