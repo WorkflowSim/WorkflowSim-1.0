@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,26 +15,32 @@
  */
 package org.workflowsim.clusering;
 
+import java.util.List;
 import org.workflowsim.Job;
 import org.workflowsim.Task;
-//import edu.isi.pegasus.workflowsim.TaskFile;
-import java.util.List;
 
 /**
- *
+ *  The ClusteringInterface for all clustering methods
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public interface ClusteringInterface {
     
+    /** set the task list. */
     public void setTaskList(List<Task> list);
     
+    /** get job list. */
     public List<Job> getJobList();
     
+    /** get task list. */
     public List<Task> getTaskList();
     
+    /** the main function. */
     public void run();
     
+    /** get all the task files. */
     public List<org.cloudbus.cloudsim.File> getTaskFiles();
     
-    //public long getInputDataSize();
 }
