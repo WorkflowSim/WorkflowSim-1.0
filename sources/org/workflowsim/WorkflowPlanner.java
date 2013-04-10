@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,10 +16,7 @@
 package org.workflowsim;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import java.util.Map;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEntity;
@@ -28,36 +25,30 @@ import org.cloudbus.cloudsim.core.SimEvent;
 
 
 /**
- * WorkflowPlanner supports dynamic planning in the future
+ * WorkflowPlanner supports dynamic planning. In the future we will have global and static 
+ * algorithm here. The WorkflowSim starts from WorkflowPlanner. 
  * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  *
  */
 public class WorkflowPlanner extends SimEntity {
 
 
-	/** The cloudlet list. */
+	/** The task list. */
 	protected List< Task> taskList;
         
-        
+        /** The workflow parser. */
         protected WorkflowParser parser;
         
-        
+        /** The associated clustereing engine. */
         private int clusteringEngineId;
         
         private ClusteringEngine clusteringEngine;
         
-        //private int workflowEngineId;
-        // it could be a list
-        //private WorkflowEngine workflowEngine;
-        
-        //public static Map ReplicaCatalog;
-        
-        //public static Map FileName2File;
-        
-        
        	/**
-	 * Created a new DatacenterBroker object.
+	 * Created a new WorkflowPlanner object.
 	 * 
 	 * @param name name to be associated with this entity (as required by Sim_entity class from
 	 *            simjava package)
@@ -74,51 +65,52 @@ public class WorkflowPlanner extends SimEntity {
 
             setTaskList(new ArrayList<Task>());
 
-
-            //this.ReplicaCatalog     = new HashMap<String, List>();
-            //this.FileName2File      = new HashMap<String, org.cloudbus.cloudsim.File>();
-
             this.clusteringEngine = new ClusteringEngine(name +  "_Merger_", schedulers);
             this.clusteringEngineId = this.clusteringEngine.getId();
 
-            this.parser             = new WorkflowParser(getClusteringEngine().getWorkflowEngine().getSchedulerId(0));
-            
-            
-
-                        
+            this.parser             = new WorkflowParser(getClusteringEngine().getWorkflowEngine().getSchedulerId(0));           
 
 	}
 
-
+        /**
+         * Gets the clustering engine id
+         * @return clustering engine id
+         */
         public int getClusteringEngineId(){
             return this.clusteringEngineId;
         }
+        
+        /**
+         * Gets the clustering engine 
+         * @return the clustering engine
+         */
         public ClusteringEngine getClusteringEngine(){
             return this.clusteringEngine;
         }
+        
+        /**
+         * Gets the workflow parser
+         * @return the workflow parser
+         */
         public WorkflowParser getWorkflowParser(){
             return this.parser;
         }
 
-      
+      /**
+       * Gets the workflow engine id
+       * @return the workflow engine id
+       */
         public int getWorkflowEngineId(){
             return getClusteringEngine().getWorkflowEngineId();
         }
+        /**
+         * Gets the workflow engine
+         * @return the workflow engine
+         */
         public WorkflowEngine getWorkflowEngine(){
             return getClusteringEngine().getWorkflowEngine();
         }
        
-	/**
-	 * This method is used to send to the broker the list of cloudlets.
-	 * 
-	 * @param list the list
-	 * @pre list !=null
-	 * @post $none
-	 */
-//	public void submitTaskList(List<Task> list) {
-//		getTaskList().addAll(list);
-//	}
-
 	/**
 	 * Processes events available for this Broker.
 	 * 
@@ -129,8 +121,6 @@ public class WorkflowPlanner extends SimEntity {
 	@Override
 	public void processEvent(SimEvent ev) {
 		switch (ev.getTag()) {
-		// Resource characteristics request
-			// if the simulation finishes
                         case WorkflowSimTags.START_SIMULATION:
                                 getWorkflowParser().parse();
                                 setTaskList(getWorkflowParser().getTaskList());
@@ -146,7 +136,12 @@ public class WorkflowPlanner extends SimEntity {
 				break;
 		}
 	}
-        
+
+        /**
+         * Add impact factor for each task. This is useful in task balanced clustering algorithm
+         * It is for research purpose and thus it is optional. 
+         * @param taskList all the tasks
+         */
         private void processImpactFactors(List<Task> taskList){
             ArrayList<Task> exits = new ArrayList();
             for(Task task: taskList){
@@ -156,10 +151,15 @@ public class WorkflowPlanner extends SimEntity {
             }
             double avg = 1.0 / exits.size();
             for(Task task: exits){
-                //set.setImpactFafctor(avg);
                 addImpact(task, avg);
             }
         }
+        
+        /**
+         * Add impact factor for one particular task
+         * @param task, the task 
+         * @param impact , the impact factor
+         */
         private void addImpact(Task task, double impact){
 
             task.setImpact(task.getImpact() + impact);
@@ -220,10 +220,10 @@ public class WorkflowPlanner extends SimEntity {
 
 
 	/**
-	 * Gets the cloudlet list.
+	 * Gets the task list.
 	 * 
 	 * @param <T> the generic type
-	 * @return the cloudlet list
+	 * @return the task list
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Task> getTaskList() {
@@ -231,10 +231,10 @@ public class WorkflowPlanner extends SimEntity {
 	}
        
 	/**
-	 * Sets the cloudlet list.
+	 * Sets the task list.
 	 * 
 	 * @param <T> the generic type
-	 * @param cloudletList the new cloudlet list
+	 * @param cloudletList the new task list
 	 */
 	protected void setTaskList(List<Task> taskList) {
 		this.taskList = taskList;
