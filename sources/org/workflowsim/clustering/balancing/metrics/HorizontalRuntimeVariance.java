@@ -15,35 +15,33 @@
  *   limitations under the License.
  * 
  */
-package org.workflowsim.clusering.balancing.metrics;
+package org.workflowsim.clustering.balancing.metrics;
 
-import org.workflowsim.clusering.balancing.metrics.BalancingMetric;
-import org.workflowsim.clusering.TaskSet;
+import org.workflowsim.clustering.balancing.metrics.BalancingMetric;
+import org.workflowsim.clustering.TaskSet;
 import java.util.ArrayList;
 
 /**
  *
  * @author Weiwei Chen
  */
-public class ImpactFactorVariance implements BalancingMetric{
+public class HorizontalRuntimeVariance implements BalancingMetric {
     @Override
     public double getMetric(ArrayList<TaskSet> list){
-         if(list == null || list.size() <= 1){
+        if(list == null || list.size() <= 1){
             return 0.0;
         }
-        double sum = 0;
+        long sum = 0;
         for(TaskSet task: list){
-            sum += task.getImpactFactor();
-            
+            sum+= task.getJobRuntime();
+            //Log.printLine(task.getJobRuntime());
         }
-        double mean = sum / list.size();
-        //Log.printLine("sum: " + sum );
-        sum = 0.0;
+        long mean = sum / list.size();
+        sum = 0;
         for(TaskSet task: list){
-            double var = task.getImpactFactor();
-            sum += Math.pow(var-mean, 2);
+            long var = task.getJobRuntime();
+            sum += Math.pow((double)(var-mean), 2);
         }
-        return Math.sqrt(sum/list.size());
-    }
-    
+        return Math.sqrt((double)(sum/list.size()))/mean;
+    } 
 }

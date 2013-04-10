@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.workflowsim.clusering.balancing;
+package org.workflowsim.clustering.balancing;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,17 +23,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import org.cloudbus.cloudsim.Log;
 import org.workflowsim.Task;
-import org.workflowsim.clusering.BasicClustering;
-import org.workflowsim.clusering.TaskSet;
-import org.workflowsim.clusering.balancing.methods.ChildAwareHorizontalClustering;
-import org.workflowsim.clusering.balancing.methods.HorizontalDistanceBalancing;
-import org.workflowsim.clusering.balancing.methods.HorizontalImpactBalancing;
-import org.workflowsim.clusering.balancing.methods.HorizontalRuntimeBalancing;
-import org.workflowsim.clusering.balancing.methods.VerticalBalancing;
-import org.workflowsim.clusering.balancing.metrics.DistanceVariance;
-import org.workflowsim.clusering.balancing.metrics.HorizontalRuntimeVariance;
-import org.workflowsim.clusering.balancing.metrics.ImpactFactorVariance;
-import org.workflowsim.clusering.balancing.metrics.PipelineRuntimeVariance;
+import org.workflowsim.clustering.BasicClustering;
+import org.workflowsim.clustering.TaskSet;
+import org.workflowsim.clustering.balancing.methods.ChildAwareHorizontalClustering;
+import org.workflowsim.clustering.balancing.methods.HorizontalDistanceBalancing;
+import org.workflowsim.clustering.balancing.methods.HorizontalImpactBalancing;
+import org.workflowsim.clustering.balancing.methods.HorizontalRuntimeBalancing;
+import org.workflowsim.clustering.balancing.methods.VerticalBalancing;
+import org.workflowsim.clustering.balancing.metrics.DistanceVariance;
+import org.workflowsim.clustering.balancing.metrics.HorizontalRuntimeVariance;
+import org.workflowsim.clustering.balancing.metrics.ImpactFactorVariance;
+import org.workflowsim.clustering.balancing.metrics.PipelineRuntimeVariance;
 import org.workflowsim.utils.Parameters;
 
 /**

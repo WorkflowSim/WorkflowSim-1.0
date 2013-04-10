@@ -15,10 +15,10 @@
  *   limitations under the License.
  * 
  */
-package org.workflowsim.clusering.balancing.methods;
+package org.workflowsim.clustering.balancing.methods;
 
 import org.workflowsim.Task;
-import org.workflowsim.clusering.TaskSet;
+import org.workflowsim.clustering.TaskSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

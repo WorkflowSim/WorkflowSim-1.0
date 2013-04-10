@@ -15,7 +15,7 @@
  *   limitations under the License.
  * 
  */
-package org.workflowsim.clusering;
+package org.workflowsim.clustering;
 
 import java.util.ArrayList;
 

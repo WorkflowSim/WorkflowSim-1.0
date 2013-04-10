@@ -15,9 +15,9 @@
  *   limitations under the License.
  * 
  */
-package org.workflowsim.clusering.balancing.metrics;
+package org.workflowsim.clustering.balancing.metrics;
 
-import org.workflowsim.clusering.TaskSet;
+import org.workflowsim.clustering.TaskSet;
 import java.util.ArrayList;
 
 /**
