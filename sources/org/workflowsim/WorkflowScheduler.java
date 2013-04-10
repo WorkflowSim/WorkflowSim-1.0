@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,14 +16,6 @@
 package org.workflowsim;
 
 
-import org.workflowsim.failure.FailureGenerator;
-import org.workflowsim.scheduler.DefaultScheduler;
-import org.workflowsim.scheduler.HEFTScheduler;
-import org.workflowsim.scheduler.MCTScheduler;
-import org.workflowsim.scheduler.MaxMinScheduler;
-import org.workflowsim.scheduler.MinMinScheduler;
-import org.workflowsim.utils.Parameters;
-import org.workflowsim.utils.Parameters.SCHMethod;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,18 +26,28 @@ import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEvent;
+import org.workflowsim.failure.FailureGenerator;
+import org.workflowsim.scheduler.DefaultScheduler;
+import org.workflowsim.scheduler.HEFTScheduler;
+import org.workflowsim.scheduler.MCTScheduler;
+import org.workflowsim.scheduler.MaxMinScheduler;
+import org.workflowsim.scheduler.MinMinScheduler;
+import org.workflowsim.utils.Parameters;
+import org.workflowsim.utils.Parameters.SCHMethod;
 
 /**
  * WorkflowScheduler represents a scheduler acting on behalf of a user. It hides VM management, as vm
  * creation, sumbission of jobs to this VMs and destruction of VMs.
  * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class WorkflowScheduler extends DatacenterBroker {
 
-	//private List<Integer> datacenterIdsList;
-        //private int datacenterId;
-        
+        /** The workflow engine id associated with this workflow scheduler. */
+        private int workflowEngineId;
+
 	/**
 	 * Created a new WorkflowScheduler object.
 	 * 
@@ -55,13 +57,11 @@ public class WorkflowScheduler extends DatacenterBroker {
 	 * @pre name != null
 	 * @post $none
 	 */
-        private int workflowEngineId;
 	public WorkflowScheduler(String name) throws Exception {
-		super(name);
-                
-
+		super(name); 
 	}
         
+        /** Binds this scheduler to a datacenter */
         public void bindSchedulerDatacenter(int datacenterId)
         {
             if(datacenterId <=0) 
@@ -72,11 +72,19 @@ public class WorkflowScheduler extends DatacenterBroker {
             this.datacenterIdsList.add( datacenterId);
         }
 
+        /**
+         * Sets the workflow engine id
+         * @param workflowEngineId the workflow engine id
+         */
         public void setWorkflowEngineId(int workflowEngineId)
         {
             this.workflowEngineId = workflowEngineId;
         }
 	
+        /**
+         * Process an event
+         * @param ev a simEvent obj
+         */
         @Override
 	public void processEvent(SimEvent ev) {
 		switch (ev.getTag()) {
@@ -97,8 +105,6 @@ public class WorkflowScheduler extends DatacenterBroker {
                             processCloudletReturn(ev);
                             break;
 			case CloudSimTags.CLOUDLET_RETURN:
-				//processCloudletCheck(ev);
-                            
                             processCloudletReturn(ev);
 				break;
 			// if the simulation finishes
@@ -118,10 +124,15 @@ public class WorkflowScheduler extends DatacenterBroker {
 				break;
 		}
 	}
-        
+        /**
+         * Switch between multiple schedulers.
+         * Based on scheduler.method
+         * @param name the SCHMethod name
+         * @return the scheduler that extends DefaultScheduler
+         */
         private DefaultScheduler getScheduler(SCHMethod name){
             DefaultScheduler  scheduler = null;
-            //MAXMIN_SCH, MINMIN_SCH, ROUNDR_SCH, HEFT_SCH
+            //MAXMIN_SCH, MINMIN_SCH, ROUNDR_SCH, HEFT_SCH, MCT_SCH
             switch(name){
                 case MINMIN_SCH:
                 
@@ -154,7 +165,10 @@ public class WorkflowScheduler extends DatacenterBroker {
             return scheduler;
         }
        
-        
+        /**
+         * Update a cloudlet (job)
+         * @param ev a simEvent object
+         */
         protected void processCloudletUpdate(SimEvent ev)
         {
 
@@ -176,29 +190,27 @@ public class WorkflowScheduler extends DatacenterBroker {
                         
         }
         
-//        private void printJob(Cloudlet cl, String message){
-//            Log.printLine("Scheduler " + message +" " + cl.getCloudletId());
-//        }
+
         
-        //submitted list is actually running list
 	/**
-	 * Process a cloudlet return event.
+	 * Process a cloudlet (job) return event.
 	 * 
 	 * @param ev a SimEvent object
 	 * @pre ev != $null
 	 * @post $none
 	 */
-    @Override
+        @Override
 	protected void processCloudletReturn(SimEvent ev) {
 		Cloudlet cloudlet = (Cloudlet) ev.getData();
-                //printJob(cloudlet, "returned");
                 
                 Job job = (Job)cloudlet;
+                
+                /** Generate a failure if failure rate is not zeros. */
                 FailureGenerator.generate(job);
                 
 		getCloudletReceivedList().add(cloudlet);
                 getCloudletSubmittedList().remove(cloudlet);
-                //right
+                
                 CondorVM vm = (CondorVM)getVmsCreatedList().get(cloudlet.getVmId());
                 //so that this resource is released
                 vm.setState(WorkflowSimTags.VM_STATUS_IDLE);
@@ -211,16 +223,20 @@ public class WorkflowScheduler extends DatacenterBroker {
                 schedule(this.getId(), 0.0, WorkflowSimTags.CLOUDLET_UPDATE);
 
 	}
-
+        
+        /**
+         * process cloudlet (job) check (not supported yet)
+         * @param ev a simEvent object
+         */
         protected void processCloudletCheck(SimEvent ev){
 
-                
-                
-                
-
+                /** Left for future use. */
                 
         }
 
+        /**
+         * Start this entity (WorkflowScheduler)
+         */
     	@Override
 	public void startEntity() {
 		Log.printLine(getName() + " is starting...");
@@ -239,6 +255,10 @@ public class WorkflowScheduler extends DatacenterBroker {
                 //schedule(getId(), 0, CloudSimTags.RESOURCE_CHARACTERISTICS_REQUEST);
 
 	}
+        
+        /**
+         * Terminate this entity (WorkflowScheduler)
+         */
         @Override
         public void shutdownEntity()
         {
@@ -248,29 +268,31 @@ public class WorkflowScheduler extends DatacenterBroker {
             
         }
 	/**
-	 * Submit cloudlets to the created VMs.
+	 * Submit cloudlets (jobs) to the created VMs.
 	 * Scheduling is here
 	 * @pre $none
 	 * @post $none
 	 */
-        //Used at some points
-        //if all vms are created submitCloulets would be called
         @Override
 	protected void submitCloudlets() {
             
             sendNow(this.workflowEngineId, CloudSimTags.CLOUDLET_SUBMIT, null);
 	}
-        //private int vmIndex = 0;
+        
+        /** A trick here. Assure that we just submit it once*/
         private boolean processCloudletSubmitHasShown = false;
+        
+        /**
+         * Submits cloudlet (job) list
+         * @param ev a simEvent object
+         */
     	protected void processCloudletSubmit(SimEvent ev) {
-		//Cloudlet cloudlet = (Cloudlet) ev.getData();
                 List<Job> list = (List)ev.getData();
                 getCloudletList().addAll(list);
-                //should delay
-                //processCloudletUpdate();
+
                 sendNow(this.getId(), WorkflowSimTags.CLOUDLET_UPDATE);
                 if(!processCloudletSubmitHasShown){
-                    Log.printLine("Pay Attention that the actual vm size is " + getVmsCreatedList().size());
+                    //Log.printLine("Pay Attention that the actual vm size is " + getVmsCreatedList().size());
                     processCloudletSubmitHasShown = true;
                 }
         }
@@ -285,7 +307,6 @@ public class WorkflowScheduler extends DatacenterBroker {
     @Override
 	protected void processResourceCharacteristicsRequest(SimEvent ev) {
                 
-		//setDatacenterIdsList(CloudSim.getCloudResourceList());
 		setDatacenterCharacteristicsList(new HashMap<Integer, DatacenterCharacteristics>());
 
 		Log.printLine(CloudSim.clock() + ": " + getName() + ": Cloud Resource List received with "
