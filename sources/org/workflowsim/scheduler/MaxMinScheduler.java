@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,33 +15,37 @@
  */
 package org.workflowsim.scheduler;
 
-import org.workflowsim.CondorVM;
-import org.workflowsim.Job;
-import org.workflowsim.WorkflowSimTags;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Log;
+import org.workflowsim.CondorVM;
+import org.workflowsim.WorkflowSimTags;
 
 /**
- *
+ * MaxMin algorithm. 
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class MaxMinScheduler extends DefaultScheduler{
     
+    /** 
+     * Initialize a MaxMin scheduler.
+     */
     public MaxMinScheduler(){
         super();
     }
     
+    /** the check point list. */
     private List hasChecked = new ArrayList<Boolean>();
     
     @Override
     public void run(){
-        //FCFS
-        //need to change it to be MinMin
 
-        Log.printLine("Schedulin Cycle");
+
+        //Log.printLine("Schedulin Cycle");
         int size = getCloudletList().size();
         hasChecked.clear();
         for(int t= 0; t< size; t++){
@@ -111,9 +115,6 @@ public class MaxMinScheduler extends DefaultScheduler{
             Log.printLine("Schedules " + maxCloudlet.getCloudletId() + " with "
                     + maxCloudlet.getCloudletLength() + " to VM " + firstIdleVm.getId() 
                     +" with " + firstIdleVm.getCurrentRequestedTotalMips());
-//            if(minCloudlet.getCloudletId()==10)
-//                Log.printLine();
-
             
         }
     }
