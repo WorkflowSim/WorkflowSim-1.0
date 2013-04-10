@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,29 +15,40 @@
  */
 package org.workflowsim.reclustering;
 
-import org.workflowsim.Job;
-import org.workflowsim.Task;
-import org.workflowsim.failure.FailureMonitor;
-import org.workflowsim.failure.FailureRecord;
-import org.workflowsim.utils.Parameters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Log;
+import org.workflowsim.Job;
+import org.workflowsim.Task;
+import org.workflowsim.failure.FailureMonitor;
+import org.workflowsim.failure.FailureRecord;
+import org.workflowsim.utils.Parameters;
 
 /**
  *
+ * A ReclusteringEngine creates a new clustered job after a job fails
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
+ * 
  */
 public class ReclusteringEngine {
     
+    /**
+     * Create a new job
+     * @param id, the job id
+     * @param job, the failed job
+     * @param length, the length of this job
+     * @param taskList, the task list 
+     * @return a new job
+     */
     private static Job createJob(int id, Job job, long length, List taskList){
         try{
-            Job newJob = new Job(id, length/*, job.getCloudletFileSize(), job.getCloudletOutputSize()*/);
+            Job newJob = new Job(id, length);
             newJob.setUserId(job.getUserId());
             newJob.setVmId(-1);
             newJob.setCloudletStatus(Cloudlet.CREATED);
@@ -58,6 +69,13 @@ public class ReclusteringEngine {
         return null;
                 
     }
+    
+    /**
+     * Process job recreation based on different reclustering algorithm
+     * @param job, job
+     * @param id, job id
+     * @return a list of new jobs
+     */
     public static List<Job> process(Job job, int id){
         List jobList = new ArrayList();
 
@@ -65,27 +83,32 @@ public class ReclusteringEngine {
             
             switch(Parameters.getFTCMethod())
             {
-                    //case Parameters.FTCLUSTERING_NOOP:
                 case FTCLUSTERING_NOOP:
 
                         jobList.add(createJob(id, job, job.getCloudletLength(), job.getTaskList()));
                         //job submttted doesn't have to be considered
                         break;
+                    /** Dynamic clustering. */
                     case FTCLUSTERING_DC:
                         jobList = DCReclustering(jobList, job, id, job.getTaskList());
                         break;
+                    /** Selective reclustering. */
                     case FTCLUSTERING_SR:
                         jobList = SRReclustering(jobList, job, id);
                         
                         break;
+                    /** Dynamic reclustering. */
                     case FTCLUSTERING_DR:
                         jobList = DRReclustering(jobList, job, id, job.getTaskList());
                         break;
+                    /** Block reclustering. */
                     case FTCLUSTERING_BLOCK:
                         jobList = BlockReclustering(jobList, job, id);
                         break;
+                    /** Binary reclustering. */
                     case FTCLUSTERING_BINARY:
                         jobList = BinaryReclustering(jobList, job, id);
+                        break;
                     default:
                         break;
             }
@@ -95,6 +118,11 @@ public class ReclusteringEngine {
         return jobList;
     }
     
+    /**
+     * Partition the list of tasks based on their depth
+     * @param list, the list to process
+     * @return a map with key equals to depth
+     */
    private static Map getDepthMap(List list){
        Map map = new HashMap<Integer, List>();
        
@@ -113,9 +141,14 @@ public class ReclusteringEngine {
        return map;
    }
    //DR + level aware
+   /**
+    * Used in DR and level aware 
+    * @param map
+    * @return the minimum key in Map
+    */
    private static int getMin(Map map){
        if(map!=null && !map.isEmpty()){
-           int min = 10000;//bug here
+           int min = Integer.MAX_VALUE;
            for(Iterator it = map.keySet().iterator();it.hasNext();){
                int value = (Integer)it.next();
                if(value < min){
@@ -127,6 +160,11 @@ public class ReclusteringEngine {
        return -1;
    }
    
+   /**
+    * Check whether this list has failed task
+    * @param list
+    * @return boolean whether this list has failed task
+    */
    private static boolean checkFailed(List list){
        boolean all = false;
        for(Iterator it = list.iterator(); it.hasNext();){
@@ -139,7 +177,13 @@ public class ReclusteringEngine {
        return all;
    }
    
-   
+   /**
+    * Binary Reclustering
+    * @param jobList, job list
+    * @param job, job
+    * @param id, job id
+    * @return 
+    */
    private static List BinaryReclustering(List jobList, Job job, int id){
        Log.printLine("Job Id for reclustering" + job.getCloudletId());
        Map map = getDepthMap(job.getTaskList());
@@ -170,6 +214,13 @@ public class ReclusteringEngine {
        
    }
    
+   /**
+    * Block Reclustering
+    * @param jobList, job list
+    * @param job, job
+    * @param id, job id
+    * @return 
+    */
    private static List BlockReclustering(List jobList, Job job, int id){
        Map map = getDepthMap(job.getTaskList());
        if(map.size()==1){
@@ -178,7 +229,6 @@ public class ReclusteringEngine {
        }
        //do that to every list
        int min = getMin(map);
-       //List freeList = new ArrayList<Task>();
        for(int i = min; i < min + map.size(); i++){
            
            List list = (List)map.get(i);
@@ -196,10 +246,16 @@ public class ReclusteringEngine {
        
        return jobList;
    }
-   //DC + BS
    
-   
-   private static List DCReclustering(List jobList, Job job, int id, List allTaskList){
+   /**
+    * Dynamic Reclustering
+    * @param jobList, job list
+    * @param job, job
+    * @param id, job id
+    * @param allTaskList, all the task List
+    * @return 
+    */
+    private static List DCReclustering(List jobList, Job job, int id, List allTaskList){
       
         Task firstTask = (Task)allTaskList.get(0);
         List tmpList = new ArrayList();
@@ -258,6 +314,13 @@ public class ReclusteringEngine {
                         
    }
     
+    /**
+    * Selective Reclustering
+    * @param jobList, job list
+    * @param job, job
+    * @param id, job id
+    * @return 
+    */
    private static List SRReclustering(List jobList, Job job, int id){
         int size = job.getTaskList().size();
          List newTaskList = new ArrayList();
@@ -272,13 +335,16 @@ public class ReclusteringEngine {
                  
              }
          }
-         //may have bug
          Log.printLine("Doesn't consider the data transfer problem");
          jobList.add(createJob(id, job, length, newTaskList));
-         //Log.printLine(job.getCloudletId() +  " with" + job.getCloudletLength() + " creates  new job " + id + " with " + length);
          return jobList;
    }
    
+   /**
+    * Get the dividend
+    * @param depth
+    * @return 
+    */
    private static int getDividend(int depth){
        int dividend = 1;
        switch (depth){
@@ -298,15 +364,21 @@ public class ReclusteringEngine {
        return dividend;
    }
    
+   /**
+    * Dynamic Reclustering
+    * @param jobList, job list
+    * @param job, job
+    * @param id, job id
+    * @param allTaskList, all task list
+    * @return 
+    */
    private static List DRReclustering(List jobList, Job job, int id, List allTaskList){
         Task firstTask = (Task)allTaskList.get(0);
         List tmpList = new ArrayList();
         tmpList.add(job);
         double delay = Parameters.getOverheadParams().getQueueDelay(job)
                 + Parameters.getOverheadParams().getWEDDelay(tmpList)
-                + Parameters.getOverheadParams().getPostDelay(job)
-                /*+ Parameters.getOverheadParams().getClustDelay(job)*/;
-        //Definition of FailureRecord(long length, int tasks, int depth, int all, int vm, int job, int workflow)
+                + Parameters.getOverheadParams().getPostDelay(job);
         double taskLength = (double)firstTask.getCloudletLength()/1000 + Parameters.getOverheadParams().getClustDelay(job)/getDividend(job.getDepth());
         if(taskLength > 20){
             Log.printLine();
@@ -317,7 +389,6 @@ public class ReclusteringEngine {
         int suggestedK = FailureMonitor.getClusteringFactor( record);
         Log.printLine("K: " + suggestedK + " a " + FailureMonitor.analyze(0, job.getDepth())) ;
         
-        //if(suggestedK > 50) suggestedK = 50;
         if(suggestedK == 0){
             //not really k=0, just too big
             jobList.add(createJob(id, job, job.getCloudletLength(), allTaskList));
