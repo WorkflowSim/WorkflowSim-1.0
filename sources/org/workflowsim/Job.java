@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,55 +17,87 @@ package org.workflowsim;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.UtilizationModelFull;
 
 /**
- *
+ * Job is an extention to Task. It is basically a group of tasks. In WorkflowSim, the ClusteringEngine
+ * merges tasks into jobs (group of tasks) and the overall runtime of a job is the sum of the task
+ * runtime.
+ * 
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class Job extends Task{
     
+    /*
+     * The list of tasks a job has. It is the only difference between Job and Task. 
+     */
     private List<Task> taskList;
     
-    /*
-     * The overhead between tasks (not yet utilized)
-     */
-    private double taskOverhead;
-    //dependency list
-    //private List<Job>parentList;
-    //private List<Job>childList;
     
+    /**
+    * Allocates a new Job object. The job length should be greater than or equal to 1. 
+    * 
+    * @param jobId the unique ID of this job
+    * @param jobLength the length or size (in MI) of this task to be executed in a
+    *            PowerDatacenter
+    * @pre jobId >= 0
+    * @pre jobLength >= 0.0
+    * @post $none
+    */
     public Job(
-                    final int cloudletId,
-                    final long cloudletLength/*,
-                    final long cloudletFileSize,
-                    final long cloudletOutputSize*/
+                    final int jobId,
+                    final long jobLength
                 ) 
     {
 
-        super(cloudletId, cloudletLength/*, cloudletFileSize, cloudletOutputSize*/);
-        //super(cloudletId, cloudletLength, 1, cloudletFileSize, cloudletOutputSize, new UtilizationModelFull(), new UtilizationModelFull(), new UtilizationModelFull());
+        super(jobId, jobLength);
         this.taskList       = new ArrayList<Task>();
-        this.taskOverhead   = 0.0;
-     //   this.childList      = new ArrayList<Job>();
-     //   this.parentList     = new ArrayList<Job>();
-    }
 
+    }
+    
+    /**
+    * Gets the list of tasks in this job
+    * 
+    * @return the list of the tasks
+    * @pre $none
+    * @post $none
+    */
     public List<Task> getTaskList()
     {
-        //System.out.println("It is not safe to do it, please update other parameters");
         return this.taskList;
     }
-    //Operators for childlist and parentlist
+    
+    /**
+     * Sets the list of the tasks
+     * 
+     * @param list, list of the tasks
+     * @return $none
+     */
     public void setTaskList(List list)
     {
         this.taskList = list;
     }
+    
+    /**
+     * Adds a task list to the existing task list
+     * 
+     * @param list, task list to be added
+     * @return $none
+     */
     public void addTaskList(List list){
         this.taskList.addAll(list);
     }
     
+    /**
+    * Gets the list of the parent tasks and override its super function
+    * 
+    * @return the list of the parents
+    * @pre $none
+    * @post $none
+    */
+    @Override
     public List getParentList(){
         
         return super.getParentList();
