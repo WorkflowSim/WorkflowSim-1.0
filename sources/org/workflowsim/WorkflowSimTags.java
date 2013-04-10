@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,19 +16,24 @@
 package org.workflowsim;
 
 /**
- *
+ * This WorkflowSimTags include tags that are not supported in CloudSimTags
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class WorkflowSimTags {
 
 	/** Starting constant value for cloud-related tags **/
 	private static final int BASE = 1000;
 
-        
+        /** VM Status is ready (not used)*/
         public static final int VM_STATUS_READY         = BASE + 2;
         
+        /** VM Status is busy (no jobs should run on this vm) */
         public static final int VM_STATUS_BUSY          = BASE + 3;
         
+        /** VM Status is idle (a job can run on this vm) */
         public static final int VM_STATUS_IDLE          = BASE + 4;
 
         
