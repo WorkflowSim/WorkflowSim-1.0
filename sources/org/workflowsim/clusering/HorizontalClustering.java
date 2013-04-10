@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,26 +15,37 @@
  */
 package org.workflowsim.clusering;
 
-import org.workflowsim.Job;
-import org.workflowsim.Task;
-import org.workflowsim.utils.Parameters;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import org.workflowsim.Job;
+import org.workflowsim.Task;
 
 /**
- *
+ * HorizontalClustering merges task at the same horizontal level
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class HorizontalClustering extends BasicClustering{
     
+    /** The number of clustered jobs per level. */
     private int clusterNum;
+    /** The number of tassk in a job. */
     private int clusterSize;
+    /** The map from depth to tasks at that depth. */
     private Map mDepth2Task;
 
+    /**
+     * Initialize a HorizontalClustering
+     * Either clusterNum or clusterSize should be set
+     * @param clusterNum clusters.num
+     * @param clusterSize clusters.size
+     */
     public HorizontalClustering(int clusterNum, int clusterSize){
         super();
         this.clusterNum = clusterNum;
@@ -42,7 +53,9 @@ public class HorizontalClustering extends BasicClustering{
         this.mDepth2Task = new HashMap<Integer, Map>();
 
     }
-    
+    /**
+     * The main function
+     */
     @Override
     public void run()
  
@@ -62,8 +75,10 @@ public class HorizontalClustering extends BasicClustering{
 
             }
         }
+        /** if clusters.num is set. */
         if(clusterNum > 0){
             bundleClustering();
+        /** else if clusters.size is set. */
         }else if(clusterSize >0){
             collapseClustering();
         }
@@ -72,30 +87,11 @@ public class HorizontalClustering extends BasicClustering{
         addClustDelay();
     }
 
-    
+    /**
+     * Merges tasks into a fixed number of jobs.
+     */
     private void bundleClustering(){
-        
-//        for (Iterator it = mDepth2Task.entrySet().iterator();it.hasNext();){
-//            Map.Entry pairs = (Map.Entry<Integer, ArrayList>)it.next();
-//            ArrayList list = (ArrayList)pairs.getValue();
-//            int num = list.size();
-//            int avg = num / this.clusterNum ;
-//            if(avg * this.clusterNum < num) 
-//                avg ++;
-//            if (avg <=0 )avg = 1;
-//            
-//            for(int i = 0; i < this.clusterNum; i ++){
-//                int start = i * avg;
-//                int end = start + avg - 1;
-//                if (end >= num)
-//                    end = num - 1;
-//                if(end < start)
-//                    break;
-//                Job job = addTasks2Job(list.subList(start, end + 1));
-//            }
-//            
-//
-//        }
+
         for (Iterator it = mDepth2Task.entrySet().iterator();it.hasNext();){
             Map.Entry pairs = (Map.Entry<Integer, ArrayList>)it.next();
             ArrayList list = (ArrayList)pairs.getValue();
@@ -128,17 +124,22 @@ public class HorizontalClustering extends BasicClustering{
                 }
                 
                 
-                if (end >= num)
+                if (end >= num){
                     end = num - 1;
-                if(end < start)
+                }
+                if(end < start){
                     break;
-                
+                }
                 addTasks2Job(list.subList(start, end + 1));
             }
             
 
         }
     }
+    
+    /**
+     * Merges a fixed number of tasks into a job
+     */
     private void collapseClustering(){
         for (Iterator it = mDepth2Task.entrySet().iterator();it.hasNext();){
             Map.Entry pairs = (Map.Entry<Integer, ArrayList>)it.next();
