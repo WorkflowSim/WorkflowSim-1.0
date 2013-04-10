@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,27 +15,39 @@
  */
 package org.workflowsim.clusering;
 
-import org.workflowsim.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.cloudbus.cloudsim.Log;
+import org.workflowsim.Task;
 
 /**
- *
+ * BlockClustering groups tasks in both horizontal and vertical direction
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class BlockClustering extends BasicClustering{
     
-    
+    /** The number of clustered jobs per level. */
     private int clusterNum;
+    
+    /** The size of a clustered job (number of tasks in a job). */
     private int clusterSize;
+    
+    /** The map stores whether a task has checked. */
     private Map mHasChecked;
+    
+    /** The map stores tasks per level. */
     private Map mDepth2Task;
     
-
+    /**
+     * Initialize a BlockClustering object
+     * @param cNum clusters.num
+     * @param cSize clusters.size
+     */
     public BlockClustering(int cNum, int cSize){
         super();
         clusterNum = cNum;
@@ -44,7 +56,10 @@ public class BlockClustering extends BasicClustering{
         this.mDepth2Task = new HashMap<Integer, Map>();
 
     }
-    
+    /**
+     * Set the check point of a task. 
+     * @param index id of a task
+     */
     private void setCheck(int index){
         
         if(mHasChecked.containsKey(index)){
@@ -54,6 +69,11 @@ public class BlockClustering extends BasicClustering{
         
                 
     }
+    /**
+     * Gets the check point of a task
+     * @param index id of a task
+     * @return 
+     */
     private boolean getCheck(int index){
 
         if(mHasChecked.containsKey(index)){
@@ -61,7 +81,9 @@ public class BlockClustering extends BasicClustering{
         }
         return false;
     }
-    
+    /**
+     * The main function
+     */
     @Override
     public void run()
  
@@ -98,7 +120,11 @@ public class BlockClustering extends BasicClustering{
         addClustDelay();
     }
     
-        
+    /**
+     * Provides the potential candidate to merge
+     * @param taskList the seed tasks
+     * @return candidate tasks
+     */ 
     private List searchList(List taskList){
         ArrayList sucList = new ArrayList<Task>();
         for(Iterator it = taskList.iterator(); it.hasNext();){
@@ -128,21 +154,16 @@ public class BlockClustering extends BasicClustering{
                         //cNum == 0, doesn't have to add
                         //cNum > 0 might be a cross dependency issue
                     }
-                }
-            
-                
-                
+                }   
             }
-            
-            
-            
         }
-        //dangerous
-        //taskList.clear();
+
         return sucList;
     }
     
-        
+    /**
+     * Merges tasks into a fixed number of jobs.
+     */   
     private void bundleClustering(){
         
         for (Iterator it = mDepth2Task.entrySet().iterator();it.hasNext();){
@@ -166,15 +187,15 @@ public class BlockClustering extends BasicClustering{
                     end = start + avg_b - 1;
                 }else{
                     //use avg_a
-                    end = start + avg_a - 1;
-                    
+                    end = start + avg_a - 1;    
                 }
                 
-                
-                if (end >= num)
+                if (end >= num){
                     end = num - 1;
-                if(end < start)
+                }
+                if(end < start){
                     break;
+                }
                 
                 addTasks2Job(searchList(list.subList(start, end + 1)));
             }
@@ -182,7 +203,9 @@ public class BlockClustering extends BasicClustering{
         }
 
     }
-        
+    /**
+     * Merges a fixed number of tasks into a job
+     */
     private void collapseClustering(){
         for (Iterator it = mDepth2Task.entrySet().iterator();it.hasNext();){
             Map.Entry pairs = (Map.Entry<Integer, ArrayList>)it.next();
@@ -197,7 +220,9 @@ public class BlockClustering extends BasicClustering{
                 start = i * avg;
                 end = start + avg - 1;
                 i ++ ;
-                if (end >= num) end = num - 1;
+                if (end >= num) {
+                    end = num - 1;
+                }
                 addTasks2Job(searchList(list.subList(start, end + 1)));
             }while(end < num - 1);
 
