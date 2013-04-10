@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,73 +16,77 @@
 package org.workflowsim.failure;
 
 
-import org.workflowsim.utils.Parameters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.cloudbus.cloudsim.Log;
+import org.workflowsim.utils.Parameters;
 
 /**
- *
+ * FailureMonitor collects failure information
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public  class FailureMonitor {
     
-    //protected ClusteringFactor factorClass;
     
-    //protected int delay;
-    
-    /** VM ID 2 Record **/
+    /** VM ID to a Failure Record. **/
     protected static Map<Integer, ArrayList<FailureRecord>> vm2record;
     
-    /** Type 2 Record**/
+    /** Type to a Failure Record. **/
     protected static Map<Integer, ArrayList<FailureRecord>> type2record;
     
-    /** JobID 2 Record**/
+    /** JobID to a Failure Record. **/
     protected static Map<Integer, FailureRecord> jobid2record;
     
+    /** All the record list. */
     protected static List<FailureRecord> recordList;
 
-    //protected static String mode;
-    
+    /** Id to a Job. */
     public static Map index2job;
     
-    
-    public static void init(/*String _mode*/)
+    /** Initialize a FailureMonitor object. */
+    public static void init()
     {   
         vm2record       = new HashMap<Integer, ArrayList<FailureRecord>>();
         type2record     = new HashMap<Integer, ArrayList<FailureRecord>>();
         jobid2record    = new HashMap<Integer, FailureRecord>();
         recordList      = new ArrayList<FailureRecord>();
-        //mode            = _mode;
         
     }
     
+    /**
+     * Gets the optimal clustering factor based on analysis
+     * @param d delay
+     * @param a task failure rate monitored
+     * @param t task runtime
+     * @return optimal clustering factor
+     */
     protected static double getK(double d, double a, double t)
     {
 
-        if(a<=0.0){
-            
-        }
         double k = (-d+Math.sqrt(d*d-4*d/Math.log(1-a)))/(2*t);
-
         return k;
     }
 
-    /** called by Broker**/
+    /**
+     * Gets the clustering factor
+     * @param record, a request
+     * @return the clustering factor suggested
+     */
     public static int getClusteringFactor( FailureRecord record)
     {
         
-        double d  = record.failedTasksNum;//pay attention here
-        
-        //
-        d = record.delayLength;
+        double d  = record.delayLength;
         
         double t  = record.length ;
         double a  = 0.0;
         switch(Parameters.getMonitorMode()){
             case MONITOR_JOB:
+                /** not supported **/
             case MONITOR_ALL:
                 a  = analyze( 0, record.depth);
                 break;
@@ -96,14 +100,18 @@ public  class FailureMonitor {
         }else{
             double k  = getK(d, a, t);
 
-            if(k<=1)
+            if(k<=1){
                 k=1;//minimal
+            }
 
             return (int)k;
         }
     }
 
-    /**called by Broker **/
+    /**
+     * A post from a broker so that we can update record list
+     * @param record a failure record
+     */
     public static void postFailureRecord( FailureRecord record)
     {
 
@@ -135,16 +143,16 @@ public  class FailureMonitor {
             case MONITOR_NONE:
                 break;
         }
-        
-        
-//        //for all
-//        if(jobid2record.containsKey(record.jobId)){
-//            Log.printLine("Something wrong here");
-//        }
-//        jobid2record.put(record.jobId, record);
+
         recordList.add(record);
     }
     
+    /**
+     * Update the detected task failure rate based on record lists
+     * @param workflowId, doesn't work in this version
+     * @param type, the type of job or vm
+     * @return task failure rate
+     */
     public static double analyze( int workflowId, int type)
     {
 
@@ -189,8 +197,9 @@ public  class FailureMonitor {
         }
         
         
-        if (sumFailures == 0)
+        if (sumFailures == 0){
             return 0;
+        }
         double alpha = (double)((double)sumFailures/(double)sumJobs);
         return alpha;
         
