@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,25 +15,36 @@
  */
 package org.workflowsim.clusering;
 
-import org.workflowsim.Task;
 import java.util.ArrayList;
-import java.util.Iterator;
+import org.workflowsim.Task;
 
 /**
- *
+ * TaskSet is a group of tasks used only in clustering
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class TaskSet {
+    
+    /** the task list. */
     private ArrayList<Task> taskList;
     
+    /** the parent list of this taskset. */
     private ArrayList<TaskSet> parentList;
     
+    /** the child list of this taskset. */
     private ArrayList<TaskSet> childList;
     
+    /** the check point. */
     public boolean hasChecked;
     
+    /** the impact factor. */
     private double impactFactor;
     
+    /**
+     * Initialize a TaskSet object
+     */
     public TaskSet(){
         this.taskList       = new ArrayList<Task>();
         this.parentList     = new ArrayList<TaskSet>();
@@ -44,29 +55,66 @@ public class TaskSet {
     
     }
     
+    /**
+     * Gets the impact factor
+     * @return impact factor
+     */
     public double getImpactFactor(){
         return this.impactFactor;
     }
+    
+    /**
+     * Sets the impact factor
+     * @param factor the impact factor
+     */
     public void setImpactFafctor(double factor){
         this.impactFactor = factor;
     }
+    
+    /**
+     * Gets the parent list
+     * @return parent list
+     */
     public ArrayList<TaskSet> getParentList(){
         return this.parentList;
     }
+    
+    /**
+     * Gets the child list
+     * @return the child list
+     */
     public ArrayList<TaskSet> getChildList(){
         return this.childList;
     }
     
+    /**
+     * Gets task list
+     * @return task list
+     */
     public ArrayList<Task> getTaskList(){
         return this.taskList;
     }
+    
+    /**
+     * Adds a task to this taskSet
+     * @param task to be added
+     */
     public void addTask(Task task){
         this.taskList.add(task);
     }
+    
+    /**
+     * Adds a list of task to this taskSet
+     * @param list to be added
+     */
     public void addTask(ArrayList<Task> list){
         this.taskList.addAll(list);
     }
     
+    /**
+     * Gets the job runtime of this taskSet (sum of task runtime)
+     * @return job runtime
+     */
     public long getJobRuntime(){
         long runtime = 0;
         for(Task task: taskList){
