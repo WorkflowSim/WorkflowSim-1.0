@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,14 +15,12 @@
  */
 package org.workflowsim.scheduler;
 
-import org.workflowsim.CondorVM;
-import org.workflowsim.WorkflowSimTags;
-import java.util.Iterator;
-import org.cloudbus.cloudsim.Cloudlet;
-
 /**
+ * The HEFT scheduling algorithm (not implemented yet)
  *
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class HEFTScheduler extends DefaultScheduler{
     
@@ -31,31 +29,7 @@ public class HEFTScheduler extends DefaultScheduler{
     }
     @Override
     public void run(){
-        //FCFS
-        //need to change it to be HEFT
-
-        for(Iterator it = getCloudletList().iterator();it.hasNext();)
-        {
-            Cloudlet cloudlet = (Cloudlet)it.next();
-            boolean stillHasVm = false;
-            for(Iterator itc = getVmList().iterator(); itc.hasNext();)
-            {
-
-                CondorVM vm = (CondorVM) itc.next();
-                if(vm.getState()==WorkflowSimTags.VM_STATUS_IDLE)
-                {
-                    stillHasVm = true;
-                    vm.setState(WorkflowSimTags.VM_STATUS_BUSY);
-                    cloudlet.setVmId(vm.getId());
-                    getScheduledList().add(cloudlet);
-                    break;
-                }
-            }
-            //no vm available 
-            if(!stillHasVm){
-                break;
-            }
-
-        }
+        
+ 
     }
 }
