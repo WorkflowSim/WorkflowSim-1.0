@@ -119,19 +119,23 @@ public class WorkflowSimExample1 {
 			DatacenterExtended datacenter0 = createDatacenter("Datacenter_0");
                         DatacenterExtended datacenter1 = createDatacenter("Datacenter_1");
                         
-                        
+                        /** Create a WorkflowPlanner. */
                         WorkflowPlanner planner = new WorkflowPlanner("planner_0", 2);
+                        /** Create a WorkflowEngine. */
                         WorkflowEngine wfEngine = planner.getWorkflowEngine();
+                        /** Create a list of VMs. */
                         List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0),Parameters.getVmNum()); 
                         
+                        /** Submits this list of vms to this WorkflowEngine. */
                         wfEngine.submitVmList(vmlist0, 0);
                         
+                        /** Binds the data centers with the scheduler. */
                         wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
                         wfEngine.bindSchedulerDatacenter(datacenter1.getId(), 1);
                         
                         CloudSim.startSimulation();
 
-
+                        
                         List<Job>outputList0 = wfEngine.getJobsReceivedList();
                         
 			CloudSim.stopSimulation();
@@ -223,8 +227,8 @@ public class WorkflowSimExample1 {
 
 
 	/**
-	 * Prints the Cloudlet objects
-	 * @param list  list of Cloudlets
+	 * Prints the job objects
+	 * @param list  list of jobs
 	 */
 	private static void printJobList(List<Job> list) {
 		int size = list.size();
