@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,18 +15,16 @@
  */
 package org.workflowsim.scheduler;
 
-import org.workflowsim.CondorVM;
-import org.workflowsim.Job;
-import org.workflowsim.WorkflowSimTags;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Log;
+import org.workflowsim.CondorVM;
+import org.workflowsim.WorkflowSimTags;
 
 /**
- *
+ * MCT algorithm 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class MCTScheduler extends DefaultScheduler{
     
@@ -38,17 +36,14 @@ public class MCTScheduler extends DefaultScheduler{
     
     @Override
     public void run(){
-        //FCFS
-        //need to change it to be MinMin
 
-        Log.printLine("Schedulin Cycle");
+
         int size = getCloudletList().size();
 
         for(int i = 0; i < size; i ++){
             Cloudlet cloudlet = (Cloudlet)getCloudletList().get(i);
             int vmSize = getVmList().size();
             CondorVM firstIdleVm = null;
-            //(CondorVM)getVmList().get(0);
 
             for(int j = 0; j < vmSize; j++){
                 CondorVM vm = (CondorVM)getVmList().get(j);
@@ -77,8 +72,7 @@ public class MCTScheduler extends DefaultScheduler{
             Log.printLine("Schedules " + cloudlet.getCloudletId() + " with "
                     + cloudlet.getCloudletLength() + " to VM " + firstIdleVm.getId() 
                     +" with " + firstIdleVm.getCurrentRequestedTotalMips());
-//            if(minCloudlet.getCloudletId()==10)
-//                Log.printLine();
+
 
             
         }
