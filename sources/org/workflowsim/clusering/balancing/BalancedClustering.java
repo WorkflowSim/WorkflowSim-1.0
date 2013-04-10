@@ -71,7 +71,7 @@ public class BalancedClustering extends BasicClustering{
     
     /**
      * Clean the checked flag of a taskset
-     * @return 
+     * @return $none
      */
     public void cleanTaskSetChecked(){
         Collection sets = mTask2TaskSet.values();
@@ -82,11 +82,11 @@ public class BalancedClustering extends BasicClustering{
     }
    
     
-   
-    
-    
-    
-    
+    /**
+     * Add impact factor to a TaskSet
+     * @param set TaskSet
+     * @param impact Impact Factor
+     */
     private void addImpact(TaskSet set, double impact){
         /*
          * follow the path from set
@@ -100,7 +100,9 @@ public class BalancedClustering extends BasicClustering{
             }
         }
     }
-    
+    /**
+     * Print out all the balancing metrics
+     */
     public void printMetrics(){
         Map<Integer,ArrayList<TaskSet>> map = getCurrentTaskSetAtLevels();
         for(TaskSet set: mTask2TaskSet.values()){
@@ -124,16 +126,13 @@ public class BalancedClustering extends BasicClustering{
         for(Entry entry: map.entrySet()){
             int depth = (Integer)entry.getKey();
             ArrayList<TaskSet> list = (ArrayList)entry.getValue();
+            /** Horizontal Runtime Variance. */
             double hrv = new HorizontalRuntimeVariance().getMetric(list);
-                    //getHorizontalRuntimeVariance(list);
-            
-            //Log.printLine("Depth; " + depth);
+            /** Impact Factor Variance. */
             double ifv  = new ImpactFactorVariance().getMetric(list);
-                    //getDependencyVariance(list);
-            
+            /** Pipeline Runtime Variance. */
             double prv = new PipelineRuntimeVariance().getMetric(list);
-                    //getPipelineRuntimeVariance(list);
-            
+            /** Distance Variance. */
             double dv = new DistanceVariance().getMetric(list);
             Log.printLine("HRV " + depth + " " + list.size() 
                     + " " + hrv + "\nIFV " + depth + " "
@@ -143,6 +142,10 @@ public class BalancedClustering extends BasicClustering{
         }
     }
     
+    /**
+     * Gets the current tasks per level
+     * @return tasks list per level
+     */
     public Map<Integer,ArrayList<TaskSet>> getCurrentTaskSetAtLevels(){
         //makesure it is updated 
         
@@ -169,6 +172,11 @@ public class BalancedClustering extends BasicClustering{
         return map;
     }
     
+    /**
+     * Gets the depth of a TaskSet
+     * @param set TaskSet
+     * @return depth
+     */
     private int getDepth(TaskSet set){
         if(mTaskSet2Depth.containsKey(set)){
             return (Integer)mTaskSet2Depth.get(set);
@@ -189,6 +197,13 @@ public class BalancedClustering extends BasicClustering{
         }
         
     }
+    
+    /**
+     * Check whether a task is an ancessor of another set
+     * @param ancessor ancessor
+     * @param set child
+     * @return 
+     */
     private boolean check(Task ancessor, Task set){
         if(ancessor == null || set == null){
             return false;
@@ -196,7 +211,6 @@ public class BalancedClustering extends BasicClustering{
         if(ancessor == set){
             return true;
         }
-        //for(Task parent: set.getParentList()){
         for(Iterator it = set.getParentList().iterator(); it.hasNext();){
             Task parent = (Task)it.next();
             if(check(ancessor, parent)){
@@ -207,7 +221,10 @@ public class BalancedClustering extends BasicClustering{
         }
         return false;
     }
+    /** used for recover. */
     private Map<Task, Task> mRecover = new HashMap<Task, Task>();
+    
+    /** Add pairs that needs to remove to mRecover. */
     private void remove(){
 
         for(Task set: this.getTaskList()){
@@ -216,7 +233,6 @@ public class BalancedClustering extends BasicClustering{
                         Task children = (Task)set.getChildList().get(i);
                         for(int j = i + 1; j < set.getChildList().size();j++){
                             Task another = (Task)set.getChildList().get(j);
-                            //check() takes much time
                             // avoid unnecessary checks
                             if(children.getDepth() >  another.getDepth()){
                                 if(check(another, children)){
@@ -250,6 +266,10 @@ public class BalancedClustering extends BasicClustering{
             
         }
     }
+    
+    /**
+     * Add the pair from the mRecover.
+     */
     private void recover(){
         for(Iterator it = mRecover.entrySet().iterator();it.hasNext();){
             Entry entry = (Entry)it.next();
@@ -264,8 +284,6 @@ public class BalancedClustering extends BasicClustering{
     public void run()
  
     {
-
-        //First step, initialization, (naive clustering)
         
         if(clusterNum >0){
             for(Iterator it = getTaskList().iterator();it.hasNext();)
@@ -325,13 +343,8 @@ public class BalancedClustering extends BasicClustering{
             printMetrics();
         }
         
-        
-        
-
         printOut();
         
-        
-
         Collection sets = mTask2TaskSet.values();
         for(Iterator it = sets.iterator();it.hasNext();){
             TaskSet set = (TaskSet)it.next();
@@ -350,6 +363,9 @@ public class BalancedClustering extends BasicClustering{
         recover();
     }
 
+    /**
+     * Print out the clustering information. 
+     */
     private void printOut(){
         Collection sets = mTask2TaskSet.values();
         for(Iterator it = sets.iterator();it.hasNext();){
@@ -369,7 +385,9 @@ public class BalancedClustering extends BasicClustering{
     }
     
 
-
+    /**
+     * Update task set dependencies
+     */
     private void updateTaskSetDependencies(){
         
         Collection sets = mTask2TaskSet.values();
