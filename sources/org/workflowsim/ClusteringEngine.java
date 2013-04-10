@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,81 +16,79 @@
 
 package org.workflowsim;
 
-import org.workflowsim.clusering.balancing.BalancedClustering;
-import org.workflowsim.clusering.BlockClustering;
-import org.workflowsim.clusering.BasicClustering;
-import org.workflowsim.clusering.HorizontalClustering;
-import org.workflowsim.clusering.VerticalClustering;
-import org.workflowsim.utils.ClusteringParameters;
-import org.workflowsim.utils.Parameters;
-import org.workflowsim.utils.ReplicaCatalog;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import java.util.Map;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.core.SimEvent;
+import org.workflowsim.clusering.BasicClustering;
+import org.workflowsim.clusering.BlockClustering;
+import org.workflowsim.clusering.HorizontalClustering;
+import org.workflowsim.clusering.VerticalClustering;
+import org.workflowsim.clusering.balancing.BalancedClustering;
+import org.workflowsim.utils.ClusteringParameters;
+import org.workflowsim.utils.Parameters;
+import org.workflowsim.utils.ReplicaCatalog;
 
 
 
 /**
- * WorkflowPlanner supports dynamic planning in the future
+ * ClusteringEngine is an optional component of WorkflowSim and it merges tasks into jobs
  * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  *
  */
-public class ClusteringEngine extends SimEntity {
+public final class ClusteringEngine extends SimEntity {
 
 
-	/** The cloudlet list. */
+	/** The task list */
 	protected List< Task> taskList;
         
+        /** The job list */
         protected List<Job > jobList;
 
-	/** The cloudlet submitted list. */
+	/** The task submitted list. */
 	protected List<? extends Task> taskSubmittedList;
 
-	/** The cloudlet received list. */
+	/** The task received list. */
 	protected List<? extends Task> taskReceivedList;
 
-	/** The cloudlets submitted. */
+	/** The number of tasks submitted. */
 	protected int cloudletsSubmitted;
 
+        /** The clustering engine to use */
         protected  BasicClustering engine;
         
 
-        
+        /** The WorkflowEngineId of the WorkflowEngine*/
         private int workflowEngineId;
-        // it could be a list
-        private WorkflowEngine workflowEngine;
         
-        //public static Map ReplicaCatalog;
+        /** The WorkflowEngine used in this ClusteringEngine*/
+        private WorkflowEngine workflowEngine;
         
 
         
        	/**
-	 * Created a new DatacenterBroker object.
+	 * Created a new ClusteringEngine object.
 	 * 
 	 * @param name name to be associated with this entity (as required by Sim_entity class from
 	 *            simjava package)
+         * @param schedulers the number of schedulers in this ClusteringEngine
 	 * @throws Exception the exception
 	 * @pre name != null
 	 * @post $none
 	 */
-
-        
-	public ClusteringEngine(String name, int schedulers /*, Map rc*/) throws Exception {
+	public ClusteringEngine(String name, int schedulers ) throws Exception {
             super(name);
             setJobList(new ArrayList<Job>());
             setTaskList(new ArrayList<Task>());
-            //???
             setTaskSubmittedList(new ArrayList<Task>());
             setTaskReceivedList(new ArrayList<Task>());
 
-            //this.ReplicaCatalog = rc;
             cloudletsSubmitted = 0;
             this.workflowEngine = new WorkflowEngine(name+"_Engine_0", schedulers);
             this.workflowEngineId = this.workflowEngine.getId();
@@ -98,10 +96,12 @@ public class ClusteringEngine extends SimEntity {
 	}
 
 
-
+        /** returns the WorkflowEngineId */
         public int getWorkflowEngineId(){
             return this.workflowEngineId;
         }
+        
+        /** returns the WorkflowEngine */
         public WorkflowEngine getWorkflowEngine(){
             return this.workflowEngine;
         }
@@ -120,36 +120,48 @@ public class ClusteringEngine extends SimEntity {
 		getTaskList().addAll(list);
 	}
 
-
-        protected void processClustering(){
+        /**
+	 * Processes events available for this ClusteringEngine.
+	 * 
+	 * @param ev a SimEvent object
+	 * @pre ev != null
+	 * @post $none
+	 */
+        protected void processClustering() {
             
-            //DefaultClustering engine = new DefaultClustering();
-            //this.engine = new DefaultClustering();
-            //num, size
+            /** The parameters from configuration file*/
             ClusteringParameters params = Parameters.getClusteringParameters();
             
             
             switch(params.getClusteringMethod()){
+                /** Perform Horizontal Clustering*/
                 case HORIZONTAL:
-
+                    /** if clusters.num is set in configuration file */
                     if(params.getClustersNum()!=0){
                         this.engine = new HorizontalClustering( params.getClustersNum(), 0);
                     }
+                    /** else if clusters.size is set in configuration file */
                     else if(params.getClustersSize()!=0){
                         this.engine = new HorizontalClustering( 0, params.getClustersSize());
+                    }/** else does no clustering */
+                    else{
+                        
                     }
-
                     break;
+                /** Perform Vertical Clustering */
                 case VERTICAL:
                     int depth = 1;
                     this.engine = new VerticalClustering( depth);
                     break;
+                /** Perform Block Clustering */
                 case BLOCK:
                     this.engine = new BlockClustering(params.getClustersNum(), params.getClustersSize());
                     break;
+                /** Perform Balanced Clustering */
                 case BALANCED:
                     this.engine = new BalancedClustering(params.getClustersNum());
                     break;
+                /** By default, it does no clustering */
                 default:
                     this.engine = new BasicClustering();
                     break;
@@ -159,16 +171,23 @@ public class ClusteringEngine extends SimEntity {
             setJobList(engine.getJobList());
 
             
-            
         }
+        /**
+        * Checks whether a file is an input file alone (not a output file)
+        *
+        * @param list, the list of all files
+        * @param file, the file to be checked
+        * @return 
+        */
         private boolean isRealInputFile(List<org.cloudbus.cloudsim.File> list, org.cloudbus.cloudsim.File file){
-            if(file.getType() == 1)//input file
+            /** if the type is input file) */
+            if(file.getType() == 1)
             {
 
                 for(org.cloudbus.cloudsim.File another: list){
-                    
-                    
+                    /** if there is another file that has the same name and it is output file*/
                     if(another.getName().equals(file.getName()) 
+                            /**It is output file*/
                             && another.getType()==2){
                         return false;
                     }
@@ -177,62 +196,72 @@ public class ClusteringEngine extends SimEntity {
             }
             return false;
         }
+        
+        /**
+         * Adds data stage-in jobs to the job list
+         * 
+         * @param $none
+         * @return $none
+         */
         protected void processDatastaging(){
 
-            /*
-             * here we assume that jobs are indexed in order because of clustering 
-             * Even with default clustering is it still in order replaced
-             * input file size and output file size don't matter
-             */
-            //this engine is clustering engine, not workflow engine
+            /** All the files of this workflow, it is saved in the workflow engine */
             List list = this.engine.getTaskFiles();
-            //long size  = this.engine.getInputDataSize();
-            //The duration of a job must be at least 100ms , a bug of cloudsim
-            //minimum clock time, otherwise fail
-//            Log.printLine("Data Stageing is not yet supported");
-            Job job = new Job(getJobList().size() , 110/*, 0, 0*/);
-            //job.setInputDataSize(size);
-            //input real input files at the beginning
+            /** 
+             * A bug of cloudsim, you cannot set the length of a cloudlet to be smaller than 110
+             * otherwise it will fail 
+             * The reason why we set the id of this job to be getJobList().size() is so that the 
+             * job id is the next available id
+             */
             
-            
-            List newList = new ArrayList<org.cloudbus.cloudsim.File>();
+            Job job = new Job(getJobList().size() , 110);
+
+            /**
+             * This is a very simple implementation of stage-in job, in which we 
+             * Add all the files to be the input of this stage-in job so that 
+             * WorkflowSim will transfers them when this job is executed
+             */
+            List fileList = new ArrayList<org.cloudbus.cloudsim.File>();
             for(Iterator it = list.iterator(); it.hasNext();){
                 org.cloudbus.cloudsim.File file = (org.cloudbus.cloudsim.File)it.next();
-                
+                /** To avoid duplicate files*/
                 if(isRealInputFile(list, file)){
                     ReplicaCatalog.addStorageList(file.getName(), "source");
-                    newList.add(file);
+                    fileList.add(file);
                 }
-
-                
-                
             }
-            job.setFileList(newList);
+            job.setFileList(fileList);
             job.setClassType(1);
-            //stage-in is always first level job 
-            //may have bugs when you have multiple sub-workflows
+            
+            /** stage-in is always first level job */
             job.setDepth(0);
             job.setPriority(0);
-            //bug here
-            //the first startegy sends all into the first one
+            
+            /**
+             * A very simple strategy if you have multiple schedulers and sub-workflows
+             * just use the first scheduler
+             */
             job.setUserId(getWorkflowEngine().getSchedulerId(0));
             
             
-                        //add stage-in job
+            /** add stage-in job */
             for(Iterator it = getJobList().iterator(); it.hasNext();)
             {
                 Job cJob = (Job)it.next();
+                /** first level jobs */
                 if(cJob.getParentList().isEmpty()){
-                    //first level job
                     cJob.addParent(job);
                     job.addChild(cJob);
                 }
                 
             }
-            //don't do it before the for loop otherwise there is a loop
             getJobList().add(job);
-            //add stage-out job but I don't know how to do it now
+            
+            /**
+             * In the future, we will add stage-out job
+             */
         }
+        
 	/**
 	 * Processes events available for this Broker.
 	 * 
@@ -244,27 +273,30 @@ public class ClusteringEngine extends SimEntity {
 	public void processEvent(SimEvent ev) {
             
 		switch (ev.getTag()) {
-		// Resource characteristics request
-			// if the simulation finishes
                     case WorkflowSimTags.START_SIMULATION:
                         break;
-                        case WorkflowSimTags.JOB_SUBMIT:
-                                List list = (List)ev.getData();
-                                setTaskList(list);
-
-                                processClustering();
-
-                                processDatastaging();
-
-                                sendNow(this.workflowEngineId, WorkflowSimTags.JOB_SUBMIT, getJobList());
-                                break;
-			case CloudSimTags.END_OF_SIMULATION:
-				shutdownEntity();
-				break;
-			// other unknown tags are processed by this method
-			default:
-				processOtherEvent(ev);
-				break;
+                    case WorkflowSimTags.JOB_SUBMIT:
+                        List list = (List)ev.getData();
+                        setTaskList(list);
+                        /** It doesn't mean we must do clustering here because by default 
+                         the processClustering() does nothing unless in the configuration
+                         file we have specified to use clustering
+                         */
+                        processClustering();
+                        /**
+                         * Add stage-in jobs
+                         * Currently we just add a job that has minimum runtime but inputs 
+                         * all input data at the beginning of the workflow execution
+                         */
+                        processDatastaging();
+                        sendNow(this.workflowEngineId, WorkflowSimTags.JOB_SUBMIT, getJobList());
+                        break;
+                    case CloudSimTags.END_OF_SIMULATION:
+			shutdownEntity();
+                        break;
+                    default:
+			processOtherEvent(ev);
+			break;
 		}
 	}
 
@@ -317,37 +349,50 @@ public class ClusteringEngine extends SimEntity {
 
 
 	/**
-	 * Gets the cloudlet list.
+	 * Gets the task list.
 	 * 
 	 * @param <T> the generic type
-	 * @return the cloudlet list
+	 * @return the task list
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Task> getTaskList() {
 		return (List<Task>) taskList;
 	}
+        
+        /**
+	 * Gets the job list.
+	 * 
+	 * @param <T> the generic type
+	 * @return the job list
+	 */
         public List<Job> getJobList(){
             return jobList;
         }
 
 	/**
-	 * Sets the cloudlet list.
+	 * Sets the task list.
 	 * 
 	 * @param <T> the generic type
-	 * @param cloudletList the new cloudlet list
+	 * @param taskList the new task list
 	 */
 	protected void setTaskList(List<Task> taskList) {
 		this.taskList = taskList;
 	}
-
+        
+        /**
+	 * Sets the job list.
+	 * 
+	 * @param <T> the generic type
+	 * @param jobList the new job list
+	 */
         protected void setJobList(List<Job> jobList){
             this.jobList = jobList;
         }
 	/**
-	 * Gets the cloudlet submitted list.
+	 * Gets the tasks submitted list.
 	 * 
 	 * @param <T> the generic type
-	 * @return the cloudlet submitted list
+	 * @return the task submitted list
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Task> getTaskSubmittedList() {
@@ -355,20 +400,20 @@ public class ClusteringEngine extends SimEntity {
 	}
 
 	/**
-	 * Sets the cloudlet submitted list.
+	 * Sets the tasks submitted list.
 	 * 
 	 * @param <T> the generic type
-	 * @param cloudletSubmittedList the new cloudlet submitted list
+	 * @param taskSubmittedList the new task submitted list
 	 */
 	protected void setTaskSubmittedList(List<Task> taskSubmittedList) {
 		this.taskSubmittedList = taskSubmittedList;
 	}
 
 	/**
-	 * Gets the cloudlet received list.
+	 * Gets the task received list.
 	 * 
 	 * @param <T> the generic type
-	 * @return the cloudlet received list
+	 * @return the task received list
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Task> getTaskReceivedList() {
@@ -376,10 +421,10 @@ public class ClusteringEngine extends SimEntity {
 	}
 
 	/**
-	 * Sets the cloudlet received list.
+	 * Sets the task received list.
 	 * 
 	 * @param <T> the generic type
-	 * @param cloudletReceivedList the new cloudlet received list
+	 * @param taskReceivedList the new cloudlet received list
 	 */
 	protected void setTaskReceivedList(List<Task> taskReceivedList) {
 		this.taskReceivedList = taskReceivedList;
