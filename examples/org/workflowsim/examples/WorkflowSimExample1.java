@@ -47,7 +47,13 @@ import org.workflowsim.utils.ArgumentParser;
 import org.workflowsim.utils.Parameters;
 
 /**
- *a workflow engines, one planner two schedulers
+ *  This WorkflowSimExample creates a workflow planner, a workflow engine, and two
+ * schedulers, two data centers and 20 vms. 
+ * All the configuration of CloudSim is done in WorkflowSimExamplex.java
+ * All the configuration of WorkflowSim is done in the config.txt that must be specified
+ * in argument of this WorkflowSimExample. 
+ * The argument should have at least:
+ * "-p path_to_config.txt"
  * 
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
