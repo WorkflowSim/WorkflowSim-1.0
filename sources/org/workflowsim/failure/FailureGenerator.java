@@ -1,5 +1,5 @@
 /**
- *  Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,30 +15,38 @@
  */
 package org.workflowsim.failure;
 
-import org.workflowsim.Job;
-import org.workflowsim.Task;
-import org.workflowsim.utils.Parameters;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Random;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Log;
+import org.workflowsim.Job;
+import org.workflowsim.Task;
+import org.workflowsim.utils.Parameters;
 
 /**
- *
+ * FailureGenerator creates a failure when a job returns
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class FailureGenerator {
     
-    
+    /** The Random generator. */
     private static Random generator;
     
+    /** Initialize a Failure Generator. */
     public static void init(){
         generator = new Random(System.currentTimeMillis());
     }
     
-    //true means has failure//false means no failure
+    /**
+     * Generates a failure or not
+     * @param job
+     * @return whether it fails
+     */
+    //true means has failure
+    //false means no failure
     public static boolean generate(Job job){
         boolean jobFailed = false;
         
@@ -50,11 +58,13 @@ public class FailureGenerator {
                 Task task = (Task)it.next();
                 double alpha = 0.0;
                 switch(Parameters.getFailureGeneratorMode()){
+                    /** Every task is considered. */
                     case FAILURE_ALL:
                         //by default
                         
                         alpha = (Double)(Parameters.getAlpha().get(0));
                         break;
+                    /** Generate failures based on the type of job. */
                     case FAILURE_JOB:
 
                         if(Parameters.getAlpha().size() <= task.getDepth()){
@@ -64,6 +74,7 @@ public class FailureGenerator {
                         
                         alpha = (Double)(Parameters.getAlpha().get(task.getDepth()));
                     break;
+                    /** Generate failures based on the type of vm. */
                     case FAILURE_VM:
 
                         if(!Parameters.getAlpha().containsKey(job.getVmId())){
@@ -74,13 +85,12 @@ public class FailureGenerator {
                        
                     break;
                     case FAILURE_NONE:
+                        /** 0.0 doesn't work. */
                         alpha = (-0.1);
                         break;
                 }
                
                 int bound = (int)( alpha * 1000);
-                //a bug here
-                //if(alpha <0.0) bound = -100;
                 randomValue = generator.nextInt(1000);
                 int failedTaskSum = 0;
                 if(randomValue <= bound){
