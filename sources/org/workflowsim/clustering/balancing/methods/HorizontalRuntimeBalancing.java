@@ -1,6 +1,6 @@
 /*
  * 
- *   Copyright 2007-2008 University Of Southern California
+ *  Copyright 2012-2013 University Of Southern California
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
