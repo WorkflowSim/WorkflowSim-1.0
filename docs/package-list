@@ -2,6 +2,12 @@ org.cloudbus.cloudsim
 org.cloudbus.cloudsim.core
 org.cloudbus.cloudsim.core.predicates
 org.cloudbus.cloudsim.distributions
+org.cloudbus.cloudsim.examples
+org.cloudbus.cloudsim.examples.network
+org.cloudbus.cloudsim.examples.network.datacenter
+org.cloudbus.cloudsim.examples.power
+org.cloudbus.cloudsim.examples.power.planetlab
+org.cloudbus.cloudsim.examples.power.random
 org.cloudbus.cloudsim.lists
 org.cloudbus.cloudsim.network
 org.cloudbus.cloudsim.network.datacenter
@@ -10,3 +16,13 @@ org.cloudbus.cloudsim.power.lists
 org.cloudbus.cloudsim.power.models
 org.cloudbus.cloudsim.provisioners
 org.cloudbus.cloudsim.util
+org.workflowsim
+org.workflowsim.clustering
+org.workflowsim.clustering.balancing
+org.workflowsim.clustering.balancing.methods
+org.workflowsim.clustering.balancing.metrics
+org.workflowsim.examples
+org.workflowsim.failure
+org.workflowsim.reclustering
+org.workflowsim.scheduler
+org.workflowsim.utils
