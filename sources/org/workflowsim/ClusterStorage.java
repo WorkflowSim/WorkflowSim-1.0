@@ -1,17 +1,17 @@
 /**
- *  Copyright 2012-2013 University Of Southern California
+ * Copyright 2012-2013 University Of Southern California
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.workflowsim;
 
@@ -21,37 +21,40 @@ import org.cloudbus.cloudsim.HarddriveStorage;
 import org.cloudbus.cloudsim.ParameterException;
 
 /**
- * ClusterStorage is an extention of HarddriveStorage and it is used as a local 
+ * ClusterStorage is an extention of HarddriveStorage and it is used as a local
  * storage system of a vm
- * 
+ *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public class ClusterStorage extends HarddriveStorage{
-    
-    /** The map stores the bandwidth from this clusterstorage to others*/
-    Map bandwidthMap ;
-    
+public class ClusterStorage extends HarddriveStorage {
+
+    /**
+     * The map stores the bandwidth from this clusterstorage to others
+     */
+    Map bandwidthMap;
+
     /**
      * Initialize a ClusterStorage
+     *
      * @param name, name of this storage
      * @param capacity, capacity
-     * @throws ParameterException 
+     * @throws ParameterException
      */
-    public ClusterStorage(String name, double capacity) throws ParameterException
-    {
+    public ClusterStorage(String name, double capacity) throws ParameterException {
         super(name, capacity);
     }
-    
+
     /**
      * Sets the bandwidth between this storage to the destination storage
+     *
      * @param name the destination storage
-     * @param bandwidth 
+     * @param bandwidth
      */
-    public final void setBandwidth(String name, double bandwidth){
-        if(bandwidth >= 0){
-            if(bandwidthMap == null){
+    public final void setBandwidth(String name, double bandwidth) {
+        if (bandwidth >= 0) {
+            if (bandwidthMap == null) {
                 bandwidthMap = new HashMap<String, Double>();
             }
             bandwidthMap.put(name, bandwidth);
@@ -60,15 +63,16 @@ public class ClusterStorage extends HarddriveStorage{
 
     /**
      * Gets the bandwidth from this storage to the destination storage
-     * @param destination 
+     *
+     * @param destination
      * @return bandwidth
      */
     public double getMaxTransferRate(String destination) {
-        if(bandwidthMap.containsKey(destination)){
-            return (Double)bandwidthMap.get(destination);
-        }else{
+        if (bandwidthMap.containsKey(destination)) {
+            return (Double) bandwidthMap.get(destination);
+        } else {
             //local bandwidth between vms
-            return (Double)bandwidthMap.get("local");
+            return (Double) bandwidthMap.get("local");
         }
     }
 }

@@ -25,25 +25,25 @@ import java.util.ArrayList;
  *
  * @author Weiwei Chen
  */
-public class ImpactFactorVariance implements BalancingMetric{
+public class ImpactFactorVariance implements BalancingMetric {
+
     @Override
-    public double getMetric(ArrayList<TaskSet> list){
-         if(list == null || list.size() <= 1){
+    public double getMetric(ArrayList<TaskSet> list) {
+        if (list == null || list.size() <= 1) {
             return 0.0;
         }
         double sum = 0;
-        for(TaskSet task: list){
+        for (TaskSet task : list) {
             sum += task.getImpactFactor();
-            
+
         }
         double mean = sum / list.size();
         //Log.printLine("sum: " + sum );
         sum = 0.0;
-        for(TaskSet task: list){
+        for (TaskSet task : list) {
             double var = task.getImpactFactor();
-            sum += Math.pow(var-mean, 2);
+            sum += Math.pow(var - mean, 2);
         }
-        return Math.sqrt(sum/list.size());
+        return Math.sqrt(sum / list.size());
     }
-    
 }

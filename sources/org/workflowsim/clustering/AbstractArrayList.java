@@ -20,50 +20,55 @@ package org.workflowsim.clustering;
 import java.util.ArrayList;
 
 /**
- * This data structure AbstractArrayList is used in clustering alone 
- * It is better than ArrayList since it associates with depth information
- * 
+ * This data structure AbstractArrayList is used in clustering alone It is
+ * better than ArrayList since it associates with depth information
+ *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
 public class AbstractArrayList {
-    
-    /**The task list. */
+
+    /**
+     * The task list.
+     */
     private ArrayList taskList;
-    
-    /**The depth of these tasks. */
+    /**
+     * The depth of these tasks.
+     */
     private int depth;
-    
+
     /**
      * Initialize AbstractArrayList
+     *
      * @param taskList the task list
      * @param depth the level of these tasks
      */
-    public AbstractArrayList(ArrayList taskList, int depth){
-        this.taskList   = taskList;
+    public AbstractArrayList(ArrayList taskList, int depth) {
+        this.taskList = taskList;
         this.hasChecked = false;
-        this.depth      = depth;
+        this.depth = depth;
     }
-    
+
     /**
      * Gets the task list
+     *
      * @return task list
      */
-    public ArrayList getArrayList(){
+    public ArrayList getArrayList() {
         return this.taskList;
     }
-    
+
     /**
      * Gets the depth of these tasks
+     *
      * @return depth
      */
-    public int getDepth(){
+    public int getDepth() {
         return this.depth;
     }
-    
     /**
-     * A check point. 
+     * A check point.
      */
     public boolean hasChecked;
 }

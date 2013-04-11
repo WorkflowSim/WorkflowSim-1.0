@@ -1,17 +1,17 @@
 /**
- *  Copyright 2012-2013 University Of Southern California
+ * Copyright 2012-2013 University Of Southern California
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.workflowsim;
 
@@ -22,12 +22,10 @@ import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.core.SimEvent;
 
-
-
 /**
- * WorkflowPlanner supports dynamic planning. In the future we will have global and static 
- * algorithm here. The WorkflowSim starts from WorkflowPlanner. 
- * 
+ * WorkflowPlanner supports dynamic planning. In the future we will have global
+ * and static algorithm here. The WorkflowSim starts from WorkflowPlanner.
+ *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
@@ -35,211 +33,218 @@ import org.cloudbus.cloudsim.core.SimEvent;
  */
 public class WorkflowPlanner extends SimEntity {
 
+    /**
+     * The task list.
+     */
+    protected List< Task> taskList;
+    /**
+     * The workflow parser.
+     */
+    protected WorkflowParser parser;
+    /**
+     * The associated clustereing engine.
+     */
+    private int clusteringEngineId;
+    private ClusteringEngine clusteringEngine;
 
-	/** The task list. */
-	protected List< Task> taskList;
-        
-        /** The workflow parser. */
-        protected WorkflowParser parser;
-        
-        /** The associated clustereing engine. */
-        private int clusteringEngineId;
-        
-        private ClusteringEngine clusteringEngine;
-        
-       	/**
-	 * Created a new WorkflowPlanner object.
-	 * 
-	 * @param name name to be associated with this entity (as required by Sim_entity class from
-	 *            simjava package)
-	 * @throws Exception the exception
-	 * @pre name != null
-	 * @post $none
-	 */
-        public WorkflowPlanner(String name) throws Exception{
-            this(name, 1);
+    /**
+     * Created a new WorkflowPlanner object.
+     *
+     * @param name name to be associated with this entity (as required by
+     * Sim_entity class from simjava package)
+     * @throws Exception the exception
+     * @pre name != null
+     * @post $none
+     */
+    public WorkflowPlanner(String name) throws Exception {
+        this(name, 1);
+    }
+
+    public WorkflowPlanner(String name, int schedulers) throws Exception {
+        super(name);
+
+        setTaskList(new ArrayList<Task>());
+
+        this.clusteringEngine = new ClusteringEngine(name + "_Merger_", schedulers);
+        this.clusteringEngineId = this.clusteringEngine.getId();
+
+        this.parser = new WorkflowParser(getClusteringEngine().getWorkflowEngine().getSchedulerId(0));
+
+    }
+
+    /**
+     * Gets the clustering engine id
+     *
+     * @return clustering engine id
+     */
+    public int getClusteringEngineId() {
+        return this.clusteringEngineId;
+    }
+
+    /**
+     * Gets the clustering engine
+     *
+     * @return the clustering engine
+     */
+    public ClusteringEngine getClusteringEngine() {
+        return this.clusteringEngine;
+    }
+
+    /**
+     * Gets the workflow parser
+     *
+     * @return the workflow parser
+     */
+    public WorkflowParser getWorkflowParser() {
+        return this.parser;
+    }
+
+    /**
+     * Gets the workflow engine id
+     *
+     * @return the workflow engine id
+     */
+    public int getWorkflowEngineId() {
+        return getClusteringEngine().getWorkflowEngineId();
+    }
+
+    /**
+     * Gets the workflow engine
+     *
+     * @return the workflow engine
+     */
+    public WorkflowEngine getWorkflowEngine() {
+        return getClusteringEngine().getWorkflowEngine();
+    }
+
+    /**
+     * Processes events available for this Broker.
+     *
+     * @param ev a SimEvent object
+     * @pre ev != null
+     * @post $none
+     */
+    @Override
+    public void processEvent(SimEvent ev) {
+        switch (ev.getTag()) {
+            case WorkflowSimTags.START_SIMULATION:
+                getWorkflowParser().parse();
+                setTaskList(getWorkflowParser().getTaskList());
+                processImpactFactors(getTaskList());
+                sendNow(getClusteringEngineId(), WorkflowSimTags.JOB_SUBMIT, getTaskList());
+                break;
+            case CloudSimTags.END_OF_SIMULATION:
+                shutdownEntity();
+                break;
+            // other unknown tags are processed by this method
+            default:
+                processOtherEvent(ev);
+                break;
         }
-        
-	public WorkflowPlanner(String name, int schedulers) throws Exception {
-            super(name);
+    }
 
-            setTaskList(new ArrayList<Task>());
-
-            this.clusteringEngine = new ClusteringEngine(name +  "_Merger_", schedulers);
-            this.clusteringEngineId = this.clusteringEngine.getId();
-
-            this.parser             = new WorkflowParser(getClusteringEngine().getWorkflowEngine().getSchedulerId(0));           
-
-	}
-
-        /**
-         * Gets the clustering engine id
-         * @return clustering engine id
-         */
-        public int getClusteringEngineId(){
-            return this.clusteringEngineId;
-        }
-        
-        /**
-         * Gets the clustering engine 
-         * @return the clustering engine
-         */
-        public ClusteringEngine getClusteringEngine(){
-            return this.clusteringEngine;
-        }
-        
-        /**
-         * Gets the workflow parser
-         * @return the workflow parser
-         */
-        public WorkflowParser getWorkflowParser(){
-            return this.parser;
-        }
-
-      /**
-       * Gets the workflow engine id
-       * @return the workflow engine id
-       */
-        public int getWorkflowEngineId(){
-            return getClusteringEngine().getWorkflowEngineId();
-        }
-        /**
-         * Gets the workflow engine
-         * @return the workflow engine
-         */
-        public WorkflowEngine getWorkflowEngine(){
-            return getClusteringEngine().getWorkflowEngine();
-        }
-       
-	/**
-	 * Processes events available for this Broker.
-	 * 
-	 * @param ev a SimEvent object
-	 * @pre ev != null
-	 * @post $none
-	 */
-	@Override
-	public void processEvent(SimEvent ev) {
-		switch (ev.getTag()) {
-                        case WorkflowSimTags.START_SIMULATION:
-                                getWorkflowParser().parse();
-                                setTaskList(getWorkflowParser().getTaskList());
-                                processImpactFactors(getTaskList());
-                                sendNow(getClusteringEngineId(), WorkflowSimTags.JOB_SUBMIT, getTaskList());
-                                break;
-			case CloudSimTags.END_OF_SIMULATION:
-				shutdownEntity();
-				break;
-			// other unknown tags are processed by this method
-			default:
-				processOtherEvent(ev);
-				break;
-		}
-	}
-
-        /**
-         * Add impact factor for each task. This is useful in task balanced clustering algorithm
-         * It is for research purpose and thus it is optional. 
-         * @param taskList all the tasks
-         */
-        private void processImpactFactors(List<Task> taskList){
-            ArrayList<Task> exits = new ArrayList();
-            for(Task task: taskList){
-                if(task.getChildList().isEmpty()){
-                    exits.add(task);
-                }
-            }
-            double avg = 1.0 / exits.size();
-            for(Task task: exits){
-                addImpact(task, avg);
-            }
-        }
-        
-        /**
-         * Add impact factor for one particular task
-         * @param task, the task 
-         * @param impact , the impact factor
-         */
-        private void addImpact(Task task, double impact){
-
-            task.setImpact(task.getImpact() + impact);
-            int size = task.getParentList().size();
-            if(size > 0){
-                double avg = impact / size;
-                for(Task parent: task.getParentList()){
-                    addImpact(parent, avg);
-                }
+    /**
+     * Add impact factor for each task. This is useful in task balanced
+     * clustering algorithm It is for research purpose and thus it is optional.
+     *
+     * @param taskList all the tasks
+     */
+    private void processImpactFactors(List<Task> taskList) {
+        ArrayList<Task> exits = new ArrayList();
+        for (Task task : taskList) {
+            if (task.getChildList().isEmpty()) {
+                exits.add(task);
             }
         }
-	/**
-	 * Overrides this method when making a new and different type of Broker. This method is called
-	 * by {@link #body()} for incoming unknown tags.
-	 * 
-	 * @param ev a SimEvent object
-	 * @pre ev != null
-	 * @post $none
-	 */
-	protected void processOtherEvent(SimEvent ev) {
-		if (ev == null) {
-			Log.printLine(getName() + ".processOtherEvent(): " + "Error - an event is null.");
-			return;
-		}
+        double avg = 1.0 / exits.size();
+        for (Task task : exits) {
+            addImpact(task, avg);
+        }
+    }
 
-		Log.printLine(getName() + ".processOtherEvent(): "
-				+ "Error - event unknown by this DatacenterBroker.");
-	}
+    /**
+     * Add impact factor for one particular task
+     *
+     * @param task, the task
+     * @param impact , the impact factor
+     */
+    private void addImpact(Task task, double impact) {
 
-	/**
-	 * Send an internal event communicating the end of the simulation.
-	 * 
-	 * @pre $none
-	 * @post $none
-	 */
-	protected void finishExecution() {
-		//sendNow(getId(), CloudSimTags.END_OF_SIMULATION);
-	}
+        task.setImpact(task.getImpact() + impact);
+        int size = task.getParentList().size();
+        if (size > 0) {
+            double avg = impact / size;
+            for (Task parent : task.getParentList()) {
+                addImpact(parent, avg);
+            }
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see cloudsim.core.SimEntity#shutdownEntity()
-	 */
-	@Override
-	public void shutdownEntity() {
-		Log.printLine(getName() + " is shutting down...");
-	}
+    /**
+     * Overrides this method when making a new and different type of Broker.
+     * This method is called by {@link #body()} for incoming unknown tags.
+     *
+     * @param ev a SimEvent object
+     * @pre ev != null
+     * @post $none
+     */
+    protected void processOtherEvent(SimEvent ev) {
+        if (ev == null) {
+            Log.printLine(getName() + ".processOtherEvent(): " + "Error - an event is null.");
+            return;
+        }
 
-	/*
-	 * (non-Javadoc)
-	 * @see cloudsim.core.SimEntity#startEntity()
-	 */
-	@Override
-	public void startEntity() {
-		Log.printLine(getName() + " is starting...");
-		schedule(getId(), 0, WorkflowSimTags.START_SIMULATION);
-	}
+        Log.printLine(getName() + ".processOtherEvent(): "
+                + "Error - event unknown by this DatacenterBroker.");
+    }
 
+    /**
+     * Send an internal event communicating the end of the simulation.
+     *
+     * @pre $none
+     * @post $none
+     */
+    protected void finishExecution() {
+        //sendNow(getId(), CloudSimTags.END_OF_SIMULATION);
+    }
 
-	/**
-	 * Gets the task list.
-	 * 
-	 * @param <T> the generic type
-	 * @return the task list
-	 */
-	@SuppressWarnings("unchecked")
-	public List<Task> getTaskList() {
-		return (List<Task>) taskList;
-	}
-       
-	/**
-	 * Sets the task list.
-	 * 
-	 * @param <T> the generic type
-	 * @param cloudletList the new task list
-	 */
-	protected void setTaskList(List<Task> taskList) {
-		this.taskList = taskList;
-	}
+    /*
+     * (non-Javadoc)
+     * @see cloudsim.core.SimEntity#shutdownEntity()
+     */
+    @Override
+    public void shutdownEntity() {
+        Log.printLine(getName() + " is shutting down...");
+    }
 
+    /*
+     * (non-Javadoc)
+     * @see cloudsim.core.SimEntity#startEntity()
+     */
+    @Override
+    public void startEntity() {
+        Log.printLine(getName() + " is starting...");
+        schedule(getId(), 0, WorkflowSimTags.START_SIMULATION);
+    }
 
+    /**
+     * Gets the task list.
+     *
+     * @param <T> the generic type
+     * @return the task list
+     */
+    @SuppressWarnings("unchecked")
+    public List<Task> getTaskList() {
+        return (List<Task>) taskList;
+    }
 
+    /**
+     * Sets the task list.
+     *
+     * @param <T> the generic type
+     * @param cloudletList the new task list
+     */
+    protected void setTaskList(List<Task> taskList) {
+        this.taskList = taskList;
+    }
 }

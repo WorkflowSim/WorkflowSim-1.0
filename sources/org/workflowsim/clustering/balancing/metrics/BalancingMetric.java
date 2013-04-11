@@ -25,5 +25,6 @@ import java.util.ArrayList;
  * @author Weiwei Chen
  */
 public interface BalancingMetric {
+
     public double getMetric(ArrayList<TaskSet> list);
 }

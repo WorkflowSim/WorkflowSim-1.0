@@ -31,59 +31,61 @@ import org.workflowsim.clustering.TaskSet;
  * @date Apr 9, 2013
  */
 public class BalancingMethod {
-    
+
     private Map<Task, TaskSet> taskMap;
-    
-    private Map<Integer,ArrayList<TaskSet>> levelMap;
-    
+    private Map<Integer, ArrayList<TaskSet>> levelMap;
     private int clusterNum;
-    
-    public BalancingMethod(Map levelMap, Map taskMap, int clusterNum){
+
+    public BalancingMethod(Map levelMap, Map taskMap, int clusterNum) {
         this.taskMap = taskMap;
         this.levelMap = levelMap;
         this.clusterNum = clusterNum;
     }
-    public Map getTaskMap(){
+
+    public Map getTaskMap() {
         return this.taskMap;
     }
-    public Map getLevelMap(){
+
+    public Map getLevelMap() {
         return this.levelMap;
     }
-    public int getClusterNum(){
+
+    public int getClusterNum() {
         return this.clusterNum;
     }
-        /*
+    /*
      * Add all the tasks of tail to head and clean tail(like an arrow)
      * can be reused with verticalClustering()
      */
-    public void addTaskSet2TaskSet(TaskSet tail, TaskSet head){
+
+    public void addTaskSet2TaskSet(TaskSet tail, TaskSet head) {
         head.addTask(tail.getTaskList());
         head.getParentList().remove(tail);
         //update manually, beautifully, I like it here
-        for(Task task: tail.getTaskList()){
+        for (Task task : tail.getTaskList()) {
             getTaskMap().put(task, head);
         }
         /*
          * At the same level you can do so, but for vc it doens't, 
          * while usually for vc we don't need to calculate impact
          */
-        head.setImpactFafctor( head.getImpactFactor()+tail.getImpactFactor());
-        for(TaskSet taskSet: tail.getParentList()){
+        head.setImpactFafctor(head.getImpactFactor() + tail.getImpactFactor());
+        for (TaskSet taskSet : tail.getParentList()) {
             taskSet.getChildList().remove(tail);
-            if(!taskSet.getChildList().contains(head)){
+            if (!taskSet.getChildList().contains(head)) {
                 taskSet.getChildList().add(head);
             }
-            if(!head.getParentList().contains(taskSet)){
+            if (!head.getParentList().contains(taskSet)) {
                 head.getParentList().add(taskSet);
             }
         }
-        
-        for(TaskSet taskSet: tail.getChildList()){
+
+        for (TaskSet taskSet : tail.getChildList()) {
             taskSet.getParentList().remove(tail);
-            if(!taskSet.getParentList().contains(head)){
+            if (!taskSet.getParentList().contains(head)) {
                 taskSet.getParentList().add(head);
             }
-            if(!head.getChildList().contains(taskSet)){
+            if (!head.getChildList().contains(taskSet)) {
                 head.getChildList().add(taskSet);
             }
         }
@@ -91,13 +93,15 @@ public class BalancingMethod {
         tail.getChildList().clear();
         tail.getParentList().clear();
     }
-    public void run(){
+
+    public void run() {
         throw (new RuntimeException("Should not use this function"));
     }
-    public void cleanTaskSetChecked(){
+
+    public void cleanTaskSetChecked() {
         Collection sets = getTaskMap().values();
-        for(Iterator it = sets.iterator();it.hasNext();){
-            TaskSet set = (TaskSet)it.next();
+        for (Iterator it = sets.iterator(); it.hasNext();) {
+            TaskSet set = (TaskSet) it.next();
             set.hasChecked = false;
         }
     }

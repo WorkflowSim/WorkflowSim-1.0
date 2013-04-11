@@ -28,35 +28,35 @@ import java.util.Map;
  *
  * @author chenweiwei
  */
-public class VerticalBalancing extends BalancingMethod{
-    
-    public VerticalBalancing(Map levelMap, Map taskMap, int clusterNum){
+public class VerticalBalancing extends BalancingMethod {
+
+    public VerticalBalancing(Map levelMap, Map taskMap, int clusterNum) {
         super(levelMap, taskMap, clusterNum);
     }
+
     @Override
-    public void run(){
+    public void run() {
         Collection sets = getTaskMap().values();
-        for(Iterator it = sets.iterator();it.hasNext();){
-            TaskSet set = (TaskSet)it.next();
-            if(!set.hasChecked){
+        for (Iterator it = sets.iterator(); it.hasNext();) {
+            TaskSet set = (TaskSet) it.next();
+            if (!set.hasChecked) {
                 set.hasChecked = true;
             }
             //check if you can merge it with its child
             ArrayList list = set.getChildList();
-            if(list.size()==1){
+            if (list.size() == 1) {
                 //
-                TaskSet child = (TaskSet)list.get(0);
+                TaskSet child = (TaskSet) list.get(0);
                 ArrayList pList = child.getParentList();
-                if(pList.size()==1){
+                if (pList.size() == 1) {
                     //add parent to child (don't do it reversely)
                     addTaskSet2TaskSet(set, child);
-                    
+
                 }
             }
-            
+
         }
         //within each method
         cleanTaskSetChecked();
     }
-    
 }

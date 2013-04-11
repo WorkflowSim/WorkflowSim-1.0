@@ -30,28 +30,29 @@ import java.util.Map;
  *
  * @author Weiwei Chen
  */
-public class ChildAwareHorizontalClustering extends BalancingMethod{
-    
-    public ChildAwareHorizontalClustering(Map levelMap, Map taskMap, int clusterNum){
+public class ChildAwareHorizontalClustering extends BalancingMethod {
+
+    public ChildAwareHorizontalClustering(Map levelMap, Map taskMap, int clusterNum) {
         super(levelMap, taskMap, clusterNum);
     }
+
     @Override
-    public void run(){
-        Map<Integer,ArrayList<TaskSet>> map = getLevelMap();
+    public void run() {
+        Map<Integer, ArrayList<TaskSet>> map = getLevelMap();
         Map<ArrayList<TaskSet>, AbstractArrayList> tmpMap = new HashMap();
-        for(Map.Entry entry: map.entrySet()){
-            int depth = (Integer)entry.getKey();
-            ArrayList<TaskSet> list = (ArrayList)entry.getValue();
+        for (Map.Entry entry : map.entrySet()) {
+            int depth = (Integer) entry.getKey();
+            ArrayList<TaskSet> list = (ArrayList) entry.getValue();
             AbstractArrayList abList = new AbstractArrayList(list, depth);
-            tmpMap.put(list, abList);            
+            tmpMap.put(list, abList);
         }
         ArrayList<AbstractArrayList> abList = new ArrayList(tmpMap.values());
         sortMap(abList);
-        for(AbstractArrayList list : abList){
-            if(!list.hasChecked){
+        for (AbstractArrayList list : abList) {
+            if (!list.hasChecked) {
                 boolean hasClustered = CHBcheckLevel(list.getArrayList());
                 //Log.printLine("Depth:"+list.getDepth());
-                if(hasClustered){
+                if (hasClustered) {
                     list.hasChecked = true;
                     //check its parent levels
                     int depth = list.getDepth();
@@ -62,12 +63,12 @@ public class ChildAwareHorizontalClustering extends BalancingMethod{
 //                        tsAbList.hasChecked = true;
 //                    }
                     int i = depth + 1;
-                    while(map.containsKey(i)){
-                        ArrayList<TaskSet> tsList = (ArrayList)map.get(i);
+                    while (map.containsKey(i)) {
+                        ArrayList<TaskSet> tsList = (ArrayList) map.get(i);
                         CHBcheckLevel(tsList);
-                        AbstractArrayList tsAbList = (AbstractArrayList)tmpMap.get(tsList);
+                        AbstractArrayList tsAbList = (AbstractArrayList) tmpMap.get(tsList);
                         tsAbList.hasChecked = true;
-                        i ++;
+                        i++;
                     }
                 }
             }
@@ -75,33 +76,35 @@ public class ChildAwareHorizontalClustering extends BalancingMethod{
         //within each method
         cleanTaskSetChecked();
     }
-    private void sortMap(ArrayList<AbstractArrayList> list){
-        Collections.sort(list, new Comparator<AbstractArrayList>(){
-            public int compare(AbstractArrayList l1, AbstractArrayList l2){
-                
-                return (int)(l2.getArrayList().size() - l1.getArrayList().size());
+
+    private void sortMap(ArrayList<AbstractArrayList> list) {
+        Collections.sort(list, new Comparator<AbstractArrayList>() {
+            public int compare(AbstractArrayList l1, AbstractArrayList l2) {
+
+                return (int) (l2.getArrayList().size() - l1.getArrayList().size());
             }
         });
-    
+
     }
-     private boolean CHBcheckLevel(ArrayList taskList){
+
+    private boolean CHBcheckLevel(ArrayList taskList) {
         boolean hasClustered = false;
-        for(int i = 0 ; i < taskList.size(); i ++){
-            TaskSet setA = (TaskSet)taskList.get(i);
+        for (int i = 0; i < taskList.size(); i++) {
+            TaskSet setA = (TaskSet) taskList.get(i);
             setA.hasChecked = false;//for safety
         }
-        for(int i = 0 ; i < taskList.size(); i ++){
-            TaskSet setA = (TaskSet)taskList.get(i);
-            if(!setA.hasChecked){
+        for (int i = 0; i < taskList.size(); i++) {
+            TaskSet setA = (TaskSet) taskList.get(i);
+            if (!setA.hasChecked) {
 
-                for(int j = i+1; j < taskList.size(); j++){
-                    TaskSet setB = (TaskSet)taskList.get(j);
-                    if(!setB.hasChecked){
+                for (int j = i + 1; j < taskList.size(); j++) {
+                    TaskSet setB = (TaskSet) taskList.get(j);
+                    if (!setB.hasChecked) {
                         //TaskSet kid = CHBhasOnlyChild(setA, setB);
                         //TaskSet kid = CHBhasOnlyParent(setA, setB);
                         TaskSet kid = CHBhasOneParent(setA, setB);
-                        if(kid!=null){
-                            if(true){//this condition is that the runtime is fine
+                        if (kid != null) {
+                            if (true) {//this condition is that the runtime is fine
                                 setA.hasChecked = true;//it does not matter
                                 setB.hasChecked = true;
                                 addTaskSet2TaskSet(setA, setB);
@@ -114,38 +117,39 @@ public class ChildAwareHorizontalClustering extends BalancingMethod{
         }
         return hasClustered;
     }
-      private TaskSet CHBhasOnlyChild(TaskSet setA, TaskSet setB){
-        
-        if(setA.getChildList().size()==1 && setB.getChildList().size()==1){
+
+    private TaskSet CHBhasOnlyChild(TaskSet setA, TaskSet setB) {
+
+        if (setA.getChildList().size() == 1 && setB.getChildList().size() == 1) {
             TaskSet kidA = setA.getChildList().get(0);
             TaskSet kidB = setB.getChildList().get(0);
-            if(kidA.equals(kidB)){
+            if (kidA.equals(kidB)) {
                 return kidA;
             }
         }
         return null;
     }
-    private TaskSet CHBhasOnlyParent(TaskSet setA, TaskSet setB){
-        
-        if(setA.getParentList().size()==1 && setB.getParentList().size()==1){
+
+    private TaskSet CHBhasOnlyParent(TaskSet setA, TaskSet setB) {
+
+        if (setA.getParentList().size() == 1 && setB.getParentList().size() == 1) {
             TaskSet kidA = setA.getParentList().get(0);
             TaskSet kidB = setB.getParentList().get(0);
-            if(kidA.equals(kidB)){
+            if (kidA.equals(kidB)) {
                 return kidA;
             }
         }
         return null;
     }
-    private TaskSet CHBhasOneParent(TaskSet setA, TaskSet setB){
-        for(TaskSet parentA: setA.getParentList()){
-            for (TaskSet parentB: setB.getParentList()){
-                if(parentA.equals(parentB)){
+
+    private TaskSet CHBhasOneParent(TaskSet setA, TaskSet setB) {
+        for (TaskSet parentA : setA.getParentList()) {
+            for (TaskSet parentB : setB.getParentList()) {
+                if (parentA.equals(parentB)) {
                     return parentA;
                 }
             }
         }
         return null;
     }
-
-   
 }

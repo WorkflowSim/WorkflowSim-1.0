@@ -26,22 +26,23 @@ import java.util.ArrayList;
  * @author Weiwei Chen
  */
 public class HorizontalRuntimeVariance implements BalancingMetric {
+
     @Override
-    public double getMetric(ArrayList<TaskSet> list){
-        if(list == null || list.size() <= 1){
+    public double getMetric(ArrayList<TaskSet> list) {
+        if (list == null || list.size() <= 1) {
             return 0.0;
         }
         long sum = 0;
-        for(TaskSet task: list){
-            sum+= task.getJobRuntime();
+        for (TaskSet task : list) {
+            sum += task.getJobRuntime();
             //Log.printLine(task.getJobRuntime());
         }
         long mean = sum / list.size();
         sum = 0;
-        for(TaskSet task: list){
+        for (TaskSet task : list) {
             long var = task.getJobRuntime();
-            sum += Math.pow((double)(var-mean), 2);
+            sum += Math.pow((double) (var - mean), 2);
         }
-        return Math.sqrt((double)(sum/list.size()))/mean;
-    } 
+        return Math.sqrt((double) (sum / list.size())) / mean;
+    }
 }

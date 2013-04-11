@@ -29,43 +29,45 @@ import org.cloudbus.cloudsim.Log;
  *
  * @author Weiwei Chen
  */
-public class HorizontalDistanceBalancing extends HorizontalImpactBalancing{
-    
-    public HorizontalDistanceBalancing(Map levelMap, Map taskMap, int clusterNum){
+public class HorizontalDistanceBalancing extends HorizontalImpactBalancing {
+
+    public HorizontalDistanceBalancing(Map levelMap, Map taskMap, int clusterNum) {
         super(levelMap, taskMap, clusterNum);
     }
+
     @Override
-    public void run(){
-        Map<Integer,ArrayList<TaskSet>> map = getLevelMap();
-        for(Iterator it = map.values().iterator();it.hasNext();){
-            ArrayList<TaskSet> taskList = (ArrayList)it.next();
+    public void run() {
+        Map<Integer, ArrayList<TaskSet>> map = getLevelMap();
+        for (Iterator it = map.values().iterator(); it.hasNext();) {
+            ArrayList<TaskSet> taskList = (ArrayList) it.next();
             process(taskList);
             //disMap.clear();
         }
-        
+
     }
+
     @Override
-    protected TaskSet getCandidateTastSet(ArrayList<TaskSet> taskList, TaskSet checkSet){
+    protected TaskSet getCandidateTastSet(ArrayList<TaskSet> taskList, TaskSet checkSet) {
         long min = taskList.get(0).getJobRuntime();
         int dis = Integer.MAX_VALUE;
         TaskSet task = null;
-        for(TaskSet set:taskList){
-            if(set.getJobRuntime() == min){
+        for (TaskSet set : taskList) {
+            if (set.getJobRuntime() == min) {
                 int distance = calDistance(checkSet, set);
-                if(distance < dis){
+                if (distance < dis) {
                     dis = distance;
                     task = set;
                 }
             }
         }
-        
-        if(task!=null){
+
+        if (task != null) {
             return task;
-        }else{
+        } else {
             return taskList.get(0);
         }
-      
-        
+
+
         //return null;
     }
     /*
@@ -73,9 +75,9 @@ public class HorizontalDistanceBalancing extends HorizontalImpactBalancing{
      * because it is horizontal clustering
      * does not work arbitary workflows
      */
-    private int calDistance(TaskSet taskA, TaskSet taskB){
-        if(taskA == null || taskB == null || taskA == taskB)
-        {
+
+    private int calDistance(TaskSet taskA, TaskSet taskB) {
+        if (taskA == null || taskB == null || taskA == taskB) {
             return 0;
         }
         LinkedList<TaskSet> listA = new LinkedList<TaskSet>();
@@ -84,41 +86,40 @@ public class HorizontalDistanceBalancing extends HorizontalImpactBalancing{
         listA.add(taskA);
         listB.add(taskB);
 
-        if(taskA.getTaskList().isEmpty()||taskB.getTaskList().isEmpty()){
+        if (taskA.getTaskList().isEmpty() || taskB.getTaskList().isEmpty()) {
             return 0;
         }
-        do{
-            
-            LinkedList<TaskSet> copyA = (LinkedList)listA.clone();
+        do {
+
+            LinkedList<TaskSet> copyA = (LinkedList) listA.clone();
             listA.clear();
-            for(TaskSet set: copyA){
-                for(TaskSet child: set.getChildList()){
-                    if(!listA.contains(child)){
+            for (TaskSet set : copyA) {
+                for (TaskSet child : set.getChildList()) {
+                    if (!listA.contains(child)) {
                         listA.add(child);
                     }
                 }
             }
-            LinkedList<TaskSet> copyB = (LinkedList)listB.clone();
+            LinkedList<TaskSet> copyB = (LinkedList) listB.clone();
             listB.clear();
-            for(TaskSet set: copyB){
-                for(TaskSet child: set.getChildList()){
-                    if(!listB.contains(child)){
+            for (TaskSet set : copyB) {
+                for (TaskSet child : set.getChildList()) {
+                    if (!listB.contains(child)) {
                         listB.add(child);
                     }
                 }
             }
-            
-            for(TaskSet set: listA){
-                if(listB.contains(set)){
+
+            for (TaskSet set : listA) {
+                if (listB.contains(set)) {
                     return distance * 2;
                 }
             }
-            
-            distance ++;
-            
-        }while(!listA.isEmpty()&&!listB.isEmpty());
-        
+
+            distance++;
+
+        } while (!listA.isEmpty() && !listB.isEmpty());
+
         return distance * 2;
     }
-
 }

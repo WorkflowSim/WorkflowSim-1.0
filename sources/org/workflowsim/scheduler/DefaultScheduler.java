@@ -1,17 +1,17 @@
 /**
- *  Copyright 2012-2013 University Of Southern California
+ * Copyright 2012-2013 University Of Southern California
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.workflowsim.scheduler;
 
@@ -24,84 +24,89 @@ import org.workflowsim.CondorVM;
 import org.workflowsim.WorkflowSimTags;
 
 /**
- * The default scheduler is a FCFS algorithm. Every other scheduling method should
- * extend from DefaultScheduler. 
- * 
+ * The default scheduler is a FCFS algorithm. Every other scheduling method
+ * should extend from DefaultScheduler.
+ *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public class DefaultScheduler implements SchedulerInterface{
-    
-    /**  the job list. */
-    private List <? extends Cloudlet> cloudletList;
-    
-    /**  the vm list. */
-    private List <? extends Vm> vmList;
-    
-    /** the scheduled job list. */
-    private List < Cloudlet> scheduledList;
-    
+public class DefaultScheduler implements SchedulerInterface {
+
+    /**
+     * the job list.
+     */
+    private List<? extends Cloudlet> cloudletList;
+    /**
+     * the vm list.
+     */
+    private List<? extends Vm> vmList;
+    /**
+     * the scheduled job list.
+     */
+    private List< Cloudlet> scheduledList;
+
     /**
      * Initialize a DefaultScheduler
      */
-    public DefaultScheduler(){
+    public DefaultScheduler() {
         this.scheduledList = new ArrayList();
     }
-    
+
     /**
      * Sets the job list.
-     * @param list 
+     *
+     * @param list
      */
     @Override
-    public void setCloudletList(List list){
+    public void setCloudletList(List list) {
         this.cloudletList = list;
     }
-    
+
     /**
      * Sets the vm list
-     * @param list 
+     *
+     * @param list
      */
     @Override
-    public void setVmList(List list){
-        this.vmList =new ArrayList(list);
+    public void setVmList(List list) {
+        this.vmList = new ArrayList(list);
     }
-    
+
     /**
-     * Gets the job list. 
+     * Gets the job list.
+     *
      * @return the job list
      */
     @Override
-    public List getCloudletList(){
+    public List getCloudletList() {
         return this.cloudletList;
     }
-    
+
     /**
      * Gets the vm list
+     *
      * @return the vm list
      */
     @Override
-    public List getVmList(){
+    public List getVmList() {
         return this.vmList;
-    }   
-    
-    /** 
+    }
+
+    /**
      * The main function
      */
     @Override
-    public void run(){
-        
-        
-        for(Iterator it = getCloudletList().iterator();it.hasNext();)
-        {
-            Cloudlet cloudlet = (Cloudlet)it.next();
+    public void run() {
+
+
+        for (Iterator it = getCloudletList().iterator(); it.hasNext();) {
+            Cloudlet cloudlet = (Cloudlet) it.next();
             boolean stillHasVm = false;
-            for(Iterator itc = getVmList().iterator(); itc.hasNext();)
-            {
+            for (Iterator itc = getVmList().iterator(); itc.hasNext();) {
 
                 CondorVM vm = (CondorVM) itc.next();
-                if(vm.getState()==WorkflowSimTags.VM_STATUS_IDLE)
-                {
+                if (vm.getState() == WorkflowSimTags.VM_STATUS_IDLE) {
                     stillHasVm = true;
                     vm.setState(WorkflowSimTags.VM_STATUS_BUSY);
                     cloudlet.setVmId(vm.getId());
@@ -110,20 +115,20 @@ public class DefaultScheduler implements SchedulerInterface{
                 }
             }
             //no vm available 
-            if(!stillHasVm){
+            if (!stillHasVm) {
                 break;
             }
 
         }
     }
-    
+
     /**
      * Gets the scheduled job list
+     *
      * @return job list
      */
     @Override
-    public List getScheduledList()
-    {
+    public List getScheduledList() {
         return this.scheduledList;
     }
 }
