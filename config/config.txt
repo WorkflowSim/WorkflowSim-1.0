@@ -42,7 +42,7 @@ clusters.num 	= 40
 #The size of a clustered job (number of tasks per job)
 #clusters.size 	= 20
 #The clustering method
-clusters.method = horizontal
+#clusters.method = horizontal
 #The type of file system to use
 file.system	= LOCAL
 #file.system	= SHARED
