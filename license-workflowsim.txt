@@ -9,6 +9,6 @@
  * some other similar material which is provided with the Software (if
  * any).
  *
- * Copyright 1999-2004 University of Chicago and The University of
- * Southern California. All rights reserved.
+ * Copyright 2012-2013 University of Southern California. All rights 
+ * reserved.
  */
