@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import org.workflowsim.clustering.TaskSet;
 
 /**
- * Every balancing metric should implements this interface
+ * Every balancing metric should implement this interface
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
