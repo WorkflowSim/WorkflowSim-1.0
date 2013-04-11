@@ -1,31 +1,57 @@
+#Overhead Related Parameters
+#The Workflow Engine Delay for level 1
 #d1		= 8.1 
+#The Workflow Engine Delay for level 2
 #d2		= 18.44 
-#d5		= 10.16 
+#The Workflow Engine Delay for other levels that are not specified 
 #d0		= 6.74
+#The Postscript Delay for level 1
 #p1		= 78.05
+#The Postscript Delay for level 2
 #p2		= 13.12
-#p5		= 84.93
+#The Postscript Delay for other levels that are not specified
 #p0		= 6.81
+#The Queue Delay for level 1
 #q1		= 77.75
+#The Queue Delay for level 2
 #q2		= 343.47
-#q5		= 302.98
+#The Queue Delay for other levels that are not specified
 #q0		= 161.96
+#The Clustering Delay for level 1
 #c1		= 428.28
+#The Clustering Delay for level 2
 #c2		= 67.44
-#c5		= 198.67
-#a1		= 0.02
-#a2		= 0.02
-#a5		= 0.02
-clusters.num 	= 40
-file.system	= LOCAL
-#clusters.size	= 20
-#scheduler.method= MINMIN_SCH
-#ftc.method	= FTCLUSTERING_DC
-#ftc.monitor	= MONITOR_ALL
-#ftc.failure	= FAILURE_JOB
+#The interval for Workflow Engine
 #interval	= 5
+
+#Failure related parameters
+#The Task Failure Rate for level 1
+#a1		= 0.02
+#The Task Failure Rate for level 2
+#a2		= 0.02
+#Fault tolerant clustering method
+#ftc.method	= FTCLUSTERING_DC
+#Fault tolerant clustering monitor mode
+#ftc.monitor	= MONITOR_ALL
+#Fault tolerant clustering failure generation mode
+#ftc.failure	= FAILURE_JOB
+
+#Clustering Related parameters
+#The number of clustered jobs per level
+clusters.num 	= 40
+#The size of a clustered job (number of tasks per job)
+#clusters.size 	= 20
+#The clustering method
+clusters.method = horizontal
+#The type of file system to use
+file.system	= LOCAL
+#file.system	= SHARED
+
+#Scheduling Related Parameters
+#scheduler.method= MINMIN_SCH
+
 #Please replace it with your real physical path
 dax.path 	= /Users/chenweiwei/NetBeansProjects/WorkflowSimTemp/config/dax/Montage_100.xml
-clusters.method = horizontal
+
+#Reducer mode used to remove duplicate dependencies
 #reduce.method	= montage
-bandwidth	= 2e6

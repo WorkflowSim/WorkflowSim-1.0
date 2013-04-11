@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.cloudbus.cloudsim.HarddriveStorage;
 import org.cloudbus.cloudsim.ParameterException;
-import org.workflowsim.utils.Parameters;
 
 /**
  * ClusterStorage is an extention of HarddriveStorage and it is used as a local 
@@ -31,37 +30,45 @@ import org.workflowsim.utils.Parameters;
  */
 public class ClusterStorage extends HarddriveStorage{
     
+    /** The map stores the bandwidth from this clusterstorage to others*/
     Map bandwidthMap ;
     
-    
+    /**
+     * Initialize a ClusterStorage
+     * @param name, name of this storage
+     * @param capacity, capacity
+     * @throws ParameterException 
+     */
     public ClusterStorage(String name, double capacity) throws ParameterException
     {
         super(name, capacity);
-        setBandwidthMap();
-    }
-    public ClusterStorage(double capacity) throws ParameterException 
-    {
-        super(capacity);
-        setBandwidthMap();
-    }
-    public final void setBandwidthMap()
-    {
-        bandwidthMap = new HashMap<String, Double>();
-        //double bandwidth = Parameters.getOverheadParams().getBandwidth();//20MB/sec
-        double bandwidth = 2e8;
-        bandwidthMap.put("local", bandwidth);
-        bandwidthMap.put("Datacenter_0", bandwidth);
-        bandwidthMap.put("Datacenter_1", bandwidth);
-        bandwidthMap.put("Datacenter_2", bandwidth);
-        bandwidthMap.put("Datacenter_3", bandwidth);
     }
     
+    /**
+     * Sets the bandwidth between this storage to the destination storage
+     * @param name the destination storage
+     * @param bandwidth 
+     */
+    public final void setBandwidth(String name, double bandwidth){
+        if(bandwidth >= 0){
+            if(bandwidthMap == null){
+                bandwidthMap = new HashMap<String, Double>();
+            }
+            bandwidthMap.put(name, bandwidth);
+        }
+    }
+
+    /**
+     * Gets the bandwidth from this storage to the destination storage
+     * @param destination 
+     * @return bandwidth
+     */
     public double getMaxTransferRate(String destination) {
         if(bandwidthMap.containsKey(destination)){
             return (Double)bandwidthMap.get(destination);
         }else{
-            //local bandwidth
-            return Parameters.getOverheadParams().getBandwidth();
+            //local bandwidth between vms
+            return (Double)bandwidthMap.get("local");
         }
     }
 }

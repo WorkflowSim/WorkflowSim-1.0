@@ -17,7 +17,6 @@ package org.workflowsim;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletScheduler;
 import org.cloudbus.cloudsim.Datacenter;
@@ -31,7 +30,6 @@ import org.cloudbus.cloudsim.VmAllocationPolicy;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEvent;
-import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
@@ -120,9 +118,6 @@ public class DatacenterExtended extends Datacenter{
                     /** Cast cl to task so as we can use its functions*/
                     Task task = (Task)cl;
                     
-                    
-                    
-                    
                     double fileTransferTime = processDataStageIn(task.getFileList(), cl);
 
                     Host host = getVmAllocationPolicy().getHost(vmId, userId);
@@ -174,10 +169,11 @@ public class DatacenterExtended extends Datacenter{
             org.cloudbus.cloudsim.File file = (org.cloudbus.cloudsim.File)it.next();
             
             switch (ReplicaCatalog.getFileSystem()){
-                /** For local file system, add it to local storage */
+                /** For local file system, add it to local storage (data center name) */
                 case LOCAL:
-
+                    
                     ReplicaCatalog.addStorageList(file.getName(), this.getName());
+                    /** Is it not really needed currently but it is left for future usage */
                     ClusterStorage storage = (ClusterStorage)getStorageList().get(0);
                     storage.addFile(file);
                     break;
@@ -246,19 +242,26 @@ public class DatacenterExtended extends Datacenter{
                         switch(ReplicaCatalog.getFileSystem()){
                             case SHARED:
                                 //stage-in job
+                                /**
+                                 * Picks up the site that is closest
+                                 */
                                 if(cl.getClassType()==1){
                                     
                                     for(Iterator it = siteList.iterator(); it.hasNext();)
                                     {
+                                        
                                         //site is where one replica of this data is located at
                                         String site = (String)it.next();
+                                        if(site.equals(this.getName())){
+                                            continue;
+                                        }
+                                        
                                         double bwth = tempStorage.getMaxTransferRate(site);
                                         if(bwth > maxBwth){
                                             maxBwth = bwth;
                                         }
                                     }
                                     time += file.getSize() / maxBwth;
-                                    //Log.printLine(file.getName() + " " + file.getSize());
                                 }
                                 
                                 
@@ -269,6 +272,9 @@ public class DatacenterExtended extends Datacenter{
                                 {
                                     //site is where one replica of this data is located at
                                     String site = (String)it.next();
+                                    if(site.equals(this.getName())){
+                                            continue;
+                                    }
                                     double bwth = tempStorage.getMaxTransferRate(site);
                                     if(bwth > maxBwth){
                                         maxBwth = bwth;
@@ -285,6 +291,8 @@ public class DatacenterExtended extends Datacenter{
                                  * For the case when storage is too small
                                  * it is not handled here
                                  */
+                                //We should add but since CondorVm has a small capability it often fails
+                                //We currently don't use this storage to do anything meaningful. It is left for future. 
                                 //condorVm.addLocalFile(file);
                                 ReplicaCatalog.addStorageList(file.getName(), Integer.toString(vmId));
                                 

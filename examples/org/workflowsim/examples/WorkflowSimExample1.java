@@ -219,10 +219,26 @@ public class WorkflowSimExample1 {
                 arch, os, vmm, hostList, time_zone, cost, costPerMem, costPerStorage, costPerBw);
 
 
-		// 6. Finally, we need to create a PowerDatacenter object.
-		
+		// 6. Finally, we need to create a cluster storage object.
+                /** The bandwidth between data centers. */
+                double interBandwidth = 2e7;
+                /** The bandwidth within a data center. */
+		double intraBandwidth = 2e8;
 		try {
                         ClusterStorage s1 = new ClusterStorage(name, 1e12);
+                        if(name.equals("Datacenter_0")){
+                            /** The bandwidth from Datacenter_0 to Datacenter_1. */
+                            s1.setBandwidth("Datacenter_1", interBandwidth);
+                            
+                        }else if (name.equals("Datacenter_1")){
+                            /** The bandwidth from Datacenter_1 to Datacenter_0. */
+                            s1.setBandwidth("Datacenter_0", interBandwidth);
+                            
+                        }
+                        // The bandwidth within a data center
+                        s1.setBandwidth("local", intraBandwidth);
+                        // The bandwidth to the source site 
+                        s1.setBandwidth("source", interBandwidth);
                         storageList.add(s1);
 			datacenter = new DatacenterExtended(name, characteristics, new VmAllocationPolicySimple(hostList), storageList, 0);
 		} catch (Exception e) {
