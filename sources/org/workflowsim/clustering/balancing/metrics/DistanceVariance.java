@@ -17,17 +17,24 @@
  */
 package org.workflowsim.clustering.balancing.metrics;
 
-import org.workflowsim.clustering.balancing.metrics.BalancingMetric;
-import org.workflowsim.clustering.TaskSet;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import org.workflowsim.clustering.TaskSet;
 
 /**
- *
+ * A DistanceVariance 
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class DistanceVariance implements BalancingMetric {
 
+    /**
+     * Returns the distance variance of a list of taskSets
+     * @param list the list to be checked
+     * @return the distance variance
+     */
     @Override
     public double getMetric(ArrayList<TaskSet> list) {
         if (list == null || list.size() <= 1) {
@@ -56,12 +63,16 @@ public class DistanceVariance implements BalancingMetric {
 
         return Math.sqrt(sum / list.size());
     }
-    /*
+    
+    /**
+     * Calculate the distance between two taskSet
      * one assumption here taskA and taskB are at the same level 
      * because it is horizontal clustering
-     * does not work arbitary workflows
+     * does not work with arbitary workflows
+     * @param taskA
+     * @param taskB
+     * @return 
      */
-
     private int calDistance(TaskSet taskA, TaskSet taskB) {
         if (taskA == null || taskB == null || taskA == taskB) {
             return 0;

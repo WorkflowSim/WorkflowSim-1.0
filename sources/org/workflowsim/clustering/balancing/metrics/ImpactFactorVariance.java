@@ -17,16 +17,23 @@
  */
 package org.workflowsim.clustering.balancing.metrics;
 
-import org.workflowsim.clustering.balancing.metrics.BalancingMetric;
-import org.workflowsim.clustering.TaskSet;
 import java.util.ArrayList;
+import org.workflowsim.clustering.TaskSet;
 
 /**
- *
+ * ImpactFactorVariance is the standard deviation of their impact factors
+ * 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class ImpactFactorVariance implements BalancingMetric {
 
+    /**
+     * Returns the standard deviation of their impact factors
+     * @param list the TaskSets to be checked
+     * @return the standard deviation
+     */
     @Override
     public double getMetric(ArrayList<TaskSet> list) {
         if (list == null || list.size() <= 1) {

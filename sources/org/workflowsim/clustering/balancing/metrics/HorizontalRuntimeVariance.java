@@ -17,16 +17,22 @@
  */
 package org.workflowsim.clustering.balancing.metrics;
 
-import org.workflowsim.clustering.balancing.metrics.BalancingMetric;
-import org.workflowsim.clustering.TaskSet;
 import java.util.ArrayList;
+import org.workflowsim.clustering.TaskSet;
 
 /**
- *
+ * HorizontalRuntimeVariance is the standard deviation of the runtime
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class HorizontalRuntimeVariance implements BalancingMetric {
 
+    /**
+     * Returns the standard deviation of runtime
+     * @param list taskSets to be checked
+     * @return the standard deviation
+     */
     @Override
     public double getMetric(ArrayList<TaskSet> list) {
         if (list == null || list.size() <= 1) {
@@ -35,7 +41,6 @@ public class HorizontalRuntimeVariance implements BalancingMetric {
         long sum = 0;
         for (TaskSet task : list) {
             sum += task.getJobRuntime();
-            //Log.printLine(task.getJobRuntime());
         }
         long mean = sum / list.size();
         sum = 0;

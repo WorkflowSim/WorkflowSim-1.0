@@ -17,14 +17,16 @@
  */
 package org.workflowsim.clustering.balancing.metrics;
 
-import org.workflowsim.clustering.TaskSet;
 import java.util.ArrayList;
+import org.workflowsim.clustering.TaskSet;
 
 /**
- *
+ * Every balancing metric should implements this interface
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public interface BalancingMetric {
-
+    /** Gets the metric value. */
     public double getMetric(ArrayList<TaskSet> list);
 }
