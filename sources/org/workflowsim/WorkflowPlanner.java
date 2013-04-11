@@ -21,6 +21,7 @@ import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.core.SimEvent;
+import org.workflowsim.utils.Parameters;
 
 /**
  * WorkflowPlanner supports dynamic planning. In the future we will have global
@@ -223,6 +224,7 @@ public class WorkflowPlanner extends SimEntity {
      */
     @Override
     public void startEntity() {
+        Log.printLine("Starting WorkflowSim " + Parameters.getVersion());
         Log.printLine(getName() + " is starting...");
         schedule(getId(), 0, WorkflowSimTags.START_SIMULATION);
     }

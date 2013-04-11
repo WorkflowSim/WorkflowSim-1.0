@@ -316,6 +316,14 @@ public class Parameters {
     public static SCHMethod getSchedulerMode() {
         return schedulerMode;
     }
+    
+    /**
+     * Gets the version
+     * @return version
+     */
+    public static String getVersion(){
+        return version;
+    }
 
     public static void printVersion() {
         Log.printLine("WorkflowSim Version: " + version);
