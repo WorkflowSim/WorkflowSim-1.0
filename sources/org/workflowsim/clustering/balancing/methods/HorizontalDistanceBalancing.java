@@ -17,35 +17,49 @@
  */
 package org.workflowsim.clustering.balancing.methods;
 
-import org.workflowsim.clustering.TaskSet;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import org.cloudbus.cloudsim.Log;
+import org.workflowsim.clustering.TaskSet;
 
 /**
- *
+ *  HorizontalDistanceBalancing is a method that merges tasks based on distance metric
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class HorizontalDistanceBalancing extends HorizontalImpactBalancing {
 
+    /**
+     * Initialize a HorizontalDistanceBalancing object
+     * @param levelMap the level map
+     * @param taskMap the task map
+     * @param clusterNum the clusters.num
+     */
     public HorizontalDistanceBalancing(Map levelMap, Map taskMap, int clusterNum) {
         super(levelMap, taskMap, clusterNum);
     }
 
+    /**
+     * The main function
+     */
     @Override
     public void run() {
         Map<Integer, ArrayList<TaskSet>> map = getLevelMap();
         for (Iterator it = map.values().iterator(); it.hasNext();) {
             ArrayList<TaskSet> taskList = (ArrayList) it.next();
             process(taskList);
-            //disMap.clear();
         }
 
     }
 
+    /**
+     * Gets the potential candidate taskSets to merge
+     * @param taskList
+     * @param checkSet
+     * @return 
+     */
     @Override
     protected TaskSet getCandidateTastSet(ArrayList<TaskSet> taskList, TaskSet checkSet) {
         long min = taskList.get(0).getJobRuntime();
@@ -68,14 +82,17 @@ public class HorizontalDistanceBalancing extends HorizontalImpactBalancing {
         }
 
 
-        //return null;
     }
-    /*
+
+    /**
+     * Calculate the distance between two taskSet
      * one assumption here taskA and taskB are at the same level 
      * because it is horizontal clustering
-     * does not work arbitary workflows
+     * does not work with arbitary workflows
+     * @param taskA
+     * @param taskB
+     * @return 
      */
-
     private int calDistance(TaskSet taskA, TaskSet taskB) {
         if (taskA == null || taskB == null || taskA == taskB) {
             return 0;

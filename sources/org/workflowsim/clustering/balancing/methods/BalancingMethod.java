@@ -25,39 +25,66 @@ import org.workflowsim.Task;
 import org.workflowsim.clustering.TaskSet;
 
 /**
- *
+ * BlancingMethod is the super class of all balancing methods
+ * 
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
 public class BalancingMethod {
 
+    /** Task Map */
     private Map<Task, TaskSet> taskMap;
+    
+    /**
+     * TaskSet per level.
+     */
     private Map<Integer, ArrayList<TaskSet>> levelMap;
+    /** Number of clustered jobs per level. */
     private int clusterNum;
 
+    /**
+     * Initialize a BalancingMethod
+     * @param levelMap, taskSets per level
+     * @param taskMap, map from task to taskSet
+     * @param clusterNum number of clustered jobs
+     */
     public BalancingMethod(Map levelMap, Map taskMap, int clusterNum) {
         this.taskMap = taskMap;
         this.levelMap = levelMap;
         this.clusterNum = clusterNum;
     }
 
+    /**
+     * Gets the task map
+     * @return task map
+     */
     public Map getTaskMap() {
         return this.taskMap;
     }
 
+    /**
+     * Gets the level map
+     * @return level map
+     */
     public Map getLevelMap() {
         return this.levelMap;
     }
 
+    /**
+     * Gets clusters.num
+     * @return clusters.num
+     */
     public int getClusterNum() {
         return this.clusterNum;
     }
-    /*
-     * Add all the tasks of tail to head and clean tail(like an arrow)
-     * can be reused with verticalClustering()
+    
+    /**
+     * Add all the tasks in tail to head and then clean tail. Can be reused with 
+     * verticalClustering()
+     * @param tail
+     * @param head 
      */
-
     public void addTaskSet2TaskSet(TaskSet tail, TaskSet head) {
         head.addTask(tail.getTaskList());
         head.getParentList().remove(tail);
@@ -93,11 +120,16 @@ public class BalancingMethod {
         tail.getChildList().clear();
         tail.getParentList().clear();
     }
-
+    /**
+     * BalancingMethod is the super class and it should not be used.
+     */
     public void run() {
         throw (new RuntimeException("Should not use this function"));
     }
 
+    /**
+     * Clean all the check points
+     */
     public void cleanTaskSetChecked() {
         Collection sets = getTaskMap().values();
         for (Iterator it = sets.iterator(); it.hasNext();) {

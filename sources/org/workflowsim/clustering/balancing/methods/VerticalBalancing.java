@@ -17,23 +17,34 @@
  */
 package org.workflowsim.clustering.balancing.methods;
 
-import org.workflowsim.clustering.balancing.methods.BalancingMethod;
-import org.workflowsim.clustering.TaskSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import org.workflowsim.clustering.TaskSet;
 
 /**
- *
- * @author chenweiwei
+ * VerticalBalancing is the same vc as in org.workflowsim.clustering. Rewrite here so as
+ * to test it again with other balancing methods
+ * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class VerticalBalancing extends BalancingMethod {
 
+    /**
+     * Initialize a VerticalBalancing object
+     * @param levelMap the level map
+     * @param taskMap the task map
+     * @param clusterNum the clusters.num
+     */
     public VerticalBalancing(Map levelMap, Map taskMap, int clusterNum) {
         super(levelMap, taskMap, clusterNum);
     }
 
+    /**
+     * The main function
+     */
     @Override
     public void run() {
         Collection sets = getTaskMap().values();

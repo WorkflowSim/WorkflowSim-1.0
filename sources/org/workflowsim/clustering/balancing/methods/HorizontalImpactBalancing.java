@@ -17,27 +17,36 @@
  */
 package org.workflowsim.clustering.balancing.methods;
 
-import org.workflowsim.Task;
-import org.workflowsim.clustering.balancing.methods.BalancingMethod;
-import org.workflowsim.clustering.TaskSet;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
-import org.cloudbus.cloudsim.Log;
+import org.workflowsim.Task;
+import org.workflowsim.clustering.TaskSet;
 
 /**
- *
+ * HorizontalImpactBalancing is a method that merges tasks that have similar impact
+ * factors. 
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class HorizontalImpactBalancing extends BalancingMethod {
 
+    /**
+     * Initialize a HorizontalImpactBalancing object
+     * @param levelMap the level map
+     * @param taskMap the task map
+     * @param clusterNum the clusters.num
+     */
     public HorizontalImpactBalancing(Map levelMap, Map taskMap, int clusterNum) {
         super(levelMap, taskMap, clusterNum);
     }
 
+    /**
+     * The main function
+     */
     @Override
     public void run() {
         Map<Integer, ArrayList<TaskSet>> map = getLevelMap();
@@ -58,10 +67,12 @@ public class HorizontalImpactBalancing extends BalancingMethod {
         }
         return taskList.get(0);
 
-
-        //return null;
     }
 
+    /**
+     * Sort taskSet based on their impact factors and then merge similar taskSet together
+     * @param taskList 
+     */
     public void process(ArrayList<TaskSet> taskList) {
 
         if (taskList.size() > getClusterNum()) {
@@ -71,9 +82,7 @@ public class HorizontalImpactBalancing extends BalancingMethod {
             }
             sortListDecreasing(taskList);
             for (TaskSet set : taskList) {
-                //MinHeap is required 
                 sortListIncreasing(jobList);
-                //TaskSet job = (TaskSet)jobList.get(0);
                 TaskSet job = getCandidateTastSet(jobList, set);
                 addTaskSet2TaskSet(set, job);
                 job.addTask(set.getTaskList());
@@ -81,7 +90,6 @@ public class HorizontalImpactBalancing extends BalancingMethod {
                 //update dependency
                 for (Task task : set.getTaskList()) {
                     getTaskMap().put(task, job);//this is enough
-
                     //impact factor is not updated
                 }
 
@@ -95,126 +103,33 @@ public class HorizontalImpactBalancing extends BalancingMethod {
 
     }
 
+    /**
+     * Sort taskSet in an ascending order of impact factor
+     * @param taskList taskSets to be sorted
+     */
     private void sortListIncreasing(ArrayList taskList) {
         Collections.sort(taskList, new Comparator<TaskSet>() {
             public int compare(TaskSet t1, TaskSet t2) {
                 //Decreasing order
-//                if(t1.getImpactFactor() == t2.getImpactFactor()){
                 return (int) (t1.getJobRuntime() - t2.getJobRuntime());
-//                }else{
-//                   return (int)(t1.getImpactFactor()- t2.getImpactFactor());
-//                }
+
             }
         });
 
     }
-
+    /**
+     * Sort taskSet in a descending order of impact factor
+     * @param taskList taskSets to be sorted
+     */
     private void sortListDecreasing(ArrayList taskList) {
         Collections.sort(taskList, new Comparator<TaskSet>() {
             public int compare(TaskSet t1, TaskSet t2) {
                 //Decreasing order
-//                if(t1.getImpactFactor() == t2.getImpactFactor()){
                 return (int) (t2.getJobRuntime() - t1.getJobRuntime());
-//                }else{
-//                   return (int)(t2.getImpactFactor()- t1.getImpactFactor());
-//                }
 
             }
         });
 
     }
 
-    public void process2(ArrayList<TaskSet> setList) {
-
-        do {
-
-            int size = setList.size();
-            int count = size - getClusterNum();
-            if (count <= 0) {
-                return;
-            }
-            for (int i = 0; i < setList.size(); i++) {
-                TaskSet set = setList.get(i);
-                Log.printLine("Value " + set.getImpactFactor());
-            }
-            double min = Double.MAX_VALUE;
-            for (int i = 0; i < setList.size(); i++) {
-                TaskSet set = setList.get(i);
-                if (set.getImpactFactor() < min) {
-                    min = set.getImpactFactor();
-                }
-            }
-            ArrayList<TaskSet> unList = new ArrayList();
-            for (int i = 0; i < setList.size(); i++) {
-                TaskSet set = setList.get(i);
-                if (set.getImpactFactor() == min) {
-                    unList.add(set);
-                }
-            }
-            int num = this.getClusterNum();
-            double avg = 1.0 / num;
-            if (min >= avg) {
-                return;
-            }
-
-            int avg_size = (int) (avg / min);
-            if (size - getClusterNum() - size / avg_size <= 0) {
-                return;
-            }
-            int index = 0;
-            TaskSet cur_set = null;
-            for (int i = 0; i < unList.size(); i++) {
-                TaskSet set = unList.get(i);
-                if (index == 0) {
-                    index++;
-                    cur_set = set;
-                } else {
-                    index++;
-                    if (index == avg_size) {
-                        index = 0;
-                        setList.remove(cur_set);
-                    }
-                    addTaskSet2TaskSet(set, cur_set);
-                    setList.remove(set);
-                }
-            }
-            if (cur_set != null) {
-                setList.remove(cur_set);
-            }
-
-            /*
-             *find a small one 
-             */
-//            int min_i = 0;
-//            int min_j = 0;
-//            double min_diff = Double.MAX_VALUE;
-//            boolean flag = false;
-//            for(int i =0; i < setList.size(); i ++){
-//                TaskSet setA = setList.get(i);
-//                for(int j = i + 1; j < setList.size(); j++){
-//                    TaskSet setB = setList.get(j);
-//                    if(setA.getImpactFactor() == setB.getImpactFactor()){
-//                        min_i = i;
-//                        min_j = j;
-//                        flag = true;
-//                        break;
-//                    }
-//                    else{
-//                        if(Math.abs(setA.getImpactFactor() - setB.getImpactFactor())<min_diff){
-//                            min_diff = Math.abs(setA.getImpactFactor() - setB.getImpactFactor());
-//                            min_i = i;
-//                            min_j = j;
-//                        }
-//                    }
-//                }
-//                if(flag){
-//                    break;
-//                }
-//            }
-//            TaskSet setA = setList.get(min_i);
-//            TaskSet setB = setList.get(min_j);
-//            addTaskSet2TaskSet(setA, setB);
-//            setList.remove(setA);
-        } while (true);
-    }
 }

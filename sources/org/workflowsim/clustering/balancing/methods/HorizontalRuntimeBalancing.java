@@ -17,31 +17,42 @@
  */
 package org.workflowsim.clustering.balancing.methods;
 
-import org.workflowsim.Task;
-import org.workflowsim.clustering.TaskSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import org.workflowsim.Task;
+import org.workflowsim.clustering.TaskSet;
 
 /**
- *
+ * HorizontalRuntimeBalancing is a method that merges task so as to balance job runtime
  * @author Weiwei Chen
+ * @since WorkflowSim Toolkit 1.0
+ * @date Apr 9, 2013
  */
 public class HorizontalRuntimeBalancing extends BalancingMethod {
 
+    /**
+     * Initialize a HorizontalRuntimeBalancing object
+     * @param levelMap the level map
+     * @param taskMap the task map
+     * @param clusterNum the clustes.num
+     */
     public HorizontalRuntimeBalancing(Map levelMap, Map taskMap, int clusterNum) {
         super(levelMap, taskMap, clusterNum);
     }
 
+    /**
+     * The main function
+     */
     @Override
     public void run() {
         Map<Integer, ArrayList<TaskSet>> map = getLevelMap();
         for (Iterator it = map.values().iterator(); it.hasNext();) {
             ArrayList<TaskSet> taskList = (ArrayList) it.next();
-
+            /**The reason why we don shuffle is very complicated. */
             long seed = System.nanoTime();
             Collections.shuffle(taskList, new Random(seed));
             seed = System.nanoTime();
@@ -72,7 +83,10 @@ public class HorizontalRuntimeBalancing extends BalancingMethod {
 
         }
     }
-
+    /**
+     * Sort taskSets based on their runtime
+     * @param taskList taskSets to be sorted
+     */
     private void sortListIncreasing(ArrayList taskList) {
         Collections.sort(taskList, new Comparator<TaskSet>() {
             public int compare(TaskSet t1, TaskSet t2) {
@@ -83,6 +97,10 @@ public class HorizontalRuntimeBalancing extends BalancingMethod {
 
     }
 
+    /**
+     * Sort taskSets based on their runtime
+     * @param taskList taskSets to be sorted
+     */
     private void sortListDecreasing(ArrayList taskList) {
         Collections.sort(taskList, new Comparator<TaskSet>() {
             public int compare(TaskSet t1, TaskSet t2) {
