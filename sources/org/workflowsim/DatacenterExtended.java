@@ -125,7 +125,10 @@ public class DatacenterExtended extends Datacenter {
              */
             Task task = (Task) cl;
 
-            double fileTransferTime = processDataStageIn(task.getFileList(), cl);
+            double fileTransferTime = 0.0;
+            if(cl.getClassType()!=1){
+                fileTransferTime = processDataStageIn(task.getFileList(), cl);
+            }
 
             Host host = getVmAllocationPolicy().getHost(vmId, userId);
             Vm vm = host.getVm(vmId, userId);
@@ -284,25 +287,35 @@ public class DatacenterExtended extends Datacenter {
 
                         break;
                     case LOCAL:
+                        
+                        int vmId = cl.getVmId();
+                        int userId = cl.getUserId();
+                        Host host = getVmAllocationPolicy().getHost(vmId, userId);
+                        Vm vm = host.getVm(vmId, userId);
+                        CondorVM condorVm = (CondorVM) vm;
 
+                        boolean requiredFileStagein = true;
+                        
                         for (Iterator it = siteList.iterator(); it.hasNext();) {
                             //site is where one replica of this data is located at
                             String site = (String) it.next();
                             if (site.equals(this.getName())) {
                                 continue;
                             }
+                            if(site.equals(Integer.toString(vmId))){
+                                requiredFileStagein = false;
+                                break;
+                            }
                             double bwth = tempStorage.getMaxTransferRate(site);
                             if (bwth > maxBwth) {
                                 maxBwth = bwth;
                             }
                         }
-                        time += file.getSize() / maxBwth;
+                        if(requiredFileStagein && maxBwth > 0.0){
+                            time += file.getSize() / maxBwth;
+                        }
 
-                        int vmId = cl.getVmId();
-                        int userId = cl.getUserId();
-                        Host host = getVmAllocationPolicy().getHost(vmId, userId);
-                        Vm vm = host.getVm(vmId, userId);
-                        CondorVM condorVm = (CondorVM) vm;
+
                         /**
                          * For the case when storage is too small it is not
                          * handled here

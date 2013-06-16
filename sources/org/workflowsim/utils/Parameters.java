@@ -57,7 +57,7 @@ public class Parameters {
 
     public enum SCHMethod {
 
-        MAXMIN_SCH, MINMIN_SCH, ROUNDR_SCH, HEFT_SCH, MCT_SCH
+        MAXMIN_SCH, MINMIN_SCH, ROUNDR_SCH, HEFT_SCH, MCT_SCH, DATA_SCH
     }
     public static final int BASE = 0;
     /**

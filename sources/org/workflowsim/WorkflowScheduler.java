@@ -25,7 +25,9 @@ import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEvent;
+import org.cloudbus.cloudsim.lists.VmList;
 import org.workflowsim.failure.FailureGenerator;
+import org.workflowsim.scheduler.DataAwareScheduler;
 import org.workflowsim.scheduler.DefaultScheduler;
 import org.workflowsim.scheduler.HEFTScheduler;
 import org.workflowsim.scheduler.MCTScheduler;
@@ -159,6 +161,9 @@ public class WorkflowScheduler extends DatacenterBroker {
 
                 scheduler = new DefaultScheduler();
                 break;
+            case DATA_SCH:
+                scheduler  = new DataAwareScheduler();
+                break;
             default:
                 scheduler = new DefaultScheduler();
                 break;
@@ -168,6 +173,68 @@ public class WorkflowScheduler extends DatacenterBroker {
 
         return scheduler;
     }
+    
+    /**
+	 * Process the ack received due to a request for VM creation.
+	 * 
+	 * @param ev a SimEvent object
+	 * @pre ev != null
+	 * @post $none
+	 */
+    @Override
+	protected void processVmCreate(SimEvent ev) {
+		int[] data = (int[]) ev.getData();
+		int datacenterId = data[0];
+		int vmId = data[1];
+		int result = data[2];
+
+		if (result == CloudSimTags.TRUE) {
+			getVmsToDatacentersMap().put(vmId, datacenterId);
+                        /**
+                         * Fix a bug of cloudsim
+                         * Don't add a null to getVmsCreatedList()
+                         * June 15, 2013
+                         */
+                        if(VmList.getById(getVmList(), vmId)!=null){
+                            getVmsCreatedList().add(VmList.getById(getVmList(), vmId));
+                        
+			Log.printLine(CloudSim.clock() + ": " + getName() + ": VM #" + vmId
+					+ " has been created in Datacenter #" + datacenterId + ", Host #"
+					+ VmList.getById(getVmsCreatedList(), vmId).getHost().getId());
+                        }
+		} else {
+			Log.printLine(CloudSim.clock() + ": " + getName() + ": Creation of VM #" + vmId
+					+ " failed in Datacenter #" + datacenterId);
+		}
+
+		incrementVmsAcks();
+
+		// all the requested VMs have been created
+		if (getVmsCreatedList().size() == getVmList().size() - getVmsDestroyed()) {
+			submitCloudlets();
+		} else {
+			// all the acks received, but some VMs were not created
+			if (getVmsRequested() == getVmsAcks()) {
+				// find id of the next datacenter that has not been tried
+				for (int nextDatacenterId : getDatacenterIdsList()) {
+					if (!getDatacenterRequestedIdsList().contains(nextDatacenterId)) {
+						createVmsInDatacenter(nextDatacenterId);
+						return;
+					}
+				}
+
+				// all datacenters already queried
+				if (getVmsCreatedList().size() > 0) { // if some vm were created
+					submitCloudlets();
+				} else { // no vms created. abort
+					Log.printLine(CloudSim.clock() + ": " + getName()
+							+ ": none of the required VMs could be created. Aborting");
+					finishExecution();
+				}
+			}
+		}
+	}
+
 
     /**
      * Update a cloudlet (job)

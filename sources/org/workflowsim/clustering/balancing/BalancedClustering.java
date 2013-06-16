@@ -28,6 +28,7 @@ import org.workflowsim.clustering.TaskSet;
 import org.workflowsim.clustering.balancing.methods.ChildAwareHorizontalClustering;
 import org.workflowsim.clustering.balancing.methods.HorizontalDistanceBalancing;
 import org.workflowsim.clustering.balancing.methods.HorizontalImpactBalancing;
+import org.workflowsim.clustering.balancing.methods.HorizontalRandomClustering;
 import org.workflowsim.clustering.balancing.methods.HorizontalRuntimeBalancing;
 import org.workflowsim.clustering.balancing.methods.VerticalBalancing;
 import org.workflowsim.clustering.balancing.metrics.DistanceVariance;
@@ -351,6 +352,11 @@ public class BalancedClustering extends BasicClustering {
                         HorizontalDistanceBalancing d =
                                 new HorizontalDistanceBalancing(map, this.mTask2TaskSet, this.clusterNum);
                         d.run();
+                        break;
+                    case 'h':
+                        HorizontalRandomClustering h =
+                                new HorizontalRandomClustering(map, this.mTask2TaskSet, this.clusterNum);
+                        h.run();
                         break;
                     default:
                         break;

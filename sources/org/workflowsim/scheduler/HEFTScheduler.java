@@ -15,6 +15,8 @@
  */
 package org.workflowsim.scheduler;
 
+import org.cloudbus.cloudsim.Log;
+
 /**
  * The HEFT scheduling algorithm (not implemented yet)
  *
@@ -30,5 +32,6 @@ public class HEFTScheduler extends DefaultScheduler {
 
     @Override
     public void run() {
+        Log.printLine("It is not implemented. Please do not use HEFT currently");
     }
 }

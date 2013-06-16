@@ -122,7 +122,7 @@ public class WorkflowSimExample1 {
             DatacenterExtended datacenter1 = createDatacenter("Datacenter_1");
 
             /**
-             * Create a WorkflowPlanner.
+             * Create a WorkflowPlanner with two schedulers.
              */
             WorkflowPlanner planner = new WorkflowPlanner("planner_0", 2);
             /**
@@ -175,7 +175,7 @@ public class WorkflowSimExample1 {
         // 2. A Machine contains one or more PEs or CPUs/Cores. Therefore, should
         //    create a list to store these PEs before creating
         //    a Machine.
-        for (int i = 1; i <= 28; i++) {
+        for (int i = 1; i <= 20; i++) {
             List<Pe> peList1 = new ArrayList<Pe>();
             int mips = 2000;
             // 3. Create PEs and add these into the list.
@@ -223,11 +223,12 @@ public class WorkflowSimExample1 {
         /**
          * The bandwidth between data centers.
          */
-        double interBandwidth = 2e7;
+        double interBandwidth = 1.5e7;// the futuregrid site
+        interBandwidth = Parameters.getOverheadParams().getBandwidth();
         /**
          * The bandwidth within a data center.
          */
-        double intraBandwidth = 2e8;
+        double intraBandwidth = interBandwidth;
         try {
             ClusterStorage s1 = new ClusterStorage(name, 1e12);
             if (name.equals("Datacenter_0")) {

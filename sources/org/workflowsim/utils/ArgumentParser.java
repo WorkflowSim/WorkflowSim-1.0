@@ -49,7 +49,7 @@ public class ArgumentParser {
         String properties = null;
         String code = null;
         String dax = null;
-
+        double bandwidth = 2e8; // by default 
         String clustering = null;
         while (i < args.length) {
             switch (args[i].charAt(1)) {
@@ -64,6 +64,10 @@ public class ArgumentParser {
                     break;
                 case 'k':
                     clustering = args[++i];
+                    break;
+                case 'b':
+                    bandwidth = Double.parseDouble(args[++i]);
+                    break;
                 case 'h':
 
                     break;
@@ -93,7 +97,7 @@ public class ArgumentParser {
             int cNum = 0;
             int interval = 0;
             int vmNum = 0;
-            double bandwidth = 2e8;
+            
             String datasizePath = null;
             String runtimePath = null;
             String daxPath = null;
