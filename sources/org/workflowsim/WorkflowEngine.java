@@ -107,9 +107,9 @@ public class WorkflowEngine extends SimEntity {
      * @pre list !=null
      * @post $none
      */
-    public void submitVmList(List<? extends Vm> list, int id) {
+    public void submitVmList(List<? extends Vm> list, int schedulerId) {
 
-        getScheduler(id).submitVmList(list);
+        getScheduler(schedulerId).submitVmList(list);
     }
 
     public void submitVmList(List<? extends Vm> list) {
@@ -188,8 +188,8 @@ public class WorkflowEngine extends SimEntity {
      * @param datacenterId the data center id
      * @param id the scheduler id
      */
-    public void bindSchedulerDatacenter(int datacenterId, int id) {
-        getScheduler(id).bindSchedulerDatacenter(datacenterId);
+    public void bindSchedulerDatacenter(int datacenterId, int schedulerId) {
+        getScheduler(schedulerId).bindSchedulerDatacenter(datacenterId);
 
     }
 
@@ -533,10 +533,10 @@ public class WorkflowEngine extends SimEntity {
      * @param index the scheduler id
      * @return the scheduler
      */
-    public WorkflowScheduler getScheduler(int id) {
+    public WorkflowScheduler getScheduler(int schedulerId) {
 
         if (this.scheduler != null) {
-            return this.scheduler.get(id);
+            return this.scheduler.get(schedulerId);
         }
         return null;
     }
