@@ -135,6 +135,6 @@ The same to 3.1.
 This page is written by Weiwei Chen @chenww05. For details or bug reports, please contact the author. 
 
 ### Support or Contact
-Please send an email to support@workflowsim.org. We strongly welcome your contribution to this project and please go to github to submit your bug report.  
+Please send an email to support@workflowsim.org. We appreciate your contribution to this project and please go to github to submit your bug report.  
 
 
