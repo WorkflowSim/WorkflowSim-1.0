@@ -284,6 +284,9 @@ public class ArgumentParser {
              * be set as STATIC_SCH to avoid unnecessary change during the runtime
              */
             if(!pln_method.equals(PLNMethod.INVALID)){
+                if(sch_method != SCHMethod.STATIC_SCH || sch_method != SCHMethod.INVALID_SCH){
+                    Log.printLine("Warning: your scheduler.method is reset to be STATIC_SCH");
+                }
                 sch_method = SCHMethod.STATIC_SCH;
             }
             
