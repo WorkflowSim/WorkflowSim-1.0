@@ -22,5 +22,5 @@ package org.workflowsim.scheduler;
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public class DFSScheduler extends DefaultScheduler {
+public class DFSScheduler extends BaseScheduler {
 }

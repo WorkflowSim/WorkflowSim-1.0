@@ -24,7 +24,7 @@ import org.cloudbus.cloudsim.Log;
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public class HEFTScheduler extends DefaultScheduler {
+public class HEFTScheduler extends BaseScheduler {
 
     public HEFTScheduler() {
         super();

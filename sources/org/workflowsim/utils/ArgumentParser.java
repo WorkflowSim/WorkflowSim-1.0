@@ -106,7 +106,7 @@ public class ArgumentParser {
             FTCMethod ftc_method = null;
             FTCMonitor ftc_monitor = FTCMonitor.MONITOR_NONE;
             FTCFailure ftc_failure = FTCFailure.FAILURE_NONE;
-            SCHMethod sch_method = SCHMethod.ROUNDR_SCH;
+            SCHMethod sch_method = SCHMethod.INVALID_SCH;
             FileSystem file_system = FileSystem.SHARED;
             OverheadParameters op = null;
             ClusteringParameters cp = null;

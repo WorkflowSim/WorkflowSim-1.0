@@ -33,7 +33,8 @@ public class Parameters {
      */
     public enum FTCMethod {
 
-        FTCLUSTERING_DC, FTCLUSTERING_SR, FTCLUSTERING_DR, FTCLUSTERING_NOOP, FTCLUSTERING_BLOCK, FTCLUSTERING_BINARY
+        FTCLUSTERING_DC, FTCLUSTERING_SR, FTCLUSTERING_DR, FTCLUSTERING_NOOP, 
+        FTCLUSTERING_BLOCK, FTCLUSTERING_BINARY
     }
     /*
      * FTC Monitor mode
@@ -57,7 +58,8 @@ public class Parameters {
 
     public enum SCHMethod {
 
-        MAXMIN_SCH, MINMIN_SCH, ROUNDR_SCH, HEFT_SCH, MCT_SCH, DATA_SCH
+        MAXMIN_SCH, MINMIN_SCH, HEFT_SCH, MCT_SCH, DATA_SCH, 
+        STATIC_SCH, FCFS_SCH, INVALID_SCH
     }
     public static final int BASE = 0;
     /**

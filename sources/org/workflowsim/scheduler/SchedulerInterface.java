@@ -49,7 +49,7 @@ public interface SchedulerInterface {
     /**
      * the main function.
      */
-    public void run();
+    public void run() throws Exception;
 
     /**
      * Gets the scheduled jobs.

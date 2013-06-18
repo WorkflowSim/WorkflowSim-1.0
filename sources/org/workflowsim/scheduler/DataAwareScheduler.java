@@ -26,13 +26,14 @@ import org.workflowsim.WorkflowSimTags;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * MinMin algorithm.
+ * Data aware algorithm. Schedule a job to a vm that has most input data it requires. 
+ * It only works for a local environment. 
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public class DataAwareScheduler extends DefaultScheduler {
+public class DataAwareScheduler extends BaseScheduler {
 
     public DataAwareScheduler() {
         super();

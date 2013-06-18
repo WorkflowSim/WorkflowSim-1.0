@@ -29,7 +29,7 @@ import org.workflowsim.WorkflowSimTags;
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public class MaxMinScheduler extends DefaultScheduler {
+public class MaxMinScheduler extends BaseScheduler {
 
     /**
      * Initialize a MaxMin scheduler.

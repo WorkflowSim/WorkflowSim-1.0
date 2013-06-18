@@ -16,22 +16,19 @@
 package org.workflowsim.scheduler;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Vm;
-import org.workflowsim.CondorVM;
-import org.workflowsim.WorkflowSimTags;
 
 /**
- * The default scheduler is a FCFS algorithm. Every other scheduling method
- * should extend from DefaultScheduler.
+ * The base scheduler has implemented the basic features. Every other scheduling method
+ * should extend from BaseScheduler but should not directly use it. 
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public class DefaultScheduler implements SchedulerInterface {
+public class BaseScheduler implements SchedulerInterface {
 
     /**
      * the job list.
@@ -47,9 +44,9 @@ public class DefaultScheduler implements SchedulerInterface {
     private List< Cloudlet> scheduledList;
 
     /**
-     * Initialize a DefaultScheduler
+     * Initialize a BaseScheduler
      */
-    public DefaultScheduler() {
+    public BaseScheduler() {
         this.scheduledList = new ArrayList();
     }
 
@@ -97,29 +94,8 @@ public class DefaultScheduler implements SchedulerInterface {
      * The main function
      */
     @Override
-    public void run() {
-
-
-        for (Iterator it = getCloudletList().iterator(); it.hasNext();) {
-            Cloudlet cloudlet = (Cloudlet) it.next();
-            boolean stillHasVm = false;
-            for (Iterator itc = getVmList().iterator(); itc.hasNext();) {
-
-                CondorVM vm = (CondorVM) itc.next();
-                if (vm.getState() == WorkflowSimTags.VM_STATUS_IDLE) {
-                    stillHasVm = true;
-                    vm.setState(WorkflowSimTags.VM_STATUS_BUSY);
-                    cloudlet.setVmId(vm.getId());
-                    this.scheduledList.add(cloudlet);
-                    break;
-                }
-            }
-            //no vm available 
-            if (!stillHasVm) {
-                break;
-            }
-
-        }
+    public void run() throws Exception {
+        throw (new Exception("Do not use this scheduler directly. Used extended scheduler instead"));
     }
 
     /**

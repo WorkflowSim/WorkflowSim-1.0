@@ -27,7 +27,7 @@ import org.workflowsim.WorkflowSimTags;
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public class MCTScheduler extends DefaultScheduler {
+public class MCTScheduler extends BaseScheduler {
 
     public MCTScheduler() {
         super();

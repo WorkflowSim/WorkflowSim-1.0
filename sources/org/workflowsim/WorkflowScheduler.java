@@ -28,11 +28,13 @@ import org.cloudbus.cloudsim.core.SimEvent;
 import org.cloudbus.cloudsim.lists.VmList;
 import org.workflowsim.failure.FailureGenerator;
 import org.workflowsim.scheduler.DataAwareScheduler;
-import org.workflowsim.scheduler.DefaultScheduler;
+import org.workflowsim.scheduler.BaseScheduler;
+import org.workflowsim.scheduler.FCFSScheduler;
 import org.workflowsim.scheduler.HEFTScheduler;
 import org.workflowsim.scheduler.MCTScheduler;
 import org.workflowsim.scheduler.MaxMinScheduler;
 import org.workflowsim.scheduler.MinMinScheduler;
+import org.workflowsim.scheduler.StaticScheduler;
 import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.Parameters.SCHMethod;
 
@@ -134,40 +136,39 @@ public class WorkflowScheduler extends DatacenterBroker {
      * Switch between multiple schedulers. Based on scheduler.method
      *
      * @param name the SCHMethod name
-     * @return the scheduler that extends DefaultScheduler
+     * @return the scheduler that extends BaseScheduler
      */
-    private DefaultScheduler getScheduler(SCHMethod name) {
-        DefaultScheduler scheduler = null;
-        //MAXMIN_SCH, MINMIN_SCH, ROUNDR_SCH, HEFT_SCH, MCT_SCH
+    private BaseScheduler getScheduler(SCHMethod name) {
+        BaseScheduler scheduler = null;
+
+        // choose which scheduler to use. Make sure you have add related enum in
+        //Parameters.java
         switch (name) {
+            //by default it is FCFS_SCH
+            case FCFS_SCH:
+                scheduler = new FCFSScheduler();
+                break;
             case MINMIN_SCH:
-
-
                 scheduler = new MinMinScheduler();
                 break;
             case MAXMIN_SCH:
-
                 scheduler = new MaxMinScheduler();
                 break;
             case HEFT_SCH:
-
                 scheduler = new HEFTScheduler();
                 break;
             case MCT_SCH:
-
                 scheduler = new MCTScheduler();
                 break;
-            case ROUNDR_SCH:
-
-                scheduler = new DefaultScheduler();
-                break;
             case DATA_SCH:
-                scheduler  = new DataAwareScheduler();
+                scheduler = new DataAwareScheduler();
+                break;
+            case STATIC_SCH:
+                scheduler = new StaticScheduler();
                 break;
             default:
-                scheduler = new DefaultScheduler();
+                scheduler = new StaticScheduler();
                 break;
-
 
         }
 
@@ -243,10 +244,17 @@ public class WorkflowScheduler extends DatacenterBroker {
      */
     protected void processCloudletUpdate(SimEvent ev) {
 
-        DefaultScheduler scheduler = getScheduler(Parameters.getSchedulerMode());
+        BaseScheduler scheduler = getScheduler(Parameters.getSchedulerMode());
         scheduler.setCloudletList(getCloudletList());
         scheduler.setVmList(getVmsCreatedList());
-        scheduler.run();
+        
+        try{
+            scheduler.run();
+        }catch(Exception e){
+            Log.printLine("Error in configuring scheduler_method");
+            e.printStackTrace();
+        }
+        
         List scheduledList = scheduler.getScheduledList();
         for (Iterator it = scheduledList.iterator(); it.hasNext();) {
             Cloudlet cloudlet = (Cloudlet) it.next();

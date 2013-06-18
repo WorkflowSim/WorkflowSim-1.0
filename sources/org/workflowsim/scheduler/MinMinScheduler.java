@@ -28,7 +28,7 @@ import org.workflowsim.WorkflowSimTags;
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public class MinMinScheduler extends DefaultScheduler {
+public class MinMinScheduler extends BaseScheduler {
 
     public MinMinScheduler() {
         super();
