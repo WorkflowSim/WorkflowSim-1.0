@@ -38,20 +38,29 @@
 
 #Clustering Related parameters
 #The number of clustered jobs per level
-clusters.num 	= 40
+clusters.num 	= 20
+#clusters.num = 4
 #The size of a clustered job (number of tasks per job)
 #clusters.size 	= 20
 #The clustering method
 #clusters.method = horizontal
+#clusters.method = balanced
 #The type of file system to use
 file.system	= LOCAL
 #file.system	= SHARED
 
 #Scheduling Related Parameters
+#If you have specified planner.method, it will be disabled
 #scheduler.method= MINMIN_SCH
 
-#Please replace it with your real physical path
-dax.path 	= /Users/chenweiwei/NetBeansProjects/WorkflowSimTemp/config/dax/Montage_100.xml
+#Planning Related Parameters
+planner.method= RANDOM
 
+#Please replace it with your real physical path
+#dax.path       = /Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Inspiral_200.xml
+#dax.path	= /Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Inspiral_400_weird.xml
+#dax.path 	= /Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Epigenomics_500.xml
+dax.path = /Users/chenweiwei/NetBeansProjects/WorkflowSimLocality/config/dax/CyberShake_1000.xml
+#dax.path = /Users/chenweiwei/NetBeansProjects/WorkflowSimLocality/config/dax/fake-21-1.xml
 #Reducer mode used to remove duplicate dependencies
 #reduce.method	= montage

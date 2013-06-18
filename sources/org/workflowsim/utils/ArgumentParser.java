@@ -278,6 +278,15 @@ public class ArgumentParser {
             if (!failureMap.containsKey((int) 0)) {
                 failureMap.put(0, 0.0);
             }
+            
+            /**
+             * If a user has specified planner.method, the scheduler.method should 
+             * be set as STATIC_SCH to avoid unnecessary change during the runtime
+             */
+            if(!pln_method.equals(PLNMethod.INVALID)){
+                sch_method = SCHMethod.STATIC_SCH;
+            }
+            
             Parameters.init(ftc_method, ftc_monitor, ftc_failure,
                     failureMap, vmNum, daxPath, runtimePath,
                     datasizePath, op, cp, sch_method, pln_method,
