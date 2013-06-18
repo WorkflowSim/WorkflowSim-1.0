@@ -58,9 +58,18 @@ public class Parameters {
 
     public enum SCHMethod {
 
-        MAXMIN_SCH, MINMIN_SCH, HEFT_SCH, MCT_SCH, DATA_SCH, 
+        MAXMIN_SCH, MINMIN_SCH, MCT_SCH, DATA_SCH, 
         STATIC_SCH, FCFS_SCH, INVALID_SCH
     }
+    
+    /**
+     * Planning Algorithm (Global Scheduling Algorithm)
+     * 
+     */
+    public enum PLNMethod{
+        INVALID, RANDOM, 
+    }
+    
     public static final int BASE = 0;
     /**
      * Fault Tolerant Clustering method
@@ -78,6 +87,11 @@ public class Parameters {
      * Scheduling mode
      */
     private static SCHMethod schedulerMode;
+    
+    /**
+     * Planning mode
+     */
+    private static PLNMethod plannerMode;
     /**
      * Task Failure Rate key = level value = task failure rate
      *
@@ -139,13 +153,14 @@ public class Parameters {
      * @param op, overhead parameters
      * @param cp, clustering parameters
      * @param scheduler, scheduling mode
+     * @param planner, planning mode
      * @param rMethod , reducer mode
      */
     public static void init(FTCMethod fMethod, FTCMonitor monitor, FTCFailure failure,
             Map failureList,
             int vm, String dax, String runtime, String datasize,
             OverheadParameters op, ClusteringParameters cp,
-            SCHMethod scheduler, String rMethod) {
+            SCHMethod scheduler, PLNMethod planner, String rMethod) {
 
         cParams = cp;
         FTCMethod = fMethod;
@@ -160,6 +175,7 @@ public class Parameters {
 
         oParams = op;
         schedulerMode = scheduler;
+        plannerMode = planner;
         reduceMethod = rMethod;
     }
 
@@ -319,6 +335,14 @@ public class Parameters {
         return schedulerMode;
     }
     
+    /**
+     * Gets the planning method
+     * @return the planning method
+     * 
+     */
+    public static PLNMethod getPlannerMode() {
+        return plannerMode;
+    }
     /**
      * Gets the version
      * @return version

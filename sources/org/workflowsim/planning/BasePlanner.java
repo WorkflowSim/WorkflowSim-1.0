@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.workflowsim.scheduler;
+package org.workflowsim.planning;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,33 +21,29 @@ import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Vm;
 
 /**
- * The base scheduler has implemented the basic features. Every other scheduling method
- * should extend from BaseScheduler but should not directly use it. 
+ * The base planner has implemented the basic features. Every other planning method
+ * should extend from BasePlanner but should not directly use it. 
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
- * @date Apr 9, 2013
+ * @date Jun 17, 2013
  */
-public abstract class BaseScheduler implements SchedulerInterface {
+public abstract class BasePlanner implements PlannerInterface {
 
     /**
-     * the job list.
+     * the task list.
      */
-    private List<? extends Cloudlet> cloudletList;
+    private List<? extends Cloudlet> tasktList;
     /**
      * the vm list.
      */
     private List<? extends Vm> vmList;
-    /**
-     * the scheduled job list.
-     */
-    private List< Cloudlet> scheduledList;
+
 
     /**
      * Initialize a BaseScheduler
      */
-    public BaseScheduler() {
-        this.scheduledList = new ArrayList();
+    public BasePlanner() {
     }
 
     /**
@@ -56,8 +52,8 @@ public abstract class BaseScheduler implements SchedulerInterface {
      * @param list
      */
     @Override
-    public void setCloudletList(List list) {
-        this.cloudletList = list;
+    public void setTaskList(List list) {
+        this.tasktList = list;
     }
 
     /**
@@ -71,13 +67,13 @@ public abstract class BaseScheduler implements SchedulerInterface {
     }
 
     /**
-     * Gets the job list.
+     * Gets the task list.
      *
-     * @return the job list
+     * @return the task list
      */
     @Override
-    public List getCloudletList() {
-        return this.cloudletList;
+    public List getTaskList() {
+        return this.tasktList;
     }
 
     /**
@@ -95,13 +91,5 @@ public abstract class BaseScheduler implements SchedulerInterface {
      */
     public abstract void run() throws Exception;
 
-    /**
-     * Gets the scheduled job list
-     *
-     * @return job list
-     */
-    @Override
-    public List getScheduledList() {
-        return this.scheduledList;
-    }
+
 }

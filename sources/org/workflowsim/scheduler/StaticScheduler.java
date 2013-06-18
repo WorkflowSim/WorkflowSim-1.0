@@ -61,17 +61,22 @@ public class StaticScheduler extends BaseScheduler {
              */
 
             if(cloudlet.getVmId() < 0 || ! mId2Vm.containsKey(cloudlet.getVmId())){
-                throw(new Exception("Cloudlet " + cloudlet.getCloudletId() + " is not matched."
-                        + "Please configure scheduler_method in your config file"));
+//                throw(new Exception("Cloudlet " + cloudlet.getCloudletId() + " is not matched."
+//                        + "Please configure scheduler_method in your config file"));
+                Log.printLine("Cloudlet " + cloudlet.getCloudletId() + " is not matched."
+                        + "It is possible a stage-in job");
+                cloudlet.setVmId(0);
+                
             }
             CondorVM vm = (CondorVM)mId2Vm.get(cloudlet.getVmId());
             if(vm.getState() == WorkflowSimTags.VM_STATUS_IDLE){   
                vm.setState(WorkflowSimTags.VM_STATUS_BUSY);
+               getScheduledList().add(cloudlet);
+               Log.printLine("Schedules " + cloudlet.getCloudletId() + " with "
+                    + cloudlet.getCloudletLength() + " to VM " + cloudlet.getVmId() );
             }
 
-            getScheduledList().add(cloudlet);
-            Log.printLine("Schedules " + cloudlet.getCloudletId() + " with "
-                    + cloudlet.getCloudletLength() + " to VM " + cloudlet.getVmId() );
+            
 
         }
 

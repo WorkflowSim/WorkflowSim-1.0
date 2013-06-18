@@ -130,6 +130,7 @@ public class BasicClustering implements ClusteringInterface {
             List taskList = new ArrayList();
             taskList.add(task);
             Job job = addTasks2Job(taskList);
+            job.setVmId(task.getVmId());
             getTask2Job().put(task, job);
 
         }

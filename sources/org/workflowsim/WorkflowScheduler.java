@@ -30,7 +30,6 @@ import org.workflowsim.failure.FailureGenerator;
 import org.workflowsim.scheduler.DataAwareScheduler;
 import org.workflowsim.scheduler.BaseScheduler;
 import org.workflowsim.scheduler.FCFSScheduler;
-import org.workflowsim.scheduler.HEFTScheduler;
 import org.workflowsim.scheduler.MCTScheduler;
 import org.workflowsim.scheduler.MaxMinScheduler;
 import org.workflowsim.scheduler.MinMinScheduler;
@@ -153,9 +152,6 @@ public class WorkflowScheduler extends DatacenterBroker {
                 break;
             case MAXMIN_SCH:
                 scheduler = new MaxMinScheduler();
-                break;
-            case HEFT_SCH:
-                scheduler = new HEFTScheduler();
                 break;
             case MCT_SCH:
                 scheduler = new MCTScheduler();

@@ -118,6 +118,19 @@ public class WorkflowEngine extends SimEntity {
         getScheduler(0).submitVmList(list);
         setVmList(list);
     }
+    
+    public List<? extends Vm> getAllVmList(){
+        if(this.vmList != null && !this.vmList.isEmpty()){
+            return this.vmList;
+        }
+        else{
+            List list = new ArrayList();
+            for(int i = 0;i < getSchedulers().size();i ++){
+                list.addAll(getScheduler(i).getVmList());
+            }
+            return list;
+        }
+    }
 
     /**
      * This method is used to send to the broker the list of cloudlets.

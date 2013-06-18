@@ -13,25 +13,43 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.workflowsim.scheduler;
+package org.workflowsim.planning;
 
-import org.cloudbus.cloudsim.Log;
+import java.util.List;
 
 /**
- * The HEFT scheduling algorithm (not implemented yet)
+ * The Planner interface
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
- * @date Apr 9, 2013
+ * @date Jun 18, 2013
  */
-public class HEFTScheduler extends BaseScheduler {
+public interface PlannerInterface {
 
-    public HEFTScheduler() {
-        super();
-    }
+    /**
+     * Sets the task list.
+     */
+    public void setTaskList(List list);
 
-    @Override
-    public void run() {
-        Log.printLine("It is not implemented. Please do not use HEFT currently");
-    }
+    /**
+     * Sets the vm list.
+     */
+    public void setVmList(List list);
+
+    /**
+     * Gets the task list.
+     */
+    public List getTaskList();
+
+    /**
+     * Gets the vm list. An algorithm must implement it
+     */
+    public List getVmList();
+
+    /**
+     * the main function.
+     */
+    public void run() throws Exception;
+
+
 }

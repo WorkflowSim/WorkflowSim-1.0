@@ -139,7 +139,7 @@ public class DatacenterExtended extends Datacenter {
             if (estimatedFinishTime > 0.0 && !Double.isInfinite(estimatedFinishTime)) {
                 send(getId(), estimatedFinishTime, CloudSimTags.VM_DATACENTER_EVENT);
             } else {
-                Log.printLine("Error here");
+                Log.printLine("Warning: You schedule cloudlet to a busy VM");
             }
 
             if (ack) {

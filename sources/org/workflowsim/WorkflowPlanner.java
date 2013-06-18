@@ -21,7 +21,10 @@ import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.core.SimEvent;
+import org.workflowsim.planning.BasePlanner;
+import org.workflowsim.planning.RandomPlanner;
 import org.workflowsim.utils.Parameters;
+import org.workflowsim.utils.Parameters.PLNMethod;
 
 /**
  * WorkflowPlanner supports dynamic planning. In the future we will have global
@@ -131,6 +134,9 @@ public class WorkflowPlanner extends SimEntity {
             case WorkflowSimTags.START_SIMULATION:
                 getWorkflowParser().parse();
                 setTaskList(getWorkflowParser().getTaskList());
+                
+                processPlanning();
+                
                 processImpactFactors(getTaskList());
                 sendNow(getClusteringEngineId(), WorkflowSimTags.JOB_SUBMIT, getTaskList());
                 break;
@@ -144,6 +150,51 @@ public class WorkflowPlanner extends SimEntity {
         }
     }
 
+    
+    private void processPlanning(){
+        if (Parameters.getPlannerMode().equals(PLNMethod.INVALID)){
+            return;
+        }
+        BasePlanner planner = getPlanner(Parameters.getPlannerMode());
+        planner.setTaskList(getTaskList());
+        planner.setVmList(getWorkflowEngine().getAllVmList());
+        
+        try{
+            planner.run();
+        }catch(Exception e){
+            Log.printLine("Error in configuring scheduler_method");
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Switch between multiple planners. Based on planner.method
+     *
+     * @param name the SCHMethod name
+     * @return the scheduler that extends BaseScheduler
+     */
+    private BasePlanner getPlanner(PLNMethod name) {
+        BasePlanner planner = null;
+
+        // choose which scheduler to use. Make sure you have add related enum in
+        //Parameters.java
+        switch (name) {
+            //by default it is FCFS_SCH
+            case INVALID:
+                planner = null;
+                break;
+            case RANDOM:
+                planner = new RandomPlanner();
+                break;
+            default:
+                planner = null;
+                break;
+
+        }
+
+        return planner;
+    }
+    
     /**
      * Add impact factor for each task. This is useful in task balanced
      * clustering algorithm It is for research purpose and thus it is optional.
