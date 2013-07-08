@@ -27,6 +27,11 @@ import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.core.SimEvent;
 import org.workflowsim.reclustering.ReclusteringEngine;
+import org.workflowsim.releasing.BFSReleaser;
+import org.workflowsim.releasing.BaseReleaser;
+import org.workflowsim.releasing.DFSReleaser;
+import org.workflowsim.releasing.MaxMinReleaser;
+import org.workflowsim.releasing.MinMinReleaser;
 import org.workflowsim.utils.Parameters;
 
 /**
@@ -293,6 +298,41 @@ public class WorkflowEngine extends SimEntity {
         }
         return false;
     }
+    
+    /**
+     * Sort Jobs based on releaser
+     * @param list to be sort
+     * @return list after sorting
+     */
+    private List<Job> sortJobs (List list){
+        
+        BaseReleaser releaser = null;
+        switch (Parameters.getReleaserMode()){
+            case MAXMIN_RLS:
+                releaser = new MaxMinReleaser();
+                break;
+            case MINMIN_RLS:
+                releaser = new MinMinReleaser();
+                break;
+            case BFS_RLS:
+                releaser = new BFSReleaser();
+                break;
+            case DFS_RLS:
+                releaser = new DFSReleaser();
+                break;
+            default:
+                return list;
+        }
+        
+        releaser.setJobList(list);
+        try{
+            releaser.run();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return releaser.getJobList();
+    }
 
     /**
      * Submit jobs to the created VMs.
@@ -346,8 +386,9 @@ public class WorkflowEngine extends SimEntity {
         for (int i = 0; i < getSchedulers().size(); i++) {
 
             List submittedList = (List) allocationList.get(getSchedulerId(i));
-            //divid it into sublist
-
+            
+            submittedList = sortJobs(submittedList);
+            
             int interval = Parameters.getOverheadParams().getWEDInterval();
             double delay = Parameters.getOverheadParams().getWEDDelay(submittedList);
 

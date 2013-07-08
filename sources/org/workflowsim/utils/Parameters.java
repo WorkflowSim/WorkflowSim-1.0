@@ -67,7 +67,15 @@ public class Parameters {
      * 
      */
     public enum PLNMethod{
-        INVALID, RANDOM, 
+        INVALID_PLN, RANDOM_PLN, 
+    }
+    /**
+     * Releasing Algorithm for Workflow Engine
+     */
+    public enum RLSMethod {
+
+        MAXMIN_RLS, MINMIN_RLS, BFS_RLS, DFS_RLS, 
+        MCT_RLS, FCFS_RLS, INVALID_RLS
     }
     
     public static final int BASE = 0;
@@ -92,6 +100,12 @@ public class Parameters {
      * Planning mode
      */
     private static PLNMethod plannerMode;
+    
+    /**
+     * Releasing mode
+     */
+    private static RLSMethod releaserMode;
+    
     /**
      * Task Failure Rate key = level value = task failure rate
      *
@@ -160,7 +174,7 @@ public class Parameters {
             Map failureList,
             int vm, String dax, String runtime, String datasize,
             OverheadParameters op, ClusteringParameters cp,
-            SCHMethod scheduler, PLNMethod planner, String rMethod) {
+            SCHMethod scheduler, PLNMethod planner, RLSMethod releaser, String rMethod) {
 
         cParams = cp;
         FTCMethod = fMethod;
@@ -176,6 +190,7 @@ public class Parameters {
         oParams = op;
         schedulerMode = scheduler;
         plannerMode = planner;
+        releaserMode = releaser;
         reduceMethod = rMethod;
     }
 
@@ -343,6 +358,17 @@ public class Parameters {
     public static PLNMethod getPlannerMode() {
         return plannerMode;
     }
+    
+    
+     /**
+     * Gets the releasing method
+     * @return the releasing method
+     * 
+     */
+    public static RLSMethod getReleaserMode() {
+        return releaserMode;
+    }
+    
     /**
      * Gets the version
      * @return version

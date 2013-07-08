@@ -39,6 +39,9 @@ public class MinMinScheduler extends BaseScheduler {
     public void run() {
 
         int size = getCloudletList().size();
+        if (size <= 0){
+            return;
+        }
         hasChecked.clear();
         for (int t = 0; t < size; t++) {
             hasChecked.add(false);

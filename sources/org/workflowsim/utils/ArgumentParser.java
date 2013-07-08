@@ -26,6 +26,7 @@ import org.workflowsim.utils.Parameters.FTCFailure;
 import org.workflowsim.utils.Parameters.FTCMethod;
 import org.workflowsim.utils.Parameters.FTCMonitor;
 import org.workflowsim.utils.Parameters.PLNMethod;
+import org.workflowsim.utils.Parameters.RLSMethod;
 import org.workflowsim.utils.Parameters.SCHMethod;
 import org.workflowsim.utils.ReplicaCatalog.FileSystem;
 
@@ -108,7 +109,8 @@ public class ArgumentParser {
             FTCMonitor ftc_monitor = FTCMonitor.MONITOR_NONE;
             FTCFailure ftc_failure = FTCFailure.FAILURE_NONE;
             SCHMethod sch_method = SCHMethod.INVALID_SCH;
-            PLNMethod pln_method = PLNMethod.INVALID;
+            PLNMethod pln_method = PLNMethod.INVALID_PLN;
+            RLSMethod rls_method = RLSMethod.INVALID_RLS;
             FileSystem file_system = FileSystem.SHARED;
             OverheadParameters op = null;
             ClusteringParameters cp = null;
@@ -159,6 +161,8 @@ public class ArgumentParser {
                     sch_method = SCHMethod.valueOf(value);
                 } else if (key.equals("planner.method")){
                     pln_method = PLNMethod.valueOf(value);
+                } else if (key.equals("releaser.method")){
+                    rls_method = RLSMethod.valueOf(value);
                 } else if (key.equals("bandwidth")) {
                     bandwidth = Double.parseDouble(value);
                 } else {
@@ -283,7 +287,7 @@ public class ArgumentParser {
              * If a user has specified planner.method, the scheduler.method should 
              * be set as STATIC_SCH to avoid unnecessary change during the runtime
              */
-            if(!pln_method.equals(PLNMethod.INVALID)){
+            if(!pln_method.equals(PLNMethod.INVALID_PLN)){
                 if(sch_method != SCHMethod.STATIC_SCH || sch_method != SCHMethod.INVALID_SCH){
                     Log.printLine("Warning: your scheduler.method is reset to be STATIC_SCH");
                 }
@@ -293,7 +297,7 @@ public class ArgumentParser {
             Parameters.init(ftc_method, ftc_monitor, ftc_failure,
                     failureMap, vmNum, daxPath, runtimePath,
                     datasizePath, op, cp, sch_method, pln_method,
-                    rMethod);
+                    rls_method, rMethod);
             ReplicaCatalog.init(file_system);
         } catch (Exception e) {
             e.printStackTrace();

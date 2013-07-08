@@ -152,7 +152,7 @@ public class WorkflowPlanner extends SimEntity {
 
     
     private void processPlanning(){
-        if (Parameters.getPlannerMode().equals(PLNMethod.INVALID)){
+        if (Parameters.getPlannerMode().equals(PLNMethod.INVALID_PLN)){
             return;
         }
         BasePlanner planner = getPlanner(Parameters.getPlannerMode());
@@ -180,10 +180,10 @@ public class WorkflowPlanner extends SimEntity {
         //Parameters.java
         switch (name) {
             //by default it is FCFS_SCH
-            case INVALID:
+            case INVALID_PLN:
                 planner = null;
                 break;
-            case RANDOM:
+            case RANDOM_PLN:
                 planner = new RandomPlanner();
                 break;
             default:
