@@ -138,6 +138,10 @@ public class Parameters {
      * Clustering parameters
      */
     private static ClusteringParameters cParams;
+    /**
+     * Deadline of a workflow
+     */
+    private static long deadline;
 
     /**
      * A static function so that you can specify them in any place
@@ -155,12 +159,14 @@ public class Parameters {
      * @param scheduler, scheduling mode
      * @param planner, planning mode
      * @param rMethod , reducer mode
+     * @param deadline, deadline of a workflow
      */
     public static void init(FTCMethod fMethod, FTCMonitor monitor, FTCFailure failure,
             Map failureList,
             int vm, String dax, String runtime, String datasize,
             OverheadParameters op, ClusteringParameters cp,
-            SCHMethod scheduler, PLNMethod planner, String rMethod) {
+            SCHMethod scheduler, PLNMethod planner, String rMethod,
+            long dl) {
 
         cParams = cp;
         FTCMethod = fMethod;
@@ -177,6 +183,7 @@ public class Parameters {
         schedulerMode = scheduler;
         plannerMode = planner;
         reduceMethod = rMethod;
+        deadline = dl;
     }
 
     /**
@@ -355,4 +362,11 @@ public class Parameters {
         Log.printLine("WorkflowSim Version: " + version);
         Log.printLine("Change Note: " + note);
     }
+    /*
+     * Gets the deadline
+     */
+    public static long getDeadline(){
+    	return deadline;
+    }
+    
 }

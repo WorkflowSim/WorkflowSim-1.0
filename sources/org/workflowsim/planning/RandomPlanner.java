@@ -19,9 +19,10 @@ import java.util.Iterator;
 import java.util.Random;
 import org.workflowsim.CondorVM;
 import org.workflowsim.Task;
+import org.workflowsim.utils.Parameters;
 
 /**
- * The Random planning algorithm. 
+ * The Random planning algorithm. This is just for demo. It is not useful in practice.
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
@@ -62,7 +63,7 @@ public class RandomPlanner extends BasePlanner {
             
             task.setVmId(vm.getId());
                     
-
+            long deadline = Parameters.getDeadline();
 
         }
     }

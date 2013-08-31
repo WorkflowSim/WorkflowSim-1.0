@@ -37,7 +37,7 @@ import org.workflowsim.utils.ReplicaCatalog;
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
- * @date Apr 9, 2013
+ * @date Aug 23, 2013
  */
 public class WorkflowParser {
 
@@ -375,10 +375,10 @@ public class WorkflowParser {
 
 
         } catch (JDOMException jde) {
-            Log.printLine("JDOM Exception");
+            Log.printLine("JDOM Exception;Please make sure your dax file is valid");
 
         } catch (IOException ioe) {
-            Log.printLine("IO Exception");
+            Log.printLine("IO Exception;Please make sure dax.path is correctly set in your config file");
 
         } catch (Exception e) {
             e.printStackTrace();
