@@ -1,66 +1,61 @@
-#Overhead Related Parameters
-#The Workflow Engine Delay for level 1
+######Overhead Related Parameters
+######The Workflow Engine Delay for level 1
 #d1		= 8.1 
-#The Workflow Engine Delay for level 2
+######The Workflow Engine Delay for level 2
 #d2		= 18.44 
-#The Workflow Engine Delay for other levels that are not specified 
+######The Workflow Engine Delay for other levels that are not specified 
 #d0		= 6.74
-#The Postscript Delay for level 1
+######The Postscript Delay for level 1
 #p1		= 78.05
-#The Postscript Delay for level 2
+######The Postscript Delay for level 2
 #p2		= 13.12
-#The Postscript Delay for other levels that are not specified
+######The Postscript Delay for other levels that are not specified
 #p0		= 6.81
-#The Queue Delay for level 1
+######The Queue Delay for level 1
 #q1		= 77.75
-#The Queue Delay for level 2
+######The Queue Delay for level 2
 #q2		= 343.47
-#The Queue Delay for other levels that are not specified
+######The Queue Delay for other levels that are not specified
 #q0		= 161.96
-#The Clustering Delay for level 1
+######The Clustering Delay for level 1
 #c1		= 428.28
-#The Clustering Delay for level 2
+######The Clustering Delay for level 2
 #c2		= 67.44
-#The interval for Workflow Engine
+######The interval for Workflow Engine
 #interval	= 5
 
-#Failure related parameters
-#The Task Failure Rate for level 1
+######Failure related parameters
+######The Task Failure Rate for level 1
 #a1		= 0.02
-#The Task Failure Rate for level 2
+######The Task Failure Rate for level 2
 #a2		= 0.02
-#Fault tolerant clustering method
+######Fault tolerant clustering method
 #ftc.method	= FTCLUSTERING_DC
-#Fault tolerant clustering monitor mode
+######Fault tolerant clustering monitor mode
 #ftc.monitor	= MONITOR_ALL
-#Fault tolerant clustering failure generation mode
+######Fault tolerant clustering failure generation mode
 #ftc.failure	= FAILURE_JOB
 
-#Clustering Related parameters
-#The number of clustered jobs per level
-clusters.num 	= 20
-#clusters.num = 4
-#The size of a clustered job (number of tasks per job)
+######Clustering Related parameters
+######The number of clustered jobs per level
+#clusters.num 	= 20
+######The size of a clustered job (number of tasks per job)
 #clusters.size 	= 20
-#The clustering method
+######The clustering method
 #clusters.method = horizontal
 #clusters.method = balanced
-#The type of file system to use
+######The type of file system to use
 file.system	= LOCAL
 #file.system	= SHARED
 
-#Scheduling Related Parameters
-#If you have specified planner.method, it will be disabled
-#scheduler.method= MINMIN_SCH
+######Scheduling Related Parameters
+######If you have specified planner.method, it will be disabled
+scheduler.method= MINMIN_SCH
 
-#Planning Related Parameters
-planner.method= RANDOM
+######Planning Related Parameters
+#planner.method= RANDOM
 
-#Please replace it with your real physical path
-#dax.path       = /Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Inspiral_200.xml
-#dax.path	= /Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Inspiral_400_weird.xml
-#dax.path 	= /Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Epigenomics_500.xml
-dax.path = /Users/chenweiwei/NetBeansProjects/WorkflowSimLocality/config/dax/CyberShake_1000.xml
-#dax.path = /Users/chenweiwei/NetBeansProjects/WorkflowSimLocality/config/dax/fake-21-1.xml
-#Reducer mode used to remove duplicate dependencies
+######Please replace it with your real physical path
+dax.path = /Users/chenweiwei/Work/WorkflowSimDeadline/WorkflowSim-1.0/config/dax/Montage_100.xml
+######Reducer mode used to remove duplicate dependencies
 #reduce.method	= montage

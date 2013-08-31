@@ -98,6 +98,7 @@ public class ArgumentParser {
             int cNum = 0;
             int interval = 0;
             int vmNum = 0;
+            long deadline = 0;
             
             String datasizePath = null;
             String runtimePath = null;
@@ -161,6 +162,8 @@ public class ArgumentParser {
                     pln_method = PLNMethod.valueOf(value);
                 } else if (key.equals("bandwidth")) {
                     bandwidth = Double.parseDouble(value);
+                } else if (key.equals("deadline")) {
+                	deadline = Long.parseLong(value);
                 } else {
                     /**
                      * Set overheads per level(depth)
@@ -293,7 +296,7 @@ public class ArgumentParser {
             Parameters.init(ftc_method, ftc_monitor, ftc_failure,
                     failureMap, vmNum, daxPath, runtimePath,
                     datasizePath, op, cp, sch_method, pln_method,
-                    rMethod);
+                    rMethod, deadline);
             ReplicaCatalog.init(file_system);
         } catch (Exception e) {
             e.printStackTrace();
