@@ -137,4 +137,19 @@ This page is written by Weiwei Chen @chenww05. For details or bug reports, pleas
 ### Support or Contact
 Please send an email to support@workflowsim.org. We appreciate your contribution to this project and please go to github to submit your bug report.  
 
+### Mailing Lists
+
+WorkflowSim Announce
+Message about new release or updates
+workflowsim-announce@googlegroups.com
+
+WorkflowSim Users
+Messages about WorkflowSim related questions/reports
+workflowsim-user@googlegroups.com
+
+WorkflowSim Developers
+Messages about WorkflowSim development
+workflowsim-dev@googlegroups.com
+
+
 
