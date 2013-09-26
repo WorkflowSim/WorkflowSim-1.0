@@ -57,6 +57,6 @@ scheduler.method= MINMIN_SCH
 #deadline = 100000
 
 ######Please replace it with your real physical path
-dax.path = /Users/chenweiwei/Work/WorkflowSimDeadline/WorkflowSim-1.0/config/dax/Montage_100.xml
+dax.path = /Users/chenweiwei/Work/WorkflowSimEnergy/WorkflowSim-1.0/config/dax/Montage_100.xml
 ######Reducer mode used to remove duplicate dependencies
 #reduce.method	= montage

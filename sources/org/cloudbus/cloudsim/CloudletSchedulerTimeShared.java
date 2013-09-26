@@ -65,7 +65,7 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 		double timeSpam = currentTime - getPreviousTime();
 
 		for (ResCloudlet rcl : getCloudletExecList()) {
-			rcl.updateCloudletFinishedSoFar((long) (getCapacity(mipsShare) * timeSpam * rcl.getNumberOfPes() * 1000000));
+			rcl.updateCloudletFinishedSoFar((long) (getCapacity(mipsShare) * timeSpam * rcl.getNumberOfPes() * Consts.MILLION));
 		}
 
 		if (getCloudletExecList().size() == 0) {
@@ -90,8 +90,8 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 		for (ResCloudlet rcl : getCloudletExecList()) {
 			double estimatedFinishTime = currentTime
 					+ (rcl.getRemainingCloudletLength() / (getCapacity(mipsShare) * rcl.getNumberOfPes()));
-			if (estimatedFinishTime - currentTime < 0.1) {
-				estimatedFinishTime = currentTime + 0.1;
+			if (estimatedFinishTime - currentTime < CloudSim.getMinTimeBetweenEvents()) {
+				estimatedFinishTime = currentTime + CloudSim.getMinTimeBetweenEvents();
 			}
 
 			if (estimatedFinishTime < nextEvent) {
@@ -109,7 +109,7 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 	 * @param mipsShare the mips share
 	 * @return the capacity
 	 */
-	private double getCapacity(List<Double> mipsShare) {
+	protected double getCapacity(List<Double> mipsShare) {
 		double capacity = 0.0;
 		int cpus = 0;
 		for (Double mips : mipsShare) {
@@ -161,6 +161,7 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 		}
 
 		// Then searches in the exec list
+		position=0;
 		for (ResCloudlet rcl : getCloudletExecList()) {
 			if (rcl.getCloudletId() == cloudletId) {
 				found = true;
@@ -177,11 +178,11 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 				rcl.setCloudletStatus(Cloudlet.CANCELED);
 			}
 			return rcl.getCloudlet();
-
 		}
 
 		// Now, looks in the paused queue
 		found = false;
+		position=0;
 		for (ResCloudlet rcl : getCloudletPausedList()) {
 			if (rcl.getCloudletId() == cloudletId) {
 				found = true;

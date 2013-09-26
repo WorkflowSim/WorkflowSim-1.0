@@ -159,12 +159,6 @@ public class WorkflowSimExample2 {
             CloudSim.stopSimulation();
 
             printJobList(outputList0);
-            datacenter0.printDebts();
-
-            datacenter1.printDebts();
-
-
-
 
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");

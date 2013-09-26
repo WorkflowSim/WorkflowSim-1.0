@@ -33,8 +33,8 @@ import org.cloudbus.cloudsim.util.ExecutionTimeMeasurer;
  * 
  * Anton Beloglazov, and Rajkumar Buyya, "Optimal Online Deterministic Algorithms and Adaptive
  * Heuristics for Energy and Performance Efficient Dynamic Consolidation of Virtual Machines in
- * Cloud Data Centers", Concurrency and Computation: Practice and Experience, ISSN: 1532-0626, Wiley
- * Press, New York, USA, 2011, DOI: 10.1002/cpe.1867
+ * Cloud Data Centers", Concurrency and Computation: Practice and Experience (CCPE), Volume 24,
+ * Issue 13, Pages: 1397-1420, John Wiley & Sons, Ltd, New York, USA, 2012
  * 
  * @author Anton Beloglazov
  * @since CloudSim Toolkit 3.0
@@ -218,7 +218,7 @@ public abstract class PowerVmAllocationPolicyMigrationAbstract extends PowerVmAl
 				continue;
 			}
 			if (host.isSuitableForVm(vm)) {
-				if (host.getUtilizationOfCpuMips() != 0 && isHostOverUtilizedAfterAllocation(host, vm)) {
+				if (getUtilizationOfCpuMips(host) != 0 && isHostOverUtilizedAfterAllocation(host, vm)) {
 					continue;
 				}
 
@@ -556,17 +556,29 @@ public abstract class PowerVmAllocationPolicyMigrationAbstract extends PowerVmAl
 	 */
 	protected double getMaxUtilizationAfterAllocation(PowerHost host, Vm vm) {
 		double requestedTotalMips = vm.getCurrentRequestedTotalMips();
-		double hostUtilizationMips = host.getUtilizationOfCpuMips();
+		double hostUtilizationMips = getUtilizationOfCpuMips(host);
+		double hostPotentialUtilizationMips = hostUtilizationMips + requestedTotalMips;
+		double pePotentialUtilization = hostPotentialUtilizationMips / host.getTotalMips();
+		return pePotentialUtilization;
+	}
+	
+	/**
+	 * Gets the utilization of the CPU in MIPS for the current potentially allocated VMs.
+	 *
+	 * @param host the host
+	 *
+	 * @return the utilization of the CPU in MIPS
+	 */
+	protected double getUtilizationOfCpuMips(PowerHost host) {
+		double hostUtilizationMips = 0;
 		for (Vm vm2 : host.getVmList()) {
 			if (host.getVmsMigratingIn().contains(vm2)) {
 				// calculate additional potential CPU usage of a migrating in VM
 				hostUtilizationMips += host.getTotalAllocatedMipsForVm(vm2) * 0.9 / 0.1;
 			}
+			hostUtilizationMips += host.getTotalAllocatedMipsForVm(vm2);
 		}
-
-		double hostPotentialUtilizationMips = hostUtilizationMips + requestedTotalMips;
-		double pePotentialUtilization = hostPotentialUtilizationMips / host.getTotalMips();
-		return pePotentialUtilization;
+		return hostUtilizationMips;
 	}
 
 	/**

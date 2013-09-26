@@ -7,13 +7,11 @@
 
 package org.cloudbus.cloudsim;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
@@ -44,9 +42,6 @@ public class Datacenter extends SimEntity {
 
 	/** The last process time. */
 	private double lastProcessTime;
-
-	/** The debts. */
-	private Map<Integer, Double> debts;
 
 	/** The storage list. */
 	private List<Storage> storageList;
@@ -88,7 +83,6 @@ public class Datacenter extends SimEntity {
 		setCharacteristics(characteristics);
 		setVmAllocationPolicy(vmAllocationPolicy);
 		setLastProcessTime(0.0);
-		setDebts(new HashMap<Integer, Double>());
 		setStorageList(storageList);
 		setVmList(new ArrayList<Vm>());
 		setSchedulingInterval(schedulingInterval);
@@ -331,17 +325,6 @@ public class Datacenter extends SimEntity {
 
 		int msg = addFile(file); // add the file
 
-		double debit;
-		if (getDebts().containsKey(sentFrom)) {
-			debit = getDebts().get(sentFrom);
-		} else {
-			debit = 0.0;
-		}
-
-		debit += getCharacteristics().getCostPerBw() * file.getSize();
-
-		getDebts().put(sentFrom, debit);
-
 		if (ack) {
 			data[1] = Integer.valueOf(-1); // no sender id
 			data[2] = Integer.valueOf(msg); // the result of adding a master file
@@ -386,7 +369,7 @@ public class Datacenter extends SimEntity {
 			userId = data[1];
 			vmId = data[2];
 
-			status = getVmAllocationPolicy().getHost(vmId, userId).getVm(userId, vmId).getCloudletScheduler()
+			status = getVmAllocationPolicy().getHost(vmId, userId).getVm(vmId,userId).getCloudletScheduler()
 					.getCloudletStatus(cloudletId);
 		}
 
@@ -397,7 +380,7 @@ public class Datacenter extends SimEntity {
 				cloudletId = cl.getCloudletId();
 				userId = cl.getUserId();
 
-				status = getVmAllocationPolicy().getHost(vmId, userId).getVm(userId, vmId)
+				status = getVmAllocationPolicy().getHost(vmId, userId).getVm(vmId,userId)
 						.getCloudletScheduler().getCloudletStatus(cloudletId);
 			} catch (Exception e) {
 				Log.printLine(getName() + ": Error in processing CloudSimTags.CLOUDLET_STATUS");
@@ -457,19 +440,10 @@ public class Datacenter extends SimEntity {
 			} else {
 				data[2] = CloudSimTags.FALSE;
 			}
-			send(vm.getUserId(), 0.1, CloudSimTags.VM_CREATE_ACK, data);
+			send(vm.getUserId(), CloudSim.getMinTimeBetweenEvents(), CloudSimTags.VM_CREATE_ACK, data);
 		}
 
 		if (result) {
-			double amount = 0.0;
-			if (getDebts().containsKey(vm.getUserId())) {
-				amount = getDebts().get(vm.getUserId());
-			}
-			amount += getCharacteristics().getCostPerMem() * vm.getRam();
-			amount += getCharacteristics().getCostPerStorage() * vm.getSize();
-
-			getDebts().put(vm.getUserId(), amount);
-
 			getVmList().add(vm);
 
 			if (vm.isBeingInstantiated()) {
@@ -548,16 +522,6 @@ public class Datacenter extends SimEntity {
 			}
 			sendNow(ev.getSource(), CloudSimTags.VM_CREATE_ACK, data);
 		}
-
-		double amount = 0.0;
-		if (debts.containsKey(vm.getUserId())) {
-			amount = debts.get(vm.getUserId());
-		}
-
-		amount += getCharacteristics().getCostPerMem() * vm.getRam();
-		amount += getCharacteristics().getCostPerStorage() * vm.getSize();
-
-		debts.put(vm.getUserId(), amount);
 
 		Log.formatLine(
 				"%.2f: Migration of VM #%d to Host #%d is completed",
@@ -653,7 +617,7 @@ public class Datacenter extends SimEntity {
 		int destId = array[4];
 
 		// get the cloudlet
-		Cloudlet cl = getVmAllocationPolicy().getHost(vmId, userId).getVm(userId, vmId)
+		Cloudlet cl = getVmAllocationPolicy().getHost(vmId, userId).getVm(vmId,userId)
 				.getCloudletScheduler().cloudletCancel(cloudletId);
 
 		boolean failed = false;
@@ -675,7 +639,7 @@ public class Datacenter extends SimEntity {
 
 			// the cloudlet will migrate from one vm to another does the destination VM exist?
 			if (destId == getId()) {
-				Vm vm = getVmAllocationPolicy().getHost(vmDestId, userId).getVm(userId, vmDestId);
+				Vm vm = getVmAllocationPolicy().getHost(vmDestId, userId).getVm(vmDestId,userId);
 				if (vm == null) {
 					failed = true;
 				} else {
@@ -717,7 +681,7 @@ public class Datacenter extends SimEntity {
 		try {
 			// gets the Cloudlet object
 			Cloudlet cl = (Cloudlet) ev.getData();
-                        
+
 			// checks whether this Cloudlet has finished or not
 			if (cl.isFinished()) {
 				String name = CloudSim.getEntityName(cl.getUserId());
@@ -824,7 +788,7 @@ public class Datacenter extends SimEntity {
 	 * @post $none
 	 */
 	protected void processCloudletResume(int cloudletId, int userId, int vmId, boolean ack) {
-		double eventTime = getVmAllocationPolicy().getHost(vmId, userId).getVm(userId, vmId)
+		double eventTime = getVmAllocationPolicy().getHost(vmId, userId).getVm(vmId,userId)
 				.getCloudletScheduler().cloudletResume(cloudletId);
 
 		boolean status = false;
@@ -859,7 +823,7 @@ public class Datacenter extends SimEntity {
 	 * @post $none
 	 */
 	protected void processCloudletPause(int cloudletId, int userId, int vmId, boolean ack) {
-		boolean status = getVmAllocationPolicy().getHost(vmId, userId).getVm(userId, vmId)
+		boolean status = getVmAllocationPolicy().getHost(vmId, userId).getVm(vmId,userId)
 				.getCloudletScheduler().cloudletPause(cloudletId);
 
 		if (ack) {
@@ -885,9 +849,8 @@ public class Datacenter extends SimEntity {
 	 * @post $none
 	 */
 	protected void processCloudletCancel(int cloudletId, int userId, int vmId) {
-		Cloudlet cl = getVmAllocationPolicy().getHost(vmId, userId).getVm(userId, vmId)
+		Cloudlet cl = getVmAllocationPolicy().getHost(vmId, userId).getVm(vmId,userId)
 				.getCloudletScheduler().cloudletCancel(cloudletId);
-
 		sendNow(userId, CloudSimTags.CLOUDLET_CANCEL, cl);
 	}
 
@@ -903,7 +866,7 @@ public class Datacenter extends SimEntity {
 		// if some time passed since last processing
 		// R: for term is to allow loop at simulation start. Otherwise, one initial
 		// simulation step is skipped and schedulers are not properly initialized
-		if (CloudSim.clock() < 0.111 || CloudSim.clock() > getLastProcessTime() + 0.1) {
+		if (CloudSim.clock() < 0.111 || CloudSim.clock() > getLastProcessTime() + CloudSim.getMinTimeBetweenEvents()) {
 			List<? extends Host> list = getVmAllocationPolicy().getHostList();
 			double smallerTime = Double.MAX_VALUE;
 			// for each host...
@@ -917,8 +880,8 @@ public class Datacenter extends SimEntity {
 				}
 			}
 			// gurantees a minimal interval before scheduling the event
-			if (smallerTime < CloudSim.clock() + 0.11) {
-				smallerTime = CloudSim.clock() + 0.11;
+			if (smallerTime < CloudSim.clock() + CloudSim.getMinTimeBetweenEvents() + 0.01) {
+				smallerTime = CloudSim.clock() + CloudSim.getMinTimeBetweenEvents() + 0.01;
 			}
 			if (smallerTime != Double.MAX_VALUE) {
 				schedule(getId(), (smallerTime - CloudSim.clock()), CloudSimTags.VM_DATACENTER_EVENT);
@@ -1046,24 +1009,6 @@ public class Datacenter extends SimEntity {
 		return msg;
 	}
 
-	/**
-	 * Prints the debts.
-	 */
-	public void printDebts() {
-		Log.printLine("*****Datacenter: " + getName() + "*****");
-		Log.printLine("User id\t\tDebt");
-
-		Set<Integer> keys = getDebts().keySet();
-		Iterator<Integer> iter = keys.iterator();
-		DecimalFormat df = new DecimalFormat("#.##");
-		while (iter.hasNext()) {
-			int key = iter.next();
-			double value = getDebts().get(key);
-			Log.printLine(key + "\t\t" + df.format(value));
-		}
-		Log.printLine("**********************************");
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see cloudsim.core.SimEntity#shutdownEntity()
@@ -1174,24 +1119,6 @@ public class Datacenter extends SimEntity {
 	 */
 	protected void setLastProcessTime(double lastProcessTime) {
 		this.lastProcessTime = lastProcessTime;
-	}
-
-	/**
-	 * Gets the debts.
-	 * 
-	 * @return the debts
-	 */
-	protected Map<Integer, Double> getDebts() {
-		return debts;
-	}
-
-	/**
-	 * Sets the debts.
-	 * 
-	 * @param debts the debts
-	 */
-	protected void setDebts(Map<Integer, Double> debts) {
-		this.debts = debts;
 	}
 
 	/**

@@ -264,8 +264,6 @@ public class CloudSimTags {
 	public static final int Network_Event_Host = BASE + 47;
 
 	public static final int NextCycle = BASE + 48;
-        
-
 
 	/** Private Constructor */
 	private CloudSimTags() {

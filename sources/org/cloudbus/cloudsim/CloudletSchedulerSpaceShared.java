@@ -89,7 +89,7 @@ public class CloudletSchedulerSpaceShared extends CloudletScheduler {
 
 		// each machine in the exec list has the same amount of cpu
 		for (ResCloudlet rcl : getCloudletExecList()) {
-			rcl.updateCloudletFinishedSoFar((long) (capacity * timeSpam * rcl.getNumberOfPes() * 1000000));
+			rcl.updateCloudletFinishedSoFar((long) (capacity * timeSpam * rcl.getNumberOfPes() * Consts.MILLION));
 		}
 
 		// no more cloudlets in this scheduler
@@ -136,8 +136,8 @@ public class CloudletSchedulerSpaceShared extends CloudletScheduler {
 		for (ResCloudlet rcl : getCloudletExecList()) {
 			double remainingLength = rcl.getRemainingCloudletLength();
 			double estimatedFinishTime = currentTime + (remainingLength / (capacity * rcl.getNumberOfPes()));
-			if (estimatedFinishTime - currentTime < 0.1) {
-				estimatedFinishTime = currentTime + 0.1;
+			if (estimatedFinishTime - currentTime < CloudSim.getMinTimeBetweenEvents()) {
+				estimatedFinishTime = currentTime + CloudSim.getMinTimeBetweenEvents();
 			}
 			if (estimatedFinishTime < nextEvent) {
 				nextEvent = estimatedFinishTime;
@@ -386,7 +386,7 @@ public class CloudletSchedulerSpaceShared extends CloudletScheduler {
 				cpus++;
 			}
 		}
-                
+
 		currentCpus = cpus;
 		capacity /= cpus;
 

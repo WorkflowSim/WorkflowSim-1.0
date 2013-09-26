@@ -71,7 +71,8 @@ public class CloudSimExample2 {
 
 	            	// Second step: Create Datacenters
 	            	//Datacenters are the resource providers in CloudSim. We need at list one of them to run a CloudSim simulation
-	            	Datacenter datacenter0 = createDatacenter("Datacenter_0");
+	            	@SuppressWarnings("unused")
+					Datacenter datacenter0 = createDatacenter("Datacenter_0");
 
 	            	//Third step: Create Broker
 	            	DatacenterBroker broker = createBroker();
@@ -92,7 +93,6 @@ public class CloudSimExample2 {
 	            	//create two VMs
 	            	Vm vm1 = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
 
-	            	//the second VM will have twice the priority of VM1 and so will receive twice CPU time
 	            	vmid++;
 	            	Vm vm2 = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
 
@@ -145,9 +145,6 @@ public class CloudSimExample2 {
 	            	CloudSim.stopSimulation();
 
 	            	printCloudletList(newList);
-
-	            	//Print the debt of each user to each datacenter
-	    	    	datacenter0.printDebts();
 
 	            	Log.printLine("CloudSimExample2 finished!");
 	        }
