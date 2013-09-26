@@ -23,6 +23,7 @@ org.workflowsim.clustering.balancing.methods
 org.workflowsim.clustering.balancing.metrics
 org.workflowsim.examples
 org.workflowsim.failure
+org.workflowsim.planning
 org.workflowsim.reclustering
 org.workflowsim.scheduler
 org.workflowsim.utils
