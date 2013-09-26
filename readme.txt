@@ -58,19 +58,19 @@ Go to 'Run'->'Run Configurations'->'Java Application'->'WorkflowSimExample1'. Ma
 
 Click the 'Arguments', in the 'Program arguments', please add
 ```
--p your_repo_root/config/balanced/cybershake.txt
+-p your_repo_root/config/config.txt
 ```
-In this case, we use cybershake workflow as an example. 
+In this case, we use Montage workflow as an example. 
 
 1.6 Modify Config File
 
-Open your_repo_root/config/balanced/cybershake.txt, there is one line:
+Open your_repo_root/config/config.txt, there is one line:
 ```
-dax.path	= /Users/chenweiwei/ResearchAndTech/Research/balanced_clustering/generator/BharathiPaper/Inspiral_1000.xml
+dax.path	= /Users/chenweiwei/Work/WorkflowSimEnergy/WorkflowSim-1.0/config/dax/Montage_100.xml
 ```
 Replace it with 
 ```
-dax.path = your_repo_root/config/balanced/dax/CyberShake_100.xml. 
+dax.path = your_repo_root/config/dax/Montage_100.xml. 
 ```
 CyberShake_100.xml is a dax file for cybershake workflow with 100 tasks in it. You can try other dax files provided under the same directory. 
 Other parameters would not cause an error but they have specified the simulation details. For details of these parameters, please refer to other pages. 
