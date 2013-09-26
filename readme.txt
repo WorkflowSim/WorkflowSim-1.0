@@ -112,7 +112,7 @@ The same to 1.6.
 
 2.7 Run an Example
 
-The same to 2.7. 
+The same to 1.7. 
 
 ### 3. Use WorkflowSim with Eclipse but without GitHub
 ( If you don't want to contribute back to WorkflowSim with your codes, you can use WorkflowSim without GitHub. )
