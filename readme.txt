@@ -72,7 +72,7 @@ Replace it with
 ```
 dax.path = your_repo_root/config/dax/Montage_100.xml. 
 ```
-CyberShake_100.xml is a dax file for cybershake workflow with 100 tasks in it. You can try other dax files provided under the same directory. 
+Montage_100.xml is a dax file for montage workflow with 100 tasks in it. You can try other dax files provided under the same directory. 
 Other parameters would not cause an error but they have specified the simulation details. For details of these parameters, please refer to other pages. 
 
 1.7 Run an Example
@@ -100,11 +100,11 @@ Right click the project and choose 'Git'->'Remote'->'Pull', set the 'Repository 
 
 2.4 Import Source Files and Libraries
 
-After a while the download is down, right click the project again and choose 'Project Properties'. Go to 'Sources', click 'Add Folder' and choose two folders (your_repo_root/examples and your_repo_root/sources). Go to 'Libraries', add two jars  (your_repo_root/lib/flanagan.jar and your_repo_root/lib/jdom-2.0.0.jar). 
+After a while the download is down, right click the project again and choose 'Project Properties'. Go to 'Sources', click 'Add Folder' and choose two folders (your_repo_root/examples and your_repo_root/sources). Go to 'Libraries', add all jars  (your_repo_root/lib/*.jar). 
 
 2.5 Set Arguments
 
-Go to 'Run'->'Set Project Configuration'->'Customize'. Go to 'Run', and make sure the Main Class is 'org.workflowsim.examples.WorkflowSimExample1'. Set the 'Arguments' to be '-p your_repo_root/config/balanced/cybershake.txt'. 
+Go to 'Run'->'Set Project Configuration'->'Customize'. Go to 'Run', and make sure the Main Class is 'org.workflowsim.examples.WorkflowSimExample1'. Set the 'Arguments' to be '-p your_repo_root/config/config.txt'. 
 
 2.6 Modify Config File
 
