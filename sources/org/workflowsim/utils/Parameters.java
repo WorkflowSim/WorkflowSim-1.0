@@ -67,7 +67,7 @@ public class Parameters {
      * 
      */
     public enum PLNMethod{
-        INVALID, RANDOM, 
+        INVALID, RANDOM, HEFT, 
     }
     
     public static final int BASE = 0;

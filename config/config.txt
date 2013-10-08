@@ -53,10 +53,10 @@ file.system	= LOCAL
 scheduler.method= MINMIN_SCH
 
 ######Planning Related Parameters
-#planner.method= RANDOM
+planner.method= HEFT
 #deadline = 100000
 
 ######Please replace it with your real physical path
-dax.path = /Users/chenweiwei/Work/WorkflowSimEnergy/WorkflowSim-1.0/config/dax/Montage_100.xml
+dax.path = /home/pedropaulovc/git/WorkflowSim-1.0/config/dax/HEFT_paper.xml
 ######Reducer mode used to remove duplicate dependencies
 #reduce.method	= montage

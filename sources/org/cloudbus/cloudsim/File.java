@@ -414,4 +414,13 @@ public class File {
 		return transactionTime;
 	}
 
+	public String toString() {
+		String type = "?";
+		if(getType() == 1)
+			type = "input";
+		if(getType() == 2)
+			type = "output";
+		
+		return this.getName() + "(" + type + ")";
+	}
 }
