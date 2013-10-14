@@ -8,63 +8,63 @@ sactions on, 13(3):260–274, 2002. -->
 <!-- part 1: list of all referenced files (may be empty) -->
 <!-- part 2: definition of all jobs (at least one) -->
   <job id="ID00001" namespace="HEFT" name="heft_task" version="1.0" runtime="14">
-    <uses file="heft_file_1_2" link="output" register="true" transfer="true" optional="false" type="data" size="18000"/>
-    <uses file="heft_file_1_3" link="output" register="true" transfer="true" optional="false" type="data" size="12000"/>
-    <uses file="heft_file_1_4" link="output" register="true" transfer="true" optional="false" type="data" size="9000"/>
-    <uses file="heft_file_1_5" link="output" register="true" transfer="true" optional="false" type="data" size="11000"/>
-    <uses file="heft_file_1_6" link="output" register="true" transfer="true" optional="false" type="data" size="14000"/>
+    <uses file="heft_file_1_2" link="output" register="true" transfer="true" optional="false" type="data" size="2250"/>
+    <uses file="heft_file_1_3" link="output" register="true" transfer="true" optional="false" type="data" size="1500"/>
+    <uses file="heft_file_1_4" link="output" register="true" transfer="true" optional="false" type="data" size="1125"/>
+    <uses file="heft_file_1_5" link="output" register="true" transfer="true" optional="false" type="data" size="1375"/>
+    <uses file="heft_file_1_6" link="output" register="true" transfer="true" optional="false" type="data" size="1750"/>
   </job>
 
   <job id="ID00002" namespace="HEFT" name="heft_task" version="1.0" runtime="13">
-    <uses file="heft_file_1_2" link="input" register="true" transfer="true" optional="false" type="data" size="18000"/>
-    <uses file="heft_file_2_8" link="output" register="true" transfer="true" optional="false" type="data" size="19000"/>
-    <uses file="heft_file_2_9" link="output" register="true" transfer="true" optional="false" type="data" size="16000"/>
+    <uses file="heft_file_1_2" link="input" register="true" transfer="true" optional="false" type="data" size="2250"/>
+    <uses file="heft_file_2_8" link="output" register="true" transfer="true" optional="false" type="data" size="2375"/>
+    <uses file="heft_file_2_9" link="output" register="true" transfer="true" optional="false" type="data" size="2000"/>
   </job>
 
   <job id="ID00003" namespace="HEFT" name="heft_task" version="1.0" runtime="11">
-    <uses file="heft_file_1_3" link="input" register="true" transfer="true" optional="false" type="data" size="12000"/>
-    <uses file="heft_file_3_7" link="output" register="true" transfer="true" optional="false" type="data" size="20000"/>
+    <uses file="heft_file_1_3" link="input" register="true" transfer="true" optional="false" type="data" size="1500"/>
+    <uses file="heft_file_3_7" link="output" register="true" transfer="true" optional="false" type="data" size="2500"/>
   </job>
 
   <job id="ID00004" namespace="HEFT" name="heft_task" version="1.0" runtime="13">
-    <uses file="heft_file_1_4" link="input" register="true" transfer="true" optional="false" type="data" size="9000"/>
-    <uses file="heft_file_4_8" link="output" register="true" transfer="true" optional="false" type="data" size="27000"/>
-    <uses file="heft_file_4_9" link="output" register="true" transfer="true" optional="false" type="data" size="23000"/>
+    <uses file="heft_file_1_4" link="input" register="true" transfer="true" optional="false" type="data" size="1125"/>
+    <uses file="heft_file_4_8" link="output" register="true" transfer="true" optional="false" type="data" size="3375"/>
+    <uses file="heft_file_4_9" link="output" register="true" transfer="true" optional="false" type="data" size="2875"/>
   </job>
 
   <job id="ID00005" namespace="HEFT" name="heft_task" version="1.0" runtime="12">
-    <uses file="heft_file_1_5" link="input" register="true" transfer="true" optional="false" type="data" size="11000"/>
-    <uses file="heft_file_5_9" link="output" register="true" transfer="true" optional="false" type="data" size="13000"/>
+    <uses file="heft_file_1_5" link="input" register="true" transfer="true" optional="false" type="data" size="1375"/>
+    <uses file="heft_file_5_9" link="output" register="true" transfer="true" optional="false" type="data" size="1625"/>
   </job>
 
   <job id="ID00006" namespace="HEFT" name="heft_task" version="1.0" runtime="13">
-    <uses file="heft_file_1_6" link="input" register="true" transfer="true" optional="false" type="data" size="14000"/>
-    <uses file="heft_file_6_8" link="output" register="true" transfer="true" optional="false" type="data" size="15000"/>
+    <uses file="heft_file_1_6" link="input" register="true" transfer="true" optional="false" type="data" size="1750"/>
+    <uses file="heft_file_6_8" link="output" register="true" transfer="true" optional="false" type="data" size="1875"/>
   </job>
 
   <job id="ID00007" namespace="HEFT" name="heft_task" version="1.0" runtime="7">
-    <uses file="heft_file_3_7" link="input" register="true" transfer="true" optional="false" type="data" size="20000"/>
-    <uses file="heft_file_7_10" link="output" register="true" transfer="true" optional="false" type="data" size="17000"/>
+    <uses file="heft_file_3_7" link="input" register="true" transfer="true" optional="false" type="data" size="2500"/>
+    <uses file="heft_file_7_10" link="output" register="true" transfer="true" optional="false" type="data" size="2125"/>
   </job>
 
   <job id="ID00008" namespace="HEFT" name="heft_task" version="1.0" runtime="5">
-    <uses file="heft_file_2_8" link="input" register="true" transfer="true" optional="false" type="data" size="19000"/>
-    <uses file="heft_file_4_8" link="input" register="true" transfer="true" optional="false" type="data" size="27000"/>
-    <uses file="heft_file_6_8" link="input" register="true" transfer="true" optional="false" type="data" size="15000"/>
-    <uses file="heft_file_8_10" link="output" register="true" transfer="true" optional="false" type="data" size="11000"/>
+    <uses file="heft_file_2_8" link="input" register="true" transfer="true" optional="false" type="data" size="2375"/>
+    <uses file="heft_file_4_8" link="input" register="true" transfer="true" optional="false" type="data" size="3375"/>
+    <uses file="heft_file_6_8" link="input" register="true" transfer="true" optional="false" type="data" size="1875"/>
+    <uses file="heft_file_8_10" link="output" register="true" transfer="true" optional="false" type="data" size="1375"/>
   </job>
 
   <job id="ID00009" namespace="HEFT" name="heft_task" version="1.0" runtime="18">
-    <uses file="heft_file_2_9" link="input" register="true" transfer="true" optional="false" type="data" size="16000"/>
-    <uses file="heft_file_4_9" link="input" register="true" transfer="true" optional="false" type="data" size="23000"/>
-    <uses file="heft_file_5_9" link="input" register="true" transfer="true" optional="false" type="data" size="13000"/>
-    <uses file="heft_file_9_10" link="output" register="true" transfer="true" optional="false" type="data" size="13000"/>
+    <uses file="heft_file_2_9" link="input" register="true" transfer="true" optional="false" type="data" size="2000"/>
+    <uses file="heft_file_4_9" link="input" register="true" transfer="true" optional="false" type="data" size="2875"/>
+    <uses file="heft_file_5_9" link="input" register="true" transfer="true" optional="false" type="data" size="1625"/>
+    <uses file="heft_file_9_10" link="output" register="true" transfer="true" optional="false" type="data" size="1625"/>
   </job>
 
   <job id="ID00010" namespace="HEFT" name="heft_task" version="1.0" runtime="21">
-    <uses file="heft_file_7_10" link="input" register="true" transfer="true" optional="false" type="data" size="17000"/>
-    <uses file="heft_file_8_10" link="input" register="true" transfer="true" optional="false" type="data" size="11000"/>
-    <uses file="heft_file_9_10" link="input" register="true" transfer="true" optional="false" type="data" size="13000"/>
+    <uses file="heft_file_7_10" link="input" register="true" transfer="true" optional="false" type="data" size="2125"/>
+    <uses file="heft_file_8_10" link="input" register="true" transfer="true" optional="false" type="data" size="1375"/>
+    <uses file="heft_file_9_10" link="input" register="true" transfer="true" optional="false" type="data" size="1625"/>
   </job>
 
 <!-- part 3: list of control-flow dependencies (may be empty) -->

@@ -28,6 +28,7 @@ import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.Pe;
 import org.cloudbus.cloudsim.Storage;
 import org.cloudbus.cloudsim.VmAllocationPolicySimple;
+import org.cloudbus.cloudsim.VmSchedulerSpaceShared;
 import org.cloudbus.cloudsim.VmSchedulerTimeShared;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
@@ -72,9 +73,9 @@ public class WorkflowSimExampleHEFT {
         String vmm = "Xen"; //VMM name
 
         //create VMs
-        list.add(new CondorVM(1, userId, 1000, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared()));
-        list.add(new CondorVM(2, userId, 875, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared()));
-        list.add(new CondorVM(3, userId, 1555, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared()));
+        list.add(new CondorVM(0, userId, 1000, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared()));
+        list.add(new CondorVM(1, userId, 875, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared()));
+        list.add(new CondorVM(2, userId, 1000, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared()));
 
         return list;
     }
@@ -166,14 +167,14 @@ public class WorkflowSimExampleHEFT {
         // 2. A Machine contains one or more PEs or CPUs/Cores. Therefore, should
         //    create a list to store these PEs before creating
         //    a Machine.
+        int hostId = 0;
         for (int i = 1; i <= 3; i++) {
             List<Pe> peList1 = new ArrayList<Pe>();
             int mips = 1000;
             // 3. Create PEs and add these into the list.
             //for a quad-core machine, a list of 4 PEs is required:
             peList1.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
-
-            int hostId = 0;
+            
             int ram = 2048; //host memory (MB)
             long storage = 1000000; //host storage
             int bw = 10000;
