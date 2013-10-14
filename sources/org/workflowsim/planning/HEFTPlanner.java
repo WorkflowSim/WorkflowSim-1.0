@@ -281,7 +281,7 @@ public class HEFTPlanner extends BasePlanner {
 				minReadyTime = Math.max(minReadyTime, readyTime);
 			}
 
-			finishTime = findFinishTime(task, vm, minReadyTime);
+			finishTime = findFinishTime(task, vm, minReadyTime, false);
 
 			if (finishTime < earliestFinishTime) {
 				bestReadyTime = minReadyTime;
@@ -289,108 +289,64 @@ public class HEFTPlanner extends BasePlanner {
 				chosenVM = vm;
 			}
 		}
-		occupySlot(task, chosenVM, bestReadyTime);
+
+		findFinishTime(task, chosenVM, bestReadyTime, true);
 		earliestFinishTimes.put(task, earliestFinishTime);
 
 		task.setVmId(chosenVM.getId());
 	}
 
 	/**
-	 * Determines the earliest finish time of a task if scheduled in the given
-	 * vm with the constraint of not scheduling it before readyTime
-	 * 
-	 * @param task
-	 *            The task to have its finish time calculated
-	 * @param vm
-	 *            The chosen vm to schedule
-	 * @param readyTime
-	 *            The minimum moment in seconds when the task may be scheduled
-	 * @return The finish time in seconds
-	 */
-	private double findFinishTime(Task task, CondorVM vm, double readyTime) {
-		List<Event> sched = schedules.get(vm);
-		double computationCost = computationCosts.get(task).get(vm);
-
-		if (sched.size() == 0)
-			return readyTime + computationCost;
-
-		if (sched.size() == 1) {
-			if (readyTime >= sched.get(0).finish)
-				return readyTime + computationCost;
-			else if (readyTime + computationCost <= sched.get(0).start)
-				return readyTime + computationCost;
-			else
-				return sched.get(0).finish + computationCost;
-		}
-
-		// Trivial case: Start after the latest task scheduled
-		double start = Math.max(readyTime, sched.get(sched.size() - 1).finish);
-		double finish = start + computationCost;
-		int i = sched.size() - 1, j = sched.size() - 2;
-		while (j >= 0) {
-			Event current = sched.get(i);
-			Event previous = sched.get(j);
-
-			if (readyTime > previous.finish) {
-				if (readyTime + computationCost <= current.start) {
-					start = readyTime;
-					finish = readyTime + computationCost;
-				}
-
-				break;
-			}
-
-			if (previous.finish + computationCost <= current.start) {
-				start = previous.finish;
-				finish = previous.finish + computationCost;
-			}
-
-			i--;
-			j--;
-		}
-
-		if (readyTime + computationCost <= sched.get(0).start)
-			return readyTime + computationCost;
-
-		return finish;
-	}
-
-	/**
-	 * Reserves the best time slot available to minimize the finish time of the
+	 * Finds the best time slot available to minimize the finish time of the
 	 * given task in the vm with the constraint of not scheduling it before
-	 * readyTime.
+	 * readyTime. If occupySlot is true, reserves the time slot in the schedule.
 	 * 
 	 * @param task
 	 *            The task to have the time slot reserved
 	 * @param vm
 	 *            The vm that will execute the task
 	 * @param readyTime
+	 *            The first moment that the task is available to be scheduled
+	 * @param occupySlot
+	 *            If true, reserves the time slot in the schedule.
+	 * @return The minimal finish time of the task in the vmn
 	 */
-	private void occupySlot(Task task, CondorVM vm, double readyTime) {
+	private double findFinishTime(Task task, CondorVM vm, double readyTime,
+			boolean occupySlot) {
 		List<Event> sched = schedules.get(vm);
 		double computationCost = computationCosts.get(task).get(vm);
+		double start, finish;
+		int pos;
 
 		if (sched.size() == 0) {
-			sched.add(new Event(readyTime, readyTime + computationCost));
-			return;
+			if (occupySlot)
+				sched.add(new Event(readyTime, readyTime + computationCost));
+			return readyTime + computationCost;
 		}
 
 		if (sched.size() == 1) {
-			if (readyTime >= sched.get(0).finish)
-				sched.add(1, new Event(readyTime, readyTime + computationCost));
-			else if (readyTime + computationCost <= sched.get(0).start)
-				sched.add(0, new Event(readyTime, readyTime + computationCost));
-			else
-				sched.add(1, new Event(sched.get(0).finish, sched.get(0).finish
-						+ computationCost));
+			if (readyTime >= sched.get(0).finish) {
+				pos = 1;
+				start = readyTime;
+			} else if (readyTime + computationCost <= sched.get(0).start) {
+				pos = 0;
+				start = readyTime;
+			} else {
+				pos = 1;
+				start = sched.get(0).finish;
+			}
 
-			return;
+			if (occupySlot)
+				sched.add(pos, new Event(start, start + computationCost));
+			return start + computationCost;
 		}
 
 		// Trivial case: Start after the latest task scheduled
-		double start = Math.max(readyTime, sched.get(sched.size() - 1).finish);
-		double finish = start + computationCost;
-		int i = sched.size() - 1, j = sched.size() - 2, pos = i + 1;
+		start = Math.max(readyTime, sched.get(sched.size() - 1).finish);
+		finish = start + computationCost;
+		int i = sched.size() - 1;
+		int j = sched.size() - 2;
+		pos = i + 1;
 		while (j >= 0) {
 			Event current = sched.get(i);
 			Event previous = sched.get(j);
@@ -415,10 +371,16 @@ public class HEFTPlanner extends BasePlanner {
 		}
 
 		if (readyTime + computationCost <= sched.get(0).start) {
-			sched.add(0, new Event(readyTime, readyTime + computationCost));
-			return;
+			pos = 0;
+			start = readyTime;
+
+			if (occupySlot)
+				sched.add(pos, new Event(start, start + computationCost));
+			return start + computationCost;
 		}
-		sched.add(pos, new Event(start, finish));
+		if (occupySlot)
+			sched.add(pos, new Event(start, finish));
+		return finish;
 	}
 
 }
