@@ -22,6 +22,7 @@ import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.core.SimEvent;
 import org.workflowsim.planning.BasePlanner;
+import org.workflowsim.planning.HEFTPlanner;
 import org.workflowsim.planning.RandomPlanner;
 import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.Parameters.PLNMethod;
@@ -186,6 +187,9 @@ public class WorkflowPlanner extends SimEntity {
             case RANDOM:
                 planner = new RandomPlanner();
                 break;
+            case HEFT:
+            	planner = new HEFTPlanner();
+            	break;
             default:
                 planner = null;
                 break;
