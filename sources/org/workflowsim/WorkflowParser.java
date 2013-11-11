@@ -183,7 +183,7 @@ public class WorkflowParser {
             setDepth(cTask, task.getDepth() + 1);
         }
 
-        if (!Parameters.getAlpha().containsKey(task.getDepth())) {
+        if (Parameters.getAlpha()!=null && !Parameters.getAlpha().containsKey(task.getDepth())) {
             Parameters.getAlpha().put(task.getDepth(), 0.0);
         }
     }

@@ -15,6 +15,7 @@
  */
 package org.workflowsim.examples;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -42,11 +43,14 @@ import org.workflowsim.WorkflowPlanner;
 import org.workflowsim.failure.FailureGenerator;
 import org.workflowsim.failure.FailureMonitor;
 import org.workflowsim.utils.ArgumentParser;
+import org.workflowsim.utils.ClusteringParameters;
+import org.workflowsim.utils.OverheadParameters;
 import org.workflowsim.utils.Parameters;
+import org.workflowsim.utils.ReplicaCatalog;
 
 /**
  * This WorkflowSimExample creates a workflow planner, a workflow engine, and
- * one schedulers, one data centers and 20 vms. All the configuration of
+ * two schedulers, two data centers and 20 vms. All the configuration of
  * CloudSim is done in WorkflowSimExamplex.java All the configuration of
  * WorkflowSim is done in the config.txt that must be specified in argument of
  * this WorkflowSimExample. The argument should have at least: "-p
@@ -56,9 +60,9 @@ import org.workflowsim.utils.Parameters;
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public class WorkflowSimExample1 {
+public class WorkflowSimMultipleClusterExample1 {
 
-    private static List<CondorVM> createVM(int userId, int vms) {
+    private static List<CondorVM> createVM(int userId, int vms, int vmIdBase) {
 
         //Creates a container to store VMs. This list is passed to the broker later
         LinkedList<CondorVM> list = new LinkedList<CondorVM>();
@@ -76,7 +80,7 @@ public class WorkflowSimExample1 {
 
         for (int i = 0; i < vms; i++) {
             double ratio = 1.0;
-            vm[i] = new CondorVM(i, userId, mips * ratio, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared());
+            vm[i] = new CondorVM(vmIdBase + i, userId, mips * ratio, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared());
             list.add(vm[i]);
         }
 
@@ -86,64 +90,109 @@ public class WorkflowSimExample1 {
     ////////////////////////// STATIC METHODS ///////////////////////
     /**
      * Creates main() to run this example
-     * This example has only one datacenter and one storage
      */
     public static void main(String[] args) {
 
 
         try {
-            // First step: Initialize the CloudSim package. It should be called
+            // First step: Initialize the WorkflowSim package. 
 
-
-            ArgumentParser option = new ArgumentParser(args);//init is done in option
-
-            FailureMonitor.init();//it doesn't really matter?
-            FailureGenerator.init();//must do it so as to initialize FTC
-
-            // before creating any entities.
-            int num_user = 1;   // number of grid users
-            Calendar calendar = Calendar.getInstance();
-            boolean trace_flag = false;  // mean trace events
-
-            /**
-             * Here we overwrites the vmNum set in config.txt.
-             */
             /**
              * However, the exact number of vms may not necessarily be vmNum If
              * the data center or the host doesn't have sufficient resources the
              * exact vmNum would be smaller than that. Take care.
              */
             int vmNum = 20;//number of vms;
-            Parameters.setVmNum(vmNum);
+            /**
+             * Should change this based on real physical path
+             */
+            String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
+            if(daxPath == null){
+                Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
+                return;
+            }
+            File daxFile = new File(daxPath);
+            if(!daxFile.exists()){
+                Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
+                return;
+            }
+            /*
+             * Use default Fault Tolerant Parameters
+             */
+            Parameters.FTCMonitor ftc_monitor = Parameters.FTCMonitor.MONITOR_NONE;
+            Parameters.FTCFailure ftc_failure = Parameters.FTCFailure.FAILURE_NONE;
+            Parameters.FTCluteringAlgorithm ftc_method = null;
+
+            /**
+             * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
+             * such that the planner would not override the result of the scheduler
+             */
+            Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.MINMIN_SCH;
+            Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
+            ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
+
+            /**
+             * No overheads 
+             */
+            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);;
+            
+            /**
+             * No Clustering
+             */
+            ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.NONE;
+            ClusteringParameters cp = new ClusteringParameters(0, 0, method, null);
+
+            /**
+             * Initialize static parameters
+             */
+            Parameters.init(ftc_method, ftc_monitor, ftc_failure,
+                    null, vmNum, daxPath, null,
+                    null, op, cp, sch_method, pln_method,
+                    null, 0);
+            ReplicaCatalog.init(file_system);
+            
+            FailureMonitor.init();
+            FailureGenerator.init();
+            // before creating any entities.
+            int num_user = 1;   // number of grid users
+            Calendar calendar = Calendar.getInstance();
+            boolean trace_flag = false;  // mean trace events
 
             // Initialize the CloudSim library
             CloudSim.init(num_user, calendar, trace_flag);
 
             DatacenterExtended datacenter0 = createDatacenter("Datacenter_0");
+            DatacenterExtended datacenter1 = createDatacenter("Datacenter_1");
 
             /**
-             * Create a WorkflowPlanner with one schedulers.
+             * Create a WorkflowPlanner with one scheduler.
              */
             WorkflowPlanner wfPlanner = new WorkflowPlanner("planner_0", 1);
             /**
-             * Create a WorkflowEngine.
+             * Create a WorkflowEngine. Attach it to the workflow planner
              */
             WorkflowEngine wfEngine = wfPlanner.getWorkflowEngine();
             /**
-             * Create a list of VMs.The userId of a vm is basically the id of the scheduler
-             * that controls this vm. 
+             * Create two list of VMs. The trick is that make sure all vmId is unique so we need to 
+             * index vm from a base (in this case Parameters.getVmNum/2 for the second vmlist1). 
              */
-            List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0), Parameters.getVmNum());
+            List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0), Parameters.getVmNum() / 2 , 0);
+            List<CondorVM> vmlist1 = createVM(wfEngine.getSchedulerId(0), Parameters.getVmNum() / 2 , Parameters.getVmNum() / 2);
 
             /**
-             * Submits this list of vms to this WorkflowEngine.
+             * Submits these lists of vms to this WorkflowEngine.
              */
             wfEngine.submitVmList(vmlist0, 0);
+            wfEngine.submitVmList(vmlist1, 0);
 
             /**
-             * Binds the data centers with the scheduler.
+             * Binds the data centers with the scheduler id.
+             * This scheduler controls two data centers. Make sure your data center is not very big otherwise
+             * all the vms will be allocated to the first available data center
+             * In the future, the vm allocation algorithm should be improved. 
              */
             wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
+            wfEngine.bindSchedulerDatacenter(datacenter1.getId(), 0);
 
             CloudSim.startSimulation();
 
@@ -153,7 +202,6 @@ public class WorkflowSimExample1 {
             CloudSim.stopSimulation();
 
             printJobList(outputList0);
-            
 
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
@@ -170,7 +218,15 @@ public class WorkflowSimExample1 {
         // 2. A Machine contains one or more PEs or CPUs/Cores. Therefore, should
         //    create a list to store these PEs before creating
         //    a Machine.
-        for (int i = 1; i <= 20; i++) {
+        //
+        // Here is the trick to use multiple data centers in one broker. Broker will first
+        // allocate all vms to the first datacenter and if there is no enough resource then it will allocate 
+        // the failed vms to the next available datacenter. The trick is make sure your datacenter is not 
+        // very big so that the broker will distribute them. 
+        // In a future work, vm scheduling algorithms should be done
+        
+        //
+        for (int i = 1; i <= 3; i++) {
             List<Pe> peList1 = new ArrayList<Pe>();
             int mips = 2000;
             // 3. Create PEs and add these into the list.
@@ -216,18 +272,32 @@ public class WorkflowSimExample1 {
 
         // 6. Finally, we need to create a cluster storage object.
         /**
+         * The bandwidth between data centers.
+         */
+        double interBandwidth = 1.5e7;// the number comes from the futuregrid site, you can specify your bw
+        /**
          * The bandwidth within a data center.
          */
-        double intraBandwidth = 1.5e7;// the number comes from the futuregrid site, you can specify your bw
-        intraBandwidth = Parameters.getOverheadParams().getBandwidth();
-
+        double intraBandwidth = interBandwidth * 2;
         try {
             ClusterStorage s1 = new ClusterStorage(name, 1e12);
-            
+            if (name.equals("Datacenter_0")) {
+                /**
+                 * The bandwidth from Datacenter_0 to Datacenter_1.
+                 */
+                s1.setBandwidth("Datacenter_1", interBandwidth);
+
+            } else if (name.equals("Datacenter_1")) {
+                /**
+                 * The bandwidth from Datacenter_1 to Datacenter_0.
+                 */
+                s1.setBandwidth("Datacenter_0", interBandwidth);
+
+            }
             // The bandwidth within a data center
             s1.setBandwidth("local", intraBandwidth);
             // The bandwidth to the source site 
-            s1.setBandwidth("source", intraBandwidth);
+            s1.setBandwidth("source", interBandwidth);
             storageList.add(s1);
             datacenter = new DatacenterExtended(name, characteristics, new VmAllocationPolicySimple(hostList), storageList, 0);
         } catch (Exception e) {

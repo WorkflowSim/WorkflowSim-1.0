@@ -255,7 +255,11 @@ public class WorkflowScheduler extends DatacenterBroker {
         for (Iterator it = scheduledList.iterator(); it.hasNext();) {
             Cloudlet cloudlet = (Cloudlet) it.next();
             int vmId = cloudlet.getVmId();
-            schedule(getVmsToDatacentersMap().get(vmId), Parameters.getOverheadParams().getQueueDelay(cloudlet), CloudSimTags.CLOUDLET_SUBMIT, cloudlet);
+            double delay = 0.0;
+            if(Parameters.getOverheadParams().getQueueDelay()!=null){
+                delay = Parameters.getOverheadParams().getQueueDelay(cloudlet);
+            }
+            schedule(getVmsToDatacentersMap().get(vmId), delay, CloudSimTags.CLOUDLET_SUBMIT, cloudlet);
 
         }
         getCloudletList().removeAll(scheduledList);
@@ -289,7 +293,11 @@ public class WorkflowScheduler extends DatacenterBroker {
         //so that this resource is released
         vm.setState(WorkflowSimTags.VM_STATUS_IDLE);
 
-        schedule(this.workflowEngineId, Parameters.getOverheadParams().getPostDelay(job), CloudSimTags.CLOUDLET_RETURN, cloudlet);
+        double delay = 0.0;
+        if(Parameters.getOverheadParams().getPostDelay()!=null){
+            delay = Parameters.getOverheadParams().getPostDelay(job);
+        }
+        schedule(this.workflowEngineId, delay, CloudSimTags.CLOUDLET_RETURN, cloudlet);
 
         cloudletsSubmitted--;
         //not really update right now, should wait 1 s until many jobs have returned

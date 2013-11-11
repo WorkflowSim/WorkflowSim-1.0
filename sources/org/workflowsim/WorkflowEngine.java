@@ -349,7 +349,10 @@ public class WorkflowEngine extends SimEntity {
             //divid it into sublist
 
             int interval = Parameters.getOverheadParams().getWEDInterval();
-            double delay = Parameters.getOverheadParams().getWEDDelay(submittedList);
+            double delay = 0.0;
+            if(Parameters.getOverheadParams().getWEDDelay()!=null){
+                delay = Parameters.getOverheadParams().getWEDDelay(submittedList);
+            }
 
 
             double delaybase = delay;

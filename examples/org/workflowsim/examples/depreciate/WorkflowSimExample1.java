@@ -13,15 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.workflowsim.examples;
+package org.workflowsim.examples.depreciate;
 
+import org.workflowsim.examples.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.CloudletSchedulerDynamicWorkload;
+import org.cloudbus.cloudsim.CloudletSchedulerSpaceShared;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Log;
@@ -45,13 +46,18 @@ import org.workflowsim.utils.ArgumentParser;
 import org.workflowsim.utils.Parameters;
 
 /**
- * This WorkflowSimExample3 uses specifically CloudletSchedulerDynamicWorkload as the local scheduler;
+ * This WorkflowSimExample creates a workflow planner, a workflow engine, and
+ * one schedulers, one data centers and 20 vms. All the configuration of
+ * CloudSim is done in WorkflowSimExamplex.java All the configuration of
+ * WorkflowSim is done in the config.txt that must be specified in argument of
+ * this WorkflowSimExample. The argument should have at least: "-p
+ * path_to_config.txt"
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
- * @date Oct 13, 2013
+ * @date Apr 9, 2013
  */
-public class WorkflowSimExample3 {
+public class WorkflowSimExample1 {
 
     private static List<CondorVM> createVM(int userId, int vms) {
 
@@ -71,7 +77,7 @@ public class WorkflowSimExample3 {
 
         for (int i = 0; i < vms; i++) {
             double ratio = 1.0;
-            vm[i] = new CondorVM(i, userId, mips * ratio, pesNumber, ram, bw, size, vmm, new CloudletSchedulerDynamicWorkload(mips * ratio, pesNumber));
+            vm[i] = new CondorVM(i, userId, mips * ratio, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared());
             list.add(vm[i]);
         }
 
