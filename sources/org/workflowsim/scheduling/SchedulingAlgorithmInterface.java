@@ -13,23 +13,23 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.workflowsim.planning;
+package org.workflowsim.scheduling;
 
 import java.util.List;
 
 /**
- * The Planner interface
+ * The Scheduler interface
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
- * @date Jun 18, 2013
+ * @date Apr 9, 2013
  */
-public interface PlannerInterface {
+public interface SchedulingAlgorithmInterface {
 
     /**
-     * Sets the task list.
+     * Sets the job list.
      */
-    public void setTaskList(List list);
+    public void setCloudletList(List list);
 
     /**
      * Sets the vm list.
@@ -37,12 +37,12 @@ public interface PlannerInterface {
     public void setVmList(List list);
 
     /**
-     * Gets the task list.
+     * Gets the job list.
      */
-    public List getTaskList();
+    public List getCloudletList();
 
     /**
-     * Gets the vm list. An algorithm must implement it
+     * Gets the vm list.
      */
     public List getVmList();
 
@@ -51,5 +51,8 @@ public interface PlannerInterface {
      */
     public void run() throws Exception;
 
-
+    /**
+     * Gets the scheduled jobs.
+     */
+    public List getScheduledList();
 }

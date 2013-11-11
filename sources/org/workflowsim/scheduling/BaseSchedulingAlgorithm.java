@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.workflowsim.scheduler;
+package org.workflowsim.scheduling;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +22,13 @@ import org.cloudbus.cloudsim.Vm;
 
 /**
  * The base scheduler has implemented the basic features. Every other scheduling method
- * should extend from BaseScheduler but should not directly use it. 
+ * should extend from BaseSchedulingAlgorithm but should not directly use it. 
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public abstract class BaseScheduler implements SchedulerInterface {
+public abstract class BaseSchedulingAlgorithm implements SchedulingAlgorithmInterface {
 
     /**
      * the job list.
@@ -44,9 +44,9 @@ public abstract class BaseScheduler implements SchedulerInterface {
     private List< Cloudlet> scheduledList;
 
     /**
-     * Initialize a BaseScheduler
+     * Initialize a BaseSchedulingAlgorithm
      */
-    public BaseScheduler() {
+    public BaseSchedulingAlgorithm() {
         this.scheduledList = new ArrayList();
     }
 

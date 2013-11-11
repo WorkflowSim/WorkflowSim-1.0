@@ -21,14 +21,16 @@ import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.core.SimEvent;
-import org.workflowsim.planning.BasePlanner;
-import org.workflowsim.planning.RandomPlanner;
+import org.workflowsim.planning.BasePlanningAlgorithm;
+import org.workflowsim.planning.HEFTPlanningAlgorithm;
+import org.workflowsim.planning.RandomPlanningAlgorithm;
 import org.workflowsim.utils.Parameters;
-import org.workflowsim.utils.Parameters.PLNMethod;
+import org.workflowsim.utils.Parameters.PlanningAlgorithm;
 
 /**
  * WorkflowPlanner supports dynamic planning. In the future we will have global
- * and static algorithm here. The WorkflowSim starts from WorkflowPlanner.
+ * and static algorithm here. The WorkflowSim starts from WorkflowPlanner. It
+ * picks up a planning algorithm based on the configuration
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
@@ -46,7 +48,7 @@ public class WorkflowPlanner extends SimEntity {
      */
     protected WorkflowParser parser;
     /**
-     * The associated clustereing engine.
+     * The associated clustering engine.
      */
     private int clusteringEngineId;
     private ClusteringEngine clusteringEngine;
@@ -134,9 +136,9 @@ public class WorkflowPlanner extends SimEntity {
             case WorkflowSimTags.START_SIMULATION:
                 getWorkflowParser().parse();
                 setTaskList(getWorkflowParser().getTaskList());
-                
+
                 processPlanning();
-                
+
                 processImpactFactors(getTaskList());
                 sendNow(getClusteringEngineId(), WorkflowSimTags.JOB_SUBMIT, getTaskList());
                 break;
@@ -150,31 +152,31 @@ public class WorkflowPlanner extends SimEntity {
         }
     }
 
-    
-    private void processPlanning(){
-        if (Parameters.getPlannerMode().equals(PLNMethod.INVALID)){
+    private void processPlanning() {
+        if (Parameters.getPlanningAlgorithm().equals(PlanningAlgorithm.INVALID)) {
             return;
         }
-        BasePlanner planner = getPlanner(Parameters.getPlannerMode());
+        BasePlanningAlgorithm planner = getPlanningAlgorithm(Parameters.getPlanningAlgorithm());
+        
         planner.setTaskList(getTaskList());
         planner.setVmList(getWorkflowEngine().getAllVmList());
-        
-        try{
+
+        try {
             planner.run();
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.printLine("Error in configuring scheduler_method");
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Switch between multiple planners. Based on planner.method
      *
      * @param name the SCHMethod name
      * @return the scheduler that extends BaseScheduler
      */
-    private BasePlanner getPlanner(PLNMethod name) {
-        BasePlanner planner = null;
+    private BasePlanningAlgorithm getPlanningAlgorithm(PlanningAlgorithm name) {
+        BasePlanningAlgorithm planner = null;
 
         // choose which scheduler to use. Make sure you have add related enum in
         //Parameters.java
@@ -184,7 +186,10 @@ public class WorkflowPlanner extends SimEntity {
                 planner = null;
                 break;
             case RANDOM:
-                planner = new RandomPlanner();
+                planner = new RandomPlanningAlgorithm();
+                break;
+            case HEFT:
+                planner = new HEFTPlanningAlgorithm();
                 break;
             default:
                 planner = null;
@@ -194,7 +199,7 @@ public class WorkflowPlanner extends SimEntity {
 
         return planner;
     }
-    
+
     /**
      * Add impact factor for each task. This is useful in task balanced
      * clustering algorithm It is for research purpose and thus it is optional.

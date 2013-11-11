@@ -31,6 +31,7 @@ import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEvent;
 import org.workflowsim.utils.ReplicaCatalog;
+import org.workflowsim.utils.Parameters;
 
 /**
  * DatacenterExtended extends Datacenter so as we can use CondorVM and other
@@ -126,7 +127,7 @@ public class DatacenterExtended extends Datacenter {
             Task task = (Task) cl;
 
             double fileTransferTime = 0.0;
-            if(cl.getClassType()!=1){
+            if (cl.getClassType() != 1) {
                 fileTransferTime = processDataStageIn(task.getFileList(), cl);
             }
 
@@ -190,8 +191,8 @@ public class DatacenterExtended extends Datacenter {
                      * Is it not really needed currently but it is left for
                      * future usage
                      */
-                    ClusterStorage storage = (ClusterStorage) getStorageList().get(0);
-                    storage.addFile(file);
+                    //ClusterStorage storage = (ClusterStorage) getStorageList().get(0);
+                    //storage.addFile(file);
                     break;
                 /**
                  * For shared file system, add it to the shared storage
@@ -244,13 +245,9 @@ public class DatacenterExtended extends Datacenter {
 
     protected double processDataStageIn(List<File> requiredFiles, Cloudlet cl) throws Exception {
         double time = 0.0;
-
         Iterator<File> iter = requiredFiles.iterator();
         while (iter.hasNext()) {
-
             File file = iter.next();
-            ClusterStorage tempStorage = (ClusterStorage) getStorageList().get(0);
-
             //The input file is not an output File 
             if (isRealInputFile(requiredFiles, file)) {
                 double maxBwth = 0.0;
@@ -258,63 +255,66 @@ public class DatacenterExtended extends Datacenter {
                 if (siteList.isEmpty()) {
                     throw new Exception(file.getName() + " does not exist");
                 }
-
-
                 switch (ReplicaCatalog.getFileSystem()) {
                     case SHARED:
                         //stage-in job
                         /**
                          * Picks up the site that is closest
                          */
+                        ClusterStorage clStorage = (ClusterStorage) getStorageList().get(0);
                         if (cl.getClassType() == 1) {
-
                             for (Iterator it = siteList.iterator(); it.hasNext();) {
-
                                 //site is where one replica of this data is located at
                                 String site = (String) it.next();
                                 if (site.equals(this.getName())) {
                                     continue;
                                 }
-
-                                double bwth = tempStorage.getMaxTransferRate(site);
+                                double bwth = clStorage.getMaxTransferRate(site);
                                 if (bwth > maxBwth) {
                                     maxBwth = bwth;
                                 }
                             }
                             time += file.getSize() / maxBwth;
                         }
-
-
                         break;
                     case LOCAL:
-                        
+
                         int vmId = cl.getVmId();
                         int userId = cl.getUserId();
                         Host host = getVmAllocationPolicy().getHost(vmId, userId);
                         Vm vm = host.getVm(vmId, userId);
                         CondorVM condorVm = (CondorVM) vm;
+                        DistributedClusterStorage dcStorage = (DistributedClusterStorage) getStorageList().get(0);
 
                         boolean requiredFileStagein = true;
-                        
+
                         for (Iterator it = siteList.iterator(); it.hasNext();) {
                             //site is where one replica of this data is located at
                             String site = (String) it.next();
                             if (site.equals(this.getName())) {
                                 continue;
                             }
-                            if(site.equals(Integer.toString(vmId))){
+                            /**
+                             * This file is already in the local vm and thus it
+                             * is no need to transfer
+                             */
+                            if (site.equals(Integer.toString(vmId))) {
                                 requiredFileStagein = false;
                                 break;
                             }
-                            double bwth = tempStorage.getMaxTransferRate(site);
+                            double bwth;
+                            if (site.equals(Parameters.SOURCE)) {
+                                bwth = dcStorage.getBaseBandwidth();
+                            } else {
+                                bwth = dcStorage.getBandwidth(Integer.parseInt(site), vmId);
+                            }
                             if (bwth > maxBwth) {
                                 maxBwth = bwth;
                             }
                         }
-                        if(requiredFileStagein && maxBwth > 0.0){
+                        if (requiredFileStagein && maxBwth > 0.0) {
                             time += file.getSize() / maxBwth;
                         }
-
 
                         /**
                          * For the case when storage is too small it is not
@@ -324,16 +324,10 @@ public class DatacenterExtended extends Datacenter {
                         //We currently don't use this storage to do anything meaningful. It is left for future. 
                         //condorVm.addLocalFile(file);
                         ReplicaCatalog.addStorageList(file.getName(), Integer.toString(vmId));
-
-
                         break;
-
-
                 }
-
             }
         }
-
         return time;
     }
 

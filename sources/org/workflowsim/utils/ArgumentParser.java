@@ -23,10 +23,10 @@ import java.util.Map;
 import org.cloudbus.cloudsim.Log;
 import org.workflowsim.utils.ClusteringParameters.ClusteringMethod;
 import org.workflowsim.utils.Parameters.FTCFailure;
-import org.workflowsim.utils.Parameters.FTCMethod;
+import org.workflowsim.utils.Parameters.FTCluteringAlgorithm;
 import org.workflowsim.utils.Parameters.FTCMonitor;
-import org.workflowsim.utils.Parameters.PLNMethod;
-import org.workflowsim.utils.Parameters.SCHMethod;
+import org.workflowsim.utils.Parameters.PlanningAlgorithm;
+import org.workflowsim.utils.Parameters.SchedulingAlgorithm;
 import org.workflowsim.utils.ReplicaCatalog.FileSystem;
 
 /**
@@ -105,11 +105,11 @@ public class ArgumentParser {
             String daxPath = null;
             String cMethod = null;
             String rMethod = null;
-            FTCMethod ftc_method = null;
+            FTCluteringAlgorithm ftc_method = null;
             FTCMonitor ftc_monitor = FTCMonitor.MONITOR_NONE;
             FTCFailure ftc_failure = FTCFailure.FAILURE_NONE;
-            SCHMethod sch_method = SCHMethod.INVALID_SCH;
-            PLNMethod pln_method = PLNMethod.INVALID;
+            SchedulingAlgorithm sch_method = SchedulingAlgorithm.INVALID_SCH;
+            PlanningAlgorithm pln_method = PlanningAlgorithm.INVALID;
             FileSystem file_system = FileSystem.SHARED;
             OverheadParameters op = null;
             ClusteringParameters cp = null;
@@ -151,15 +151,15 @@ public class ArgumentParser {
                 } else if (key.equals("reduce.method")) {
                     rMethod = value;
                 } else if (key.equals("ftc.method")) {
-                    ftc_method = FTCMethod.valueOf(value);
+                    ftc_method = FTCluteringAlgorithm.valueOf(value);
                 } else if (key.equals("ftc.monitor")) {
                     ftc_monitor = FTCMonitor.valueOf(value);
                 } else if (key.equals("ftc.failure")) {
                     ftc_failure = FTCFailure.valueOf(value);
                 } else if (key.equals("scheduler.method")) {
-                    sch_method = SCHMethod.valueOf(value);
+                    sch_method = SchedulingAlgorithm.valueOf(value);
                 } else if (key.equals("planner.method")){
-                    pln_method = PLNMethod.valueOf(value);
+                    pln_method = PlanningAlgorithm.valueOf(value);
                 } else if (key.equals("bandwidth")) {
                     bandwidth = Double.parseDouble(value);
                 } else if (key.equals("deadline")) {
@@ -286,11 +286,11 @@ public class ArgumentParser {
              * If a user has specified planner.method, the scheduler.method should 
              * be set as STATIC_SCH to avoid unnecessary change during the runtime
              */
-            if(!pln_method.equals(PLNMethod.INVALID)){
-                if(sch_method != SCHMethod.STATIC_SCH || sch_method != SCHMethod.INVALID_SCH){
+            if(!pln_method.equals(PlanningAlgorithm.INVALID)){
+                if(sch_method != SchedulingAlgorithm.STATIC_SCH || sch_method != SchedulingAlgorithm.INVALID_SCH){
                     Log.printLine("Warning: your scheduler.method is reset to be STATIC_SCH");
                 }
-                sch_method = SCHMethod.STATIC_SCH;
+                sch_method = SchedulingAlgorithm.STATIC_SCH;
             }
             
             Parameters.init(ftc_method, ftc_monitor, ftc_failure,

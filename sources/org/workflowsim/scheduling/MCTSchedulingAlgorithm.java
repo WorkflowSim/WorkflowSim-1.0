@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.workflowsim.scheduler;
+package org.workflowsim.scheduling;
 
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Log;
@@ -27,9 +27,9 @@ import org.workflowsim.WorkflowSimTags;
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public class MCTScheduler extends BaseScheduler {
+public class MCTSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
-    public MCTScheduler() {
+    public MCTSchedulingAlgorithm() {
         super();
     }
 

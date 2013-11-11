@@ -83,7 +83,7 @@ public class ReclusteringEngine {
 
         try {
 
-            switch (Parameters.getFTCMethod()) {
+            switch (Parameters.getFTCluteringAlgorithm()) {
                 case FTCLUSTERING_NOOP:
 
                     jobList.add(createJob(id, job, job.getCloudletLength(), job.getTaskList()));

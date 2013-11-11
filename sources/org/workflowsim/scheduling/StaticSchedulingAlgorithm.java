@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.workflowsim.scheduler;
+package org.workflowsim.scheduling;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +24,7 @@ import org.workflowsim.WorkflowSimTags;
 
 /**
  * Static algorithm. Do not schedule at all and reply on Workflow Planner to set 
- * the mapping relationship. But StaticScheduler would check whether a job has been
+ * the mapping relationship. But StaticSchedulingAlgorithm would check whether a job has been
  * assigned a VM in this stage (in case your implementation of planning algorithm 
  * forgets it)
  *
@@ -32,9 +32,9 @@ import org.workflowsim.WorkflowSimTags;
  * @since WorkflowSim Toolkit 1.0
  * @date Jun 17, 2013
  */
-public class StaticScheduler extends BaseScheduler {
+public class StaticSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
-    public StaticScheduler() {
+    public StaticSchedulingAlgorithm() {
         super();
     }
 
@@ -56,7 +56,7 @@ public class StaticScheduler extends BaseScheduler {
             Cloudlet cloudlet = (Cloudlet) getCloudletList().get(i);
             /**
              * Make sure cloudlet is matched to a VM. It should be done in the
-             * Workflow Planner. If not, throws an exception because StaticScheduler
+             * Workflow Planner. If not, throws an exception because StaticSchedulingAlgorithm
              * itself does not do the mapping. 
              */
 

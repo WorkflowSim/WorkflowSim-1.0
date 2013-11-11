@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.workflowsim.scheduler;
+package org.workflowsim.scheduling;
 
 import java.util.Iterator;
 import org.cloudbus.cloudsim.Cloudlet;
@@ -27,7 +27,7 @@ import org.workflowsim.WorkflowSimTags;
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public class FCFSScheduler extends BaseScheduler {
+public class FCFSSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
     /**
      * The main function

@@ -29,9 +29,9 @@ import org.cloudbus.cloudsim.Log;
 public class Parameters {
 
     /**
-     * Fault Tolerant Clustering method
+     * Fault Tolerant Clustering algorithm
      */
-    public enum FTCMethod {
+    public enum FTCluteringAlgorithm {
 
         FTCLUSTERING_DC, FTCLUSTERING_SR, FTCLUSTERING_DR, FTCLUSTERING_NOOP, 
         FTCLUSTERING_BLOCK, FTCLUSTERING_BINARY
@@ -56,7 +56,7 @@ public class Parameters {
      * Scheduling Algorithm
      */
 
-    public enum SCHMethod {
+    public enum SchedulingAlgorithm {
 
         MAXMIN_SCH, MINMIN_SCH, MCT_SCH, DATA_SCH, 
         STATIC_SCH, FCFS_SCH, INVALID_SCH
@@ -66,15 +66,20 @@ public class Parameters {
      * Planning Algorithm (Global Scheduling Algorithm)
      * 
      */
-    public enum PLNMethod{
-        INVALID, RANDOM, 
+    public enum PlanningAlgorithm{
+        INVALID, RANDOM, HEFT
     }
+    
+    /** 
+     * Source Host (submit host)
+     */
+    public static String SOURCE = "source";
     
     public static final int BASE = 0;
     /**
      * Fault Tolerant Clustering method
      */
-    private static FTCMethod FTCMethod;
+    private static FTCluteringAlgorithm FTClusteringAlgorithm;
     /**
      * Fault Tolerant Clustering monitor mode
      */
@@ -86,12 +91,12 @@ public class Parameters {
     /**
      * Scheduling mode
      */
-    private static SCHMethod schedulerMode;
+    private static SchedulingAlgorithm schedulingAlgorithm;
     
     /**
      * Planning mode
      */
-    private static PLNMethod plannerMode;
+    private static PlanningAlgorithm planningAlgorithm;
     /**
      * Task Failure Rate key = level value = task failure rate
      *
@@ -125,11 +130,11 @@ public class Parameters {
     /**
      * Version number
      */
-    private static final String version = "1.0.0";
+    private static final String version = "1.1.0";
     /**
      * Note information
      */
-    private static final String note = " fixed all bugs I know at Apr 9, 2013";
+    private static final String note = " supports planning algorithm at Nov 9, 2013";
     /**
      * Overhead parameters
      */
@@ -142,6 +147,12 @@ public class Parameters {
      * Deadline of a workflow
      */
     private static long deadline;
+    
+    
+    /**
+     * the bandwidth from one vm to one vm
+     */
+    private static double[][] bandwidths;
 
     /**
      * A static function so that you can specify them in any place
@@ -161,15 +172,15 @@ public class Parameters {
      * @param rMethod , reducer mode
      * @param deadline, deadline of a workflow
      */
-    public static void init(FTCMethod fMethod, FTCMonitor monitor, FTCFailure failure,
+    public static void init(FTCluteringAlgorithm fMethod, FTCMonitor monitor, FTCFailure failure,
             Map failureList,
             int vm, String dax, String runtime, String datasize,
             OverheadParameters op, ClusteringParameters cp,
-            SCHMethod scheduler, PLNMethod planner, String rMethod,
+            SchedulingAlgorithm scheduler, PlanningAlgorithm planner, String rMethod,
             long dl) {
 
         cParams = cp;
-        FTCMethod = fMethod;
+        FTClusteringAlgorithm = fMethod;
         monitorMode = monitor;
         failureMode = failure;
         alpha = failureList;
@@ -180,8 +191,8 @@ public class Parameters {
         datasizePath = datasize;
 
         oParams = op;
-        schedulerMode = scheduler;
-        plannerMode = planner;
+        schedulingAlgorithm = scheduler;
+        planningAlgorithm = planner;
         reduceMethod = rMethod;
         deadline = dl;
     }
@@ -294,8 +305,8 @@ public class Parameters {
      * @pre $none
      * @post $none
      */
-    public static FTCMethod getFTCMethod() {
-        return FTCMethod;
+    public static FTCluteringAlgorithm getFTCluteringAlgorithm() {
+        return FTClusteringAlgorithm;
     }
 
     /**
@@ -338,8 +349,8 @@ public class Parameters {
      * @pre $none
      * @post $none
      */
-    public static SCHMethod getSchedulerMode() {
-        return schedulerMode;
+    public static SchedulingAlgorithm getSchedulingAlgorithm() {
+        return schedulingAlgorithm;
     }
     
     /**
@@ -347,8 +358,8 @@ public class Parameters {
      * @return the planning method
      * 
      */
-    public static PLNMethod getPlannerMode() {
-        return plannerMode;
+    public static PlanningAlgorithm getPlanningAlgorithm() {
+        return planningAlgorithm;
     }
     /**
      * Gets the version
@@ -369,4 +380,29 @@ public class Parameters {
     	return deadline;
     }
     
+    /**
+     * Sets the bandwidth between vms
+     * @param bw bandwidth
+     */
+    public static void setBandwidths(double[][] bw){
+        bandwidths = bw;
+    }
+    
+    /**
+     * Gets the bandwidth from src to dest
+     * @param src the source vm id
+     * @param dest the destination vm id
+     * @return the bandwidth from the source vm to the destination vm
+     */
+    public static double getBandwidth(int src, int dest){
+        return bandwidths[src][dest];
+    }
+    
+    /**
+     * Gets the bandwidths
+     * @return the bandwidths
+     */
+    public static double[][] getBandwidths(){
+        return bandwidths;
+    }
 }

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import org.cloudbus.cloudsim.Cloudlet;
+import org.cloudbus.cloudsim.Datacenter;
 import org.cloudbus.cloudsim.DatacenterBroker;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
 import org.cloudbus.cloudsim.Log;
@@ -27,20 +28,21 @@ import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEvent;
 import org.cloudbus.cloudsim.lists.VmList;
 import org.workflowsim.failure.FailureGenerator;
-import org.workflowsim.scheduler.DataAwareScheduler;
-import org.workflowsim.scheduler.BaseScheduler;
-import org.workflowsim.scheduler.FCFSScheduler;
-import org.workflowsim.scheduler.MCTScheduler;
-import org.workflowsim.scheduler.MaxMinScheduler;
-import org.workflowsim.scheduler.MinMinScheduler;
-import org.workflowsim.scheduler.StaticScheduler;
+import org.workflowsim.scheduling.DataAwareSchedulingAlgorithm;
+import org.workflowsim.scheduling.BaseSchedulingAlgorithm;
+import org.workflowsim.scheduling.FCFSSchedulingAlgorithm;
+import org.workflowsim.scheduling.MCTSchedulingAlgorithm;
+import org.workflowsim.scheduling.MaxMinSchedulingAlgorithm;
+import org.workflowsim.scheduling.MinMinSchedulingAlgorithm;
+import org.workflowsim.scheduling.StaticSchedulingAlgorithm;
 import org.workflowsim.utils.Parameters;
-import org.workflowsim.utils.Parameters.SCHMethod;
+import org.workflowsim.utils.Parameters.SchedulingAlgorithm;
 
 /**
- * WorkflowScheduler represents a scheduler acting on behalf of a user. It hides
+ * WorkflowScheduler represents a algorithm acting on behalf of a user. It hides
  * VM management, as vm creation, sumbission of jobs to this VMs and destruction
  * of VMs.
+ * It picks up a scheduling algorithm based on the configuration
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
@@ -49,7 +51,7 @@ import org.workflowsim.utils.Parameters.SCHMethod;
 public class WorkflowScheduler extends DatacenterBroker {
 
     /**
-     * The workflow engine id associated with this workflow scheduler.
+     * The workflow engine id associated with this workflow algorithm.
      */
     private int workflowEngineId;
 
@@ -76,7 +78,7 @@ public class WorkflowScheduler extends DatacenterBroker {
         }
         this.datacenterIdsList.add(datacenterId);
     }
-
+    
     /**
      * Sets the workflow engine id
      *
@@ -132,106 +134,104 @@ public class WorkflowScheduler extends DatacenterBroker {
     }
 
     /**
-     * Switch between multiple schedulers. Based on scheduler.method
+     * Switch between multiple schedulers. Based on algorithm.method
      *
-     * @param name the SCHMethod name
-     * @return the scheduler that extends BaseScheduler
+     * @param name the SchedulingAlgorithm name
+     * @return the algorithm that extends BaseSchedulingAlgorithm
      */
-    private BaseScheduler getScheduler(SCHMethod name) {
-        BaseScheduler scheduler = null;
+    private BaseSchedulingAlgorithm getScheduler(SchedulingAlgorithm name) {
+        BaseSchedulingAlgorithm algorithm = null;
 
-        // choose which scheduler to use. Make sure you have add related enum in
+        // choose which algorithm to use. Make sure you have add related enum in
         //Parameters.java
         switch (name) {
             //by default it is FCFS_SCH
             case FCFS_SCH:
-                scheduler = new FCFSScheduler();
+                algorithm = new FCFSSchedulingAlgorithm();
                 break;
             case MINMIN_SCH:
-                scheduler = new MinMinScheduler();
+                algorithm = new MinMinSchedulingAlgorithm();
                 break;
             case MAXMIN_SCH:
-                scheduler = new MaxMinScheduler();
+                algorithm = new MaxMinSchedulingAlgorithm();
                 break;
             case MCT_SCH:
-                scheduler = new MCTScheduler();
+                algorithm = new MCTSchedulingAlgorithm();
                 break;
             case DATA_SCH:
-                scheduler = new DataAwareScheduler();
+                algorithm = new DataAwareSchedulingAlgorithm();
                 break;
             case STATIC_SCH:
-                scheduler = new StaticScheduler();
+                algorithm = new StaticSchedulingAlgorithm();
                 break;
             default:
-                scheduler = new StaticScheduler();
+                algorithm = new StaticSchedulingAlgorithm();
                 break;
 
         }
 
-        return scheduler;
+        return algorithm;
     }
-    
+
     /**
-	 * Process the ack received due to a request for VM creation.
-	 * 
-	 * @param ev a SimEvent object
-	 * @pre ev != null
-	 * @post $none
-	 */
+     * Process the ack received due to a request for VM creation.
+     *
+     * @param ev a SimEvent object
+     * @pre ev != null
+     * @post $none
+     */
     @Override
-	protected void processVmCreate(SimEvent ev) {
-		int[] data = (int[]) ev.getData();
-		int datacenterId = data[0];
-		int vmId = data[1];
-		int result = data[2];
+    protected void processVmCreate(SimEvent ev) {
+        int[] data = (int[]) ev.getData();
+        int datacenterId = data[0];
+        int vmId = data[1];
+        int result = data[2];
 
-		if (result == CloudSimTags.TRUE) {
-			getVmsToDatacentersMap().put(vmId, datacenterId);
-                        /**
-                         * Fix a bug of cloudsim
-                         * Don't add a null to getVmsCreatedList()
-                         * June 15, 2013
-                         */
-                        if(VmList.getById(getVmList(), vmId)!=null){
-                            getVmsCreatedList().add(VmList.getById(getVmList(), vmId));
-                        
-			Log.printLine(CloudSim.clock() + ": " + getName() + ": VM #" + vmId
-					+ " has been created in Datacenter #" + datacenterId + ", Host #"
-					+ VmList.getById(getVmsCreatedList(), vmId).getHost().getId());
-                        }
-		} else {
-			Log.printLine(CloudSim.clock() + ": " + getName() + ": Creation of VM #" + vmId
-					+ " failed in Datacenter #" + datacenterId);
-		}
+        if (result == CloudSimTags.TRUE) {
+            getVmsToDatacentersMap().put(vmId, datacenterId);
+            /**
+             * Fix a bug of cloudsim Don't add a null to getVmsCreatedList()
+             * June 15, 2013
+             */
+            if (VmList.getById(getVmList(), vmId) != null) {
+                getVmsCreatedList().add(VmList.getById(getVmList(), vmId));
 
-		incrementVmsAcks();
+                Log.printLine(CloudSim.clock() + ": " + getName() + ": VM #" + vmId
+                        + " has been created in Datacenter #" + datacenterId + ", Host #"
+                        + VmList.getById(getVmsCreatedList(), vmId).getHost().getId());
+            }
+        } else {
+            Log.printLine(CloudSim.clock() + ": " + getName() + ": Creation of VM #" + vmId
+                    + " failed in Datacenter #" + datacenterId);
+        }
 
-		// all the requested VMs have been created
-		if (getVmsCreatedList().size() == getVmList().size() - getVmsDestroyed()) {
-			submitCloudlets();
-		} else {
-			// all the acks received, but some VMs were not created
-			if (getVmsRequested() == getVmsAcks()) {
-				// find id of the next datacenter that has not been tried
-				for (int nextDatacenterId : getDatacenterIdsList()) {
-					if (!getDatacenterRequestedIdsList().contains(nextDatacenterId)) {
-						createVmsInDatacenter(nextDatacenterId);
-						return;
-					}
-				}
+        incrementVmsAcks();
 
-				// all datacenters already queried
-				if (getVmsCreatedList().size() > 0) { // if some vm were created
-					submitCloudlets();
-				} else { // no vms created. abort
-					Log.printLine(CloudSim.clock() + ": " + getName()
-							+ ": none of the required VMs could be created. Aborting");
-					finishExecution();
-				}
-			}
-		}
-	}
+        // all the requested VMs have been created
+        if (getVmsCreatedList().size() == getVmList().size() - getVmsDestroyed()) {
+            submitCloudlets();
+        } else {
+            // all the acks received, but some VMs were not created
+            if (getVmsRequested() == getVmsAcks()) {
+                // find id of the next datacenter that has not been tried
+                for (int nextDatacenterId : getDatacenterIdsList()) {
+                    if (!getDatacenterRequestedIdsList().contains(nextDatacenterId)) {
+                        createVmsInDatacenter(nextDatacenterId);
+                        return;
+                    }
+                }
 
+                // all datacenters already queried
+                if (getVmsCreatedList().size() > 0) { // if some vm were created
+                    submitCloudlets();
+                } else { // no vms created. abort
+                    Log.printLine(CloudSim.clock() + ": " + getName()
+                            + ": none of the required VMs could be created. Aborting");
+                    finishExecution();
+                }
+            }
+        }
+    }
 
     /**
      * Update a cloudlet (job)
@@ -240,17 +240,17 @@ public class WorkflowScheduler extends DatacenterBroker {
      */
     protected void processCloudletUpdate(SimEvent ev) {
 
-        BaseScheduler scheduler = getScheduler(Parameters.getSchedulerMode());
+        BaseSchedulingAlgorithm scheduler = getScheduler(Parameters.getSchedulingAlgorithm());
         scheduler.setCloudletList(getCloudletList());
         scheduler.setVmList(getVmsCreatedList());
-        
-        try{
+
+        try {
             scheduler.run();
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.printLine("Error in configuring scheduler_method");
             e.printStackTrace();
         }
-        
+
         List scheduledList = scheduler.getScheduledList();
         for (Iterator it = scheduledList.iterator(); it.hasNext();) {
             Cloudlet cloudlet = (Cloudlet) it.next();

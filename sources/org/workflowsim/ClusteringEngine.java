@@ -255,7 +255,7 @@ public final class ClusteringEngine extends SimEntity {
              * To avoid duplicate files
              */
             if (isRealInputFile(list, file)) {
-                ReplicaCatalog.addStorageList(file.getName(), "source");
+                ReplicaCatalog.addStorageList(file.getName(), Parameters.SOURCE);
                 fileList.add(file);
             }
         }

@@ -28,7 +28,7 @@ import org.workflowsim.utils.Parameters;
  * @since WorkflowSim Toolkit 1.0
  * @date Jun 17, 2013
  */
-public class RandomPlanner extends BasePlanner {
+public class RandomPlanningAlgorithm extends BasePlanningAlgorithm {
 
     /**
      * The main function
@@ -36,7 +36,7 @@ public class RandomPlanner extends BasePlanner {
     @Override
     public void run() {
 
-
+        Random random = new Random(System.currentTimeMillis());
         for (Iterator it = getTaskList().iterator(); it.hasNext();) {
             Task task = (Task) it.next();
             double duration = task.getCloudletLength() / 1000;
@@ -54,7 +54,7 @@ public class RandomPlanner extends BasePlanner {
             /**
              * Randomly choose a vm
              */
-            Random random = new Random((long)duration);
+            
             int vmId = random.nextInt(vmNum);
             
             CondorVM vm = (CondorVM) getVmList().get(vmId);

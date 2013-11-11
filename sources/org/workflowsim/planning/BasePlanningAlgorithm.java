@@ -18,17 +18,18 @@ package org.workflowsim.planning;
 import java.util.ArrayList;
 import java.util.List;
 import org.cloudbus.cloudsim.Cloudlet;
+import org.cloudbus.cloudsim.Datacenter;
 import org.cloudbus.cloudsim.Vm;
 
 /**
  * The base planner has implemented the basic features. Every other planning method
- * should extend from BasePlanner but should not directly use it. 
+ * should extend from BasePlanningAlgorithm but should not directly use it. 
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Jun 17, 2013
  */
-public abstract class BasePlanner implements PlannerInterface {
+public abstract class BasePlanningAlgorithm implements PlanningAlgorithmInterface {
 
     /**
      * the task list.
@@ -39,11 +40,14 @@ public abstract class BasePlanner implements PlannerInterface {
      */
     private List<? extends Vm> vmList;
 
-
+    /**
+     * the datacenter list
+     */
+    private List<? extends Datacenter> datacenterList;
     /**
      * Initialize a BaseScheduler
      */
-    public BasePlanner() {
+    public BasePlanningAlgorithm() {
     }
 
     /**
@@ -87,9 +91,25 @@ public abstract class BasePlanner implements PlannerInterface {
     }
 
     /**
+     * Gets the datacenter list
+     * @return the datacenter list
+     */
+    public List getDatacenterList(){
+        return this.datacenterList;
+    }
+    
+    /**
+     * Sets the datacenter list
+     * @param list the datacenter list
+     */
+    public void setDatacenterList(List list){
+        this.datacenterList = list;
+    }
+    
+    /**
      * The main function
      */
     public abstract void run() throws Exception;
 
-
+    
 }

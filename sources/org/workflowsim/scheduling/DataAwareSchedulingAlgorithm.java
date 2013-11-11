@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.workflowsim.scheduler;
+package org.workflowsim.scheduling;
 
 import java.util.Iterator;
 import java.util.List;
@@ -33,9 +33,9 @@ import org.workflowsim.utils.ReplicaCatalog;
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public class DataAwareScheduler extends BaseScheduler {
+public class DataAwareSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
-    public DataAwareScheduler() {
+    public DataAwareSchedulingAlgorithm() {
         super();
     }
 
