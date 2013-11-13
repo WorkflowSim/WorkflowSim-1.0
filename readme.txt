@@ -52,32 +52,15 @@ First, create a new java project called 'WorkflowSim' (it doesn't have to be 'Wo
 
 Right click the project again and choose 'Properties'. Go to 'Java Build Path'. Link two source directories (your_repo_root/examples, your_repo_root/sources)to the source folders. Add two external JARs (your_repo_root/lib/flanagan.jar and your_repo_root/lib/jdom-2.0.0.jar) to the Libraries.  
 
-1.5 Set Main class and arguments
+1.5 Run an Example
 
-Go to 'Run'->'Run Configurations'->'Java Application'->'WorkflowSimExample1'. Make sure the Main class is 'org.workflowsim.examples.WorkflowSimExample1' although by default Eclipse should set the main class for you automatically. 
+Run an example i.e., org.workflowsim.examples.WorkflowSimBasicExample1.java. Open WorkflowSimBasicExample1.java, replace the 
 
-Click the 'Arguments', in the 'Program arguments', please add
-```
--p your_repo_root/config/config.txt
-```
-In this case, we use Montage workflow as an example. 
+``
+String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
+``
 
-1.6 Modify Config File
-
-Open your_repo_root/config/config.txt, there is one line:
-```
-dax.path	= /Users/chenweiwei/Work/WorkflowSimEnergy/WorkflowSim-1.0/config/dax/Montage_100.xml
-```
-Replace it with 
-```
-dax.path = your_repo_root/config/dax/Montage_100.xml. 
-```
-Montage_100.xml is a dax file for montage workflow with 100 tasks in it. You can try other dax files provided under the same directory. 
-Other parameters would not cause an error but they have specified the simulation details. For details of these parameters, please refer to other pages. 
-
-1.7 Run an Example
-
-After you have done all the changes, you can click 'Run' and the output contains the completion time of each job (if you use task clustering) or each task. 
+With your real physical file path. 
 
 ### 2. Use WorkflowSim with GitHub/NetBeans
 
@@ -102,17 +85,9 @@ Right click the project and choose 'Git'->'Remote'->'Pull', set the 'Repository 
 
 After a while the download is down, right click the project again and choose 'Project Properties'. Go to 'Sources', click 'Add Folder' and choose two folders (your_repo_root/examples and your_repo_root/sources). Go to 'Libraries', add all jars  (your_repo_root/lib/*.jar). 
 
-2.5 Set Arguments
+2.5 Run an Example
 
-Go to 'Run'->'Set Project Configuration'->'Customize'. Go to 'Run', and make sure the Main Class is 'org.workflowsim.examples.WorkflowSimExample1'. Set the 'Arguments' to be '-p your_repo_root/config/config.txt'. 
-
-2.6 Modify Config File
-
-The same to 1.6. 
-
-2.7 Run an Example
-
-The same to 1.7. 
+The same to 1.5. 
 
 ### 3. Use WorkflowSim with Eclipse but without GitHub
 ( If you don't want to contribute back to WorkflowSim with your codes, you can use WorkflowSim without GitHub. )
@@ -121,7 +96,7 @@ The same to 1.7.
 
 Skip 1.1 and 1.2. Different to 1.3, we download source files directly from https://github.com/WorkflowSim/WorkflowSim-1.0/archive/master.zip and unzip it to your_repo_root. 
 
-3.2 Switch to 1.4 and continue with the rest steps (1.5-1.7). 
+3.2 Switch to 1.4 and continue with the rest steps (1.5). 
 
 ### 4. Use WorkflowSim with NetBeans but without GitHub
 
@@ -129,7 +104,7 @@ Skip 1.1 and 1.2. Different to 1.3, we download source files directly from https
 
 The same to 3.1. 
 
-4.2 Switch to 2.4 and continue with the rest steps (2.5-2.7).
+4.2 Switch to 2.4 and continue with the rest steps (2.5).
 
 ### Authors and Contributors
 This page is written by Weiwei Chen @chenww05. For details or bug reports, please contact the author. 
