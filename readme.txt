@@ -56,9 +56,9 @@ Right click the project again and choose 'Properties'. Go to 'Java Build Path'. 
 
 Run an example i.e., org.workflowsim.examples.WorkflowSimBasicExample1.java. Open WorkflowSimBasicExample1.java, replace the 
 
-``
+''
 String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
-``
+''
 
 With your real physical file path. 
 
