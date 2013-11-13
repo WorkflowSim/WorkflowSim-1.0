@@ -56,11 +56,12 @@ Right click the project again and choose 'Properties'. Go to 'Java Build Path'. 
 
 Run an example i.e., org.workflowsim.examples.WorkflowSimBasicExample1.java. Open WorkflowSimBasicExample1.java, replace the 
 
-''
 String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
-''
 
-With your real physical file path. 
+with your real physical file path. Right click on WorkflowSimBasicExample1.java and choose 'Run File'. You should be able to see some output:
+
+98        SUCCESS        2            0            6.91        263.78            270.69            8
+99        SUCCESS        2            0            0.83        270.69            271.52            9
 
 ### 2. Use WorkflowSim with GitHub/NetBeans
 
