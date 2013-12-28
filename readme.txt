@@ -33,11 +33,10 @@ This page introduces the basic features of WorkflowSim and how to install and ru
 
 ( It is suggested to use WorkflowSim if you are going to contribute back to this project, otherwise it is not required. )
 
-We provide a youtube video to show the process described below. (http://www.youtube.com/watch?v=MvpPzZpMDzg)
 
 1.1 Register a GitHub account and fork your own branch
 
-Go to the repository page (https://github.com/WorkflowSim/WorkflowSim-1.0) and click 'Fork' on the top-right corner next to 'Star'. Then you will have your own branch of WorkflowSim and you can maintain your codes under this branch and commit your changes to it. In the video, we use 'chenww05' as an example and you will see a new repo called chenww05/WorkflowSim-1.0. Go to your repo, and copy the path. In this case, it is "https://github.com/chenww05/WorkflowSim-1.0.git". 
+Go to the repository page (https://github.com/WorkflowSim/WorkflowSim-1.0) and click 'Fork' on the top-right corner next to 'Star'. Then you will have your own branch of WorkflowSim and you can maintain your codes under this branch and commit your changes to it. In this example, we use 'chenww05' as an example and you will see a new repo called chenww05/WorkflowSim-1.0. Go to your repo, and copy the path. In this case, it is "https://github.com/chenww05/WorkflowSim-1.0.git". 
 
 1.2 Install EGit
 
