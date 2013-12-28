@@ -65,8 +65,6 @@ with your real physical file path. Right click on WorkflowSimBasicExample1.java 
 
 ### 2. Use WorkflowSim with GitHub/NetBeans
 
-The youtube video for install WorkflowSim with Git/NetBeans is here: http://www.youtube.com/watch?v=G94FW2DZbj0
-
 2.1 Register a GitHub account and fork your own branch
 
 It is the same to 1.1.
