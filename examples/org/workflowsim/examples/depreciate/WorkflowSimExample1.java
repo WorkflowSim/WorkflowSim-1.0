@@ -171,6 +171,7 @@ public class WorkflowSimExample1 {
         // 2. A Machine contains one or more PEs or CPUs/Cores. Therefore, should
         //    create a list to store these PEs before creating
         //    a Machine.
+        int hostId = 0;
         for (int i = 1; i <= 20; i++) {
             List<Pe> peList1 = new ArrayList<Pe>();
             int mips = 2000;
@@ -179,7 +180,6 @@ public class WorkflowSimExample1 {
             peList1.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
             peList1.add(new Pe(1, new PeProvisionerSimple(mips)));
 
-            int hostId = 0;
             int ram = 2048; //host memory (MB)
             long storage = 1000000; //host storage
             int bw = 10000;

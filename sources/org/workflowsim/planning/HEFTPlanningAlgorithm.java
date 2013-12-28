@@ -16,112 +16,372 @@
 package org.workflowsim.planning;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
 import org.cloudbus.cloudsim.File;
-import org.cloudbus.cloudsim.Vm;
+import org.cloudbus.cloudsim.Log;
 import org.workflowsim.CondorVM;
 import org.workflowsim.Task;
 import org.workflowsim.utils.Parameters;
 
 /**
- * The HEFT planning algorithm. This algo does not consider data transfer.
+ * The HEFT planning algorithm.
  *
- * @author Weiwei Chen
- * @since WorkflowSim Toolkit 1.0
- * @date Nov 10, 2013
+ * @author Pedro Paulo Vezzá Campos
+ * @date Oct 12, 2013
  */
 public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
+
+    private Map<Task, Map<CondorVM, Double>> computationCosts;
+    private Map<Task, Map<Task, Double>> transferCosts;
+    private Map<Task, Double> rank;
+    private Map<CondorVM, List<Event>> schedules;
+    private Map<Task, Double> earliestFinishTimes;
+    private double averageBandwidth;
+
+    private class Event {
+
+        public double start;
+        public double finish;
+
+        public Event(double start, double finish) {
+            this.start = start;
+            this.finish = finish;
+        }
+    }
+
+    private class TaskRank implements Comparable<TaskRank> {
+
+        public Task task;
+        public Double rank;
+
+        public TaskRank(Task task, Double rank) {
+            this.task = task;
+            this.rank = rank;
+        }
+
+        @Override
+        public int compareTo(TaskRank o) {
+            return o.rank.compareTo(rank);
+        }
+    }
+
+    public HEFTPlanningAlgorithm() {
+        computationCosts = new HashMap<>();
+        transferCosts = new HashMap<>();
+        rank = new HashMap<>();
+        earliestFinishTimes = new HashMap<>();
+        schedules = new HashMap<>();
+    }
 
     /**
      * The main function
      */
     @Override
     public void run() {
+        Log.printLine("HEFT planner running with " + getTaskList().size()
+                + " tasks.");
 
-        double [][] bandwidths = Parameters.getBandwidths();
-        int vmNum = getVmList().size();
-        int taskNum = getTaskList().size();
-        double [] availableTime = new double[vmNum];
-        //cloudlet id starts from 1
-        double [][] earliestStartTime = new double[taskNum + 1][vmNum];
-        double [][] earliestFinishTime = new double[taskNum + 1][vmNum];
-        int [] allocation = new int[taskNum + 1];
-        
-        List<Task> taskList = new ArrayList<Task>(getTaskList());
-        List<Task> readyList = new ArrayList<Task>();
-        while(!taskList.isEmpty()){
-            readyList.clear();
-            for(Task task : taskList){
-                boolean ready = true;
-                for(Task parent: task.getParentList()){
-                    if(taskList.contains(parent)){
-                        ready = false;
-                        break;
-                    }
-                }
-                if(ready){
-                    readyList.add(task);
-                }
-            }
-            taskList.removeAll(readyList);
-            //schedule readylist
-            for(Task task: readyList){
-                long [] fileSizes = new long[task.getParentList().size()];
-                int parentIndex = 0;
-                for(Task parent: task.getParentList()){
-                    long fileSize = 0;
-                    for(Iterator fileIter = task.getFileList().iterator(); fileIter.hasNext();){
-                        File file = (File)fileIter.next();
-                        if(file.getType()==1){
-                            for(Iterator fileIter2 = parent.getFileList().iterator();fileIter2.hasNext();){
-                                File file2 = (File)fileIter2.next();
-                                if(file2.getType() == 2 && file2.getName().equals(file.getName()))
-                                {
-                                    fileSize += file.getSize();
-                                }
-                            }
-                        }
-                    }
-                    fileSizes[parentIndex] = fileSize;
-                    parentIndex ++;
-                }     
-                
-                double minTime = Double.MAX_VALUE;
-                int minTimeIndex = 0;
-                
-                for(int vmIndex = 0; vmIndex < getVmList().size(); vmIndex++){
-                    Vm vm = (Vm)getVmList().get(vmIndex);
-                    double startTime = availableTime[vm.getId()];
-                    parentIndex = 0;
-                    for(Task parent: task.getParentList()){
-                        int allocatedVmId = allocation[parent.getCloudletId()];
-                        double actualFinishTime = earliestFinishTime[parent.getCloudletId()][allocatedVmId];
-                        double communicationTime = fileSizes[parentIndex] / bandwidths[allocatedVmId][vm.getId()];
-                        
-                        if(actualFinishTime + communicationTime > startTime){
-                            startTime = actualFinishTime + communicationTime;
-                        }
-                        parentIndex ++;
-                    }
-                    earliestStartTime[task.getCloudletId()][vm.getId()] = startTime;
-                    double runtime = task.getCloudletLength() / vm.getMips();
-                    earliestFinishTime[task.getCloudletId()][vm.getId()] = runtime + startTime;
-                    
-                    if(runtime + startTime < minTime){
-                        minTime = runtime + startTime;
-                        minTimeIndex = vmIndex;
-                    }
-                }
-                
-                allocation[task.getCloudletId()] = minTimeIndex;//we do not really need it use task.getVmId
-                task.setVmId(minTimeIndex);
-                availableTime[minTimeIndex] = minTime;
-            }
+        averageBandwidth = calculateAverageBandwidth();
+
+        for (Object vmObject : getVmList()) {
+            CondorVM vm = (CondorVM) vmObject;
+            schedules.put(vm, new ArrayList<Event>());
         }
-        
+
+        // Prioritization phase
+        calculateComputationCosts();
+        calculateTransferCosts();
+        calculateRanks();
+
+        // Selection phase
+        allocateTasks();
     }
 
+    /**
+     * Calculates the average available bandwidth among all VMs in Mbit/s
+     *
+     * @return Average available bandwidth in Mbit/s
+     */
+    private double calculateAverageBandwidth() {
+        double avg = 0.0;
+        for (Object vmObject : getVmList()) {
+            CondorVM vm = (CondorVM) vmObject;
+            avg += vm.getBw();
+        }
+        return avg / getVmList().size();
+    }
 
+    /**
+     * Populates the computationCosts field with the time in seconds to compute
+     * a task in a vm.
+     */
+    private void calculateComputationCosts() {
+        for (Object taskObject : getTaskList()) {
+            Task task = (Task) taskObject;
+
+            Map<CondorVM, Double> costsVm = new HashMap<CondorVM, Double>();
+
+            for (Object vmObject : getVmList()) {
+                CondorVM vm = (CondorVM) vmObject;
+                if (vm.getNumberOfPes() < task.getNumberOfPes()) {
+                    costsVm.put(vm, Double.MAX_VALUE);
+                } else {
+                    costsVm.put(vm,
+                            task.getCloudletTotalLength() / vm.getMips());
+                }
+            }
+            computationCosts.put(task, costsVm);
+        }
+    }
+
+    /**
+     * Populates the transferCosts map with the time in seconds to transfer all
+     * files from each parent to each child
+     */
+    private void calculateTransferCosts() {
+        // Initializing the matrix
+        for (Object taskObject1 : getTaskList()) {
+            Task task1 = (Task) taskObject1;
+            Map<Task, Double> taskTransferCosts = new HashMap<Task, Double>();
+
+            for (Object taskObject2 : getTaskList()) {
+                Task task2 = (Task) taskObject2;
+                taskTransferCosts.put(task2, 0.0);
+            }
+
+            transferCosts.put(task1, taskTransferCosts);
+        }
+
+        // Calculating the actual values
+        for (Object parentObject : getTaskList()) {
+            Task parent = (Task) parentObject;
+            for (Task child : parent.getChildList()) {
+                transferCosts.get(parent).put(child,
+                        calculateTransferCost(parent, child));
+            }
+        }
+    }
+
+    /**
+     * Accounts the time in seconds necessary to transfer all files described
+     * between parent and child
+     *
+     * @param parent
+     * @param child
+     * @return Transfer cost in seconds
+     */
+    private double calculateTransferCost(Task parent, Task child) {
+        List<File> parentFiles = (List<File>) parent.getFileList();
+        List<File> childFiles = (List<File>) child.getFileList();
+
+        double acc = 0.0;
+
+        for (File parentFile : parentFiles) {
+            if (parentFile.getType() != Parameters.FileType.OUTPUT.value) {
+                continue;
+            }
+
+            for (File childFile : childFiles) {
+                if (childFile.getType() == Parameters.FileType.INPUT.value
+                        && childFile.getName().equals(parentFile.getName())) {
+                    acc += childFile.getSize();
+                    break;
+                }
+            }
+        }
+
+        // acc in MB, averageBandwidth in Mb/s
+        return acc * 8 / averageBandwidth;
+    }
+
+    /**
+     * Invokes calculateRank for each task to be scheduled
+     */
+    private void calculateRanks() {
+        for (Object taskObject : getTaskList()) {
+            Task task = (Task) taskObject;
+            calculateRank(task);
+        }
+    }
+
+    /**
+     * Populates rank.get(task) with the rank of task as defined in the HEFT
+     * paper.
+     *
+     * @param task The task have the rank calculates
+     * @return The rank
+     */
+    private double calculateRank(Task task) {
+        if (rank.containsKey(task)) {
+            return rank.get(task);
+        }
+
+        double averageComputationCost = 0.0;
+
+        for (Double cost : computationCosts.get(task).values()) {
+            averageComputationCost += cost;
+        }
+
+        averageComputationCost /= computationCosts.get(task).size();
+
+        double max = 0.0;
+        for (Task child : task.getChildList()) {
+            double childCost = transferCosts.get(task).get(child)
+                    + calculateRank(child);
+            max = Math.max(max, childCost);
+        }
+
+        rank.put(task, averageComputationCost + max);
+
+        return rank.get(task);
+    }
+
+    /**
+     * Allocates all tasks to be scheduled in non-ascending order of schedule.
+     */
+    private void allocateTasks() {
+        List<TaskRank> taskRank = new ArrayList<>();
+        for (Task task : rank.keySet()) {
+            taskRank.add(new TaskRank(task, rank.get(task)));
+        }
+
+        // Sorting in non-ascending order of rank
+        Collections.sort(taskRank);
+        for (TaskRank tr : taskRank) {
+            allocateTask(tr.task);
+        }
+
+    }
+
+    /**
+     * Schedules the task given in one of the VMs minimizing the earliest finish
+     * time
+     *
+     * @param task The task to be scheduled
+     * @pre All parent tasks are already scheduled
+     */
+    private void allocateTask(Task task) {
+        CondorVM chosenVM = null;
+        double earliestFinishTime = Double.MAX_VALUE;
+        double bestReadyTime = 0.0;
+        double finishTime;
+
+        for (Object vmObject : getVmList()) {
+            CondorVM vm = (CondorVM) vmObject;
+            double minReadyTime = 0.0;
+
+            for (Task parent : task.getParentList()) {
+                double readyTime = earliestFinishTimes.get(parent);
+                if (parent.getVmId() != vm.getId()) {
+                    readyTime += transferCosts.get(parent).get(task);
+                }
+
+                minReadyTime = Math.max(minReadyTime, readyTime);
+            }
+
+            finishTime = findFinishTime(task, vm, minReadyTime, false);
+
+            if (finishTime < earliestFinishTime) {
+                bestReadyTime = minReadyTime;
+                earliestFinishTime = finishTime;
+                chosenVM = vm;
+            }
+        }
+
+        findFinishTime(task, chosenVM, bestReadyTime, true);
+        earliestFinishTimes.put(task, earliestFinishTime);
+
+        task.setVmId(chosenVM.getId());
+    }
+
+    /**
+     * Finds the best time slot available to minimize the finish time of the
+     * given task in the vm with the constraint of not scheduling it before
+     * readyTime. If occupySlot is true, reserves the time slot in the schedule.
+     *
+     * @param task The task to have the time slot reserved
+     * @param vm The vm that will execute the task
+     * @param readyTime The first moment that the task is available to be
+     * scheduled
+     * @param occupySlot If true, reserves the time slot in the schedule.
+     * @return The minimal finish time of the task in the vmn
+     */
+    private double findFinishTime(Task task, CondorVM vm, double readyTime,
+            boolean occupySlot) {
+        List<Event> sched = schedules.get(vm);
+        double computationCost = computationCosts.get(task).get(vm);
+        double start, finish;
+        int pos;
+
+        if (sched.size() == 0) {
+            if (occupySlot) {
+                sched.add(new Event(readyTime, readyTime + computationCost));
+            }
+            return readyTime + computationCost;
+        }
+
+        if (sched.size() == 1) {
+            if (readyTime >= sched.get(0).finish) {
+                pos = 1;
+                start = readyTime;
+            } else if (readyTime + computationCost <= sched.get(0).start) {
+                pos = 0;
+                start = readyTime;
+            } else {
+                pos = 1;
+                start = sched.get(0).finish;
+            }
+
+            if (occupySlot) {
+                sched.add(pos, new Event(start, start + computationCost));
+            }
+            return start + computationCost;
+        }
+
+        // Trivial case: Start after the latest task scheduled
+        start = Math.max(readyTime, sched.get(sched.size() - 1).finish);
+        finish = start + computationCost;
+        int i = sched.size() - 1;
+        int j = sched.size() - 2;
+        pos = i + 1;
+        while (j >= 0) {
+            Event current = sched.get(i);
+            Event previous = sched.get(j);
+
+            if (readyTime > previous.finish) {
+                if (readyTime + computationCost <= current.start) {
+                    start = readyTime;
+                    finish = readyTime + computationCost;
+                }
+
+                break;
+            }
+
+            if (previous.finish + computationCost <= current.start) {
+                start = previous.finish;
+                finish = previous.finish + computationCost;
+                pos = i;
+            }
+
+            i--;
+            j--;
+        }
+
+        if (readyTime + computationCost <= sched.get(0).start) {
+            pos = 0;
+            start = readyTime;
+
+            if (occupySlot) {
+                sched.add(pos, new Event(start, start + computationCost));
+            }
+            return start + computationCost;
+        }
+        if (occupySlot) {
+            sched.add(pos, new Event(start, finish));
+        }
+        return finish;
+    }
 }

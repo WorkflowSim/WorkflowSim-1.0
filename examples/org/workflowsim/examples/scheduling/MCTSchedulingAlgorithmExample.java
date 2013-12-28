@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.workflowsim.examples.planning;
+package org.workflowsim.examples.scheduling;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -49,15 +49,13 @@ import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * This DHEFTPlanningAlgorithmExample1 creates a workflow planner, a workflow
- * engine, and one schedulers, one data centers and 20 heterogeneous vms that
- * has different communication cost (such that HEFT algorithm should work)
+ * This MINMIN Scheduling Algorithm 
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.1
  * @date Nov 9, 2013
  */
-public class HEFTPlanningAlgorithmExample1 {
+public class MCTSchedulingAlgorithmExample {
 
     private static List<CondorVM> createVM(int userId, int vms) {
 
@@ -122,8 +120,8 @@ public class HEFTPlanningAlgorithmExample1 {
              * Since we are using HEFT planning algorithm, the scheduling algorithm should be static 
              * such that the scheduler would not override the result of the planner
              */
-            Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.STATIC;
-            Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.HEFT;
+            Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.MCT;
+            Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.LOCAL;
 
             /**
@@ -266,7 +264,11 @@ public class HEFTPlanningAlgorithmExample1 {
             for (int src = 0; src < Parameters.getVmNum(); src++) {
                 bws[src][src] = Double.MAX_VALUE;
                 for (int dest = src; dest < Parameters.getVmNum(); dest++) {
-                    double bw = intraBandwidth * bwRandom.nextDouble();
+                    double bw = intraBandwidth * 1.0;
+                    /**
+                     * To create a heterogeneous environment we can change the bandwidth distribution
+                     */
+                    //double bw = intraBandwidth * bwRandom.nextDouble();
                     bws[src][dest] = bw;
                     bws[dest][src] = bw;
                 }

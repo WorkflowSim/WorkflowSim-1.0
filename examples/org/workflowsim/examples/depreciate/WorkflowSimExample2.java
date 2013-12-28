@@ -183,6 +183,7 @@ public class WorkflowSimExample2 {
         // In a future work, vm scheduling algorithms should be done
         
         //
+        int hostId = 0;
         for (int i = 1; i <= 3; i++) {
             List<Pe> peList1 = new ArrayList<Pe>();
             int mips = 2000;
@@ -191,7 +192,6 @@ public class WorkflowSimExample2 {
             peList1.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
             peList1.add(new Pe(1, new PeProvisionerSimple(mips)));
 
-            int hostId = 0;
             int ram = 2048; //host memory (MB)
             long storage = 1000000; //host storage
             int bw = 10000;

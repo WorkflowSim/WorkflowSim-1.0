@@ -57,7 +57,7 @@ import org.workflowsim.utils.ReplicaCatalog;
  * @since WorkflowSim Toolkit 1.1
  * @date Nov 9, 2013
  */
-public class HEFTPlanningAlgorithmExample1 {
+public class DHEFTPlanningAlgorithmExample1 {
 
     private static List<CondorVM> createVM(int userId, int vms) {
 
@@ -123,7 +123,7 @@ public class HEFTPlanningAlgorithmExample1 {
              * such that the scheduler would not override the result of the planner
              */
             Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.STATIC;
-            Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.HEFT;
+            Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.DHEFT;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.LOCAL;
 
             /**

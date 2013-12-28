@@ -53,13 +53,13 @@ public class Parameters {
         FAILURE_NONE, FAILURE_ALL, FAILURE_VM, FAILURE_JOB
     }
     /*
-     * Scheduling Algorithm
+     * Scheduling Algorithm (Local Scheduling Algorithm)
      */
 
     public enum SchedulingAlgorithm {
 
-        MAXMIN_SCH, MINMIN_SCH, MCT_SCH, DATA_SCH, 
-        STATIC_SCH, FCFS_SCH, INVALID_SCH
+        MAXMIN, MINMIN, MCT, DATA, 
+        STATIC, FCFS, INVALID
     }
     
     /**
@@ -67,7 +67,18 @@ public class Parameters {
      * 
      */
     public enum PlanningAlgorithm{
-        INVALID, RANDOM, HEFT
+        INVALID, RANDOM, HEFT, DHEFT
+    }
+    
+    /**
+     * File Type
+     */
+    public enum FileType{
+        INPUT(1), OUTPUT(2);
+        public final int value;
+        private FileType(int fType){
+            this.value = fType;
+        }
     }
     
     /** 

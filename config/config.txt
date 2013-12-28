@@ -54,9 +54,9 @@ scheduler.method= MINMIN_SCH
 
 ######Planning Related Parameters
 #planner.method= RANDOM
-#deadline = 100000
+deadline = 90
 
 ######Please replace it with your real physical path
-dax.path = /Users/chenweiwei/Work/WorkflowSimEnergy/WorkflowSim-1.0/config/dax/Montage_100.xml
+dax.path = /Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml
 ######Reducer mode used to remove duplicate dependencies
 #reduce.method	= montage

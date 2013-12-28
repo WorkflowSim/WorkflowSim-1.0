@@ -145,23 +145,23 @@ public class WorkflowScheduler extends DatacenterBroker {
         // choose which algorithm to use. Make sure you have add related enum in
         //Parameters.java
         switch (name) {
-            //by default it is FCFS_SCH
-            case FCFS_SCH:
+            //by default it is Static
+            case FCFS:
                 algorithm = new FCFSSchedulingAlgorithm();
                 break;
-            case MINMIN_SCH:
+            case MINMIN:
                 algorithm = new MinMinSchedulingAlgorithm();
                 break;
-            case MAXMIN_SCH:
+            case MAXMIN:
                 algorithm = new MaxMinSchedulingAlgorithm();
                 break;
-            case MCT_SCH:
+            case MCT:
                 algorithm = new MCTSchedulingAlgorithm();
                 break;
-            case DATA_SCH:
+            case DATA:
                 algorithm = new DataAwareSchedulingAlgorithm();
                 break;
-            case STATIC_SCH:
+            case STATIC:
                 algorithm = new StaticSchedulingAlgorithm();
                 break;
             default:

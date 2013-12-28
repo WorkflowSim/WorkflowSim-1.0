@@ -125,7 +125,7 @@ public class DynamicWorkloadExample1 {
              * Since we are using HEFT planning algorithm, the scheduling algorithm should be static 
              * such that the scheduler would not override the result of the planner
              */
-            Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.STATIC_SCH;
+            Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.STATIC;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.HEFT;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.LOCAL;
 

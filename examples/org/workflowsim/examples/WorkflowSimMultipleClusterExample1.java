@@ -127,7 +127,7 @@ public class WorkflowSimMultipleClusterExample1 {
              * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
              * such that the planner would not override the result of the scheduler
              */
-            Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.MINMIN_SCH;
+            Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.MINMIN;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
 

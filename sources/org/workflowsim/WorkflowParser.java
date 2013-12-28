@@ -267,9 +267,9 @@ public class WorkflowParser {
                              */
                             int type = 0;
                             if (inout.equals("input")) {
-                                type = 1;
+                                type = Parameters.FileType.INPUT.value;
                             } else if (inout.equals("output")) {
-                                type = 2;
+                                type = Parameters.FileType.OUTPUT.value;
                             } else {
                                 Log.printLine("Parsing Error");
                             }
@@ -284,7 +284,7 @@ public class WorkflowParser {
                                 size = 0 - size;
                                 Log.printLine("Size is negative, I assume it is a parser error");
                             }
-                            if (type == 2) {
+                            if (type == Parameters.FileType.OUTPUT.value) {
                                 /**
                                  * It is good that CloudSim does tell whether a
                                  * size is zero

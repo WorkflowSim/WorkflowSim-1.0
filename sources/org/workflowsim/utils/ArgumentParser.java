@@ -108,7 +108,7 @@ public class ArgumentParser {
             FTCluteringAlgorithm ftc_method = null;
             FTCMonitor ftc_monitor = FTCMonitor.MONITOR_NONE;
             FTCFailure ftc_failure = FTCFailure.FAILURE_NONE;
-            SchedulingAlgorithm sch_method = SchedulingAlgorithm.INVALID_SCH;
+            SchedulingAlgorithm sch_method = SchedulingAlgorithm.INVALID;
             PlanningAlgorithm pln_method = PlanningAlgorithm.INVALID;
             FileSystem file_system = FileSystem.SHARED;
             OverheadParameters op = null;
@@ -284,13 +284,13 @@ public class ArgumentParser {
             
             /**
              * If a user has specified planner.method, the scheduler.method should 
-             * be set as STATIC_SCH to avoid unnecessary change during the runtime
+             * be set as STATIC to avoid unnecessary change during the runtime
              */
             if(!pln_method.equals(PlanningAlgorithm.INVALID)){
-                if(sch_method != SchedulingAlgorithm.STATIC_SCH || sch_method != SchedulingAlgorithm.INVALID_SCH){
+                if(sch_method != SchedulingAlgorithm.STATIC || sch_method != SchedulingAlgorithm.INVALID){
                     Log.printLine("Warning: your scheduler.method is reset to be STATIC_SCH");
                 }
-                sch_method = SchedulingAlgorithm.STATIC_SCH;
+                sch_method = SchedulingAlgorithm.STATIC;
             }
             
             Parameters.init(ftc_method, ftc_monitor, ftc_failure,
