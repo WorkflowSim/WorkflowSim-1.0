@@ -42,7 +42,6 @@ import org.workflowsim.WorkflowEngine;
 import org.workflowsim.WorkflowPlanner;
 import org.workflowsim.failure.FailureGenerator;
 import org.workflowsim.failure.FailureMonitor;
-import org.workflowsim.utils.ArgumentParser;
 import org.workflowsim.utils.ClusteringParameters;
 import org.workflowsim.utils.OverheadParameters;
 import org.workflowsim.utils.Parameters;
@@ -50,11 +49,8 @@ import org.workflowsim.utils.ReplicaCatalog;
 
 /**
  * This WorkflowSimExample creates a workflow planner, a workflow engine, and
- * one schedulers, one data centers and 20 vms. All the configuration of
- * CloudSim is done in WorkflowSimExamplex.java All the configuration of
- * WorkflowSim is done in the config.txt that must be specified in argument of
- * this WorkflowSimExample. The argument should have at least: "-p
- * path_to_config.txt"
+ * one schedulers, one data centers and 20 vms. You should change daxPath at least. 
+ * You may change other parameters as well.
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0

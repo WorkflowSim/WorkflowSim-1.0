@@ -13,13 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.workflowsim.examples.depreciate;
+package org.workflowsim.examples.clustering;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletSchedulerSpaceShared;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
@@ -41,22 +44,21 @@ import org.workflowsim.WorkflowEngine;
 import org.workflowsim.WorkflowPlanner;
 import org.workflowsim.failure.FailureGenerator;
 import org.workflowsim.failure.FailureMonitor;
-import org.workflowsim.utils.ArgumentParser;
+import org.workflowsim.utils.ClusteringParameters;
+import org.workflowsim.utils.OverheadParameters;
 import org.workflowsim.utils.Parameters;
+import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * This WorkflowSimExample creates a workflow planner, a workflow engine, and
- * one schedulers, one data centers and 20 vms. All the configuration of
- * CloudSim is done in WorkflowSimExamplex.java All the configuration of
- * WorkflowSim is done in the config.txt that must be specified in argument of
- * this WorkflowSimExample. The argument should have at least: "-p
- * path_to_config.txt"
+ * This HorizontalClusteringExample2 is using horizontal clustering or more specifically
+ * using clusters.num to specify the clustering strength. In contrast to HorizontalClust
+ * eringExample2 which uses clusters.size to specify the clustering strength. 
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
- * @date Apr 9, 2013
+ * @date Dec 29, 2013
  */
-public class WorkflowSimExample1 {
+public class HorizontalClusteringExample2 {
 
     private static List<CondorVM> createVM(int userId, int vms) {
 
@@ -91,30 +93,88 @@ public class WorkflowSimExample1 {
     public static void main(String[] args) {
 
 
-        try {
-            // First step: Initialize the CloudSim package. It should be called
+       try {
+            // First step: Initialize the WorkflowSim package. 
 
-
-            ArgumentParser option = new ArgumentParser(args);//init is done in option
-
-            FailureMonitor.init();//it doesn't really matter?
-            FailureGenerator.init();//must do it so as to initialize FTC
-
-            // before creating any entities.
-            int num_user = 1;   // number of grid users
-            Calendar calendar = Calendar.getInstance();
-            boolean trace_flag = false;  // mean trace events
-
-            /**
-             * Here we overwrites the vmNum set in config.txt.
-             */
             /**
              * However, the exact number of vms may not necessarily be vmNum If
              * the data center or the host doesn't have sufficient resources the
              * exact vmNum would be smaller than that. Take care.
              */
             int vmNum = 20;//number of vms;
-            Parameters.setVmNum(vmNum);
+            /**
+             * Should change this based on real physical path
+             */
+            String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
+            if(daxPath == null){
+                Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
+                return;
+            }
+            File daxFile = new File(daxPath);
+            if(!daxFile.exists()){
+                Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
+                return;
+            }
+            /*
+             * Use default Fault Tolerant Parameters
+             */
+            Parameters.FTCMonitor ftc_monitor = Parameters.FTCMonitor.MONITOR_NONE;
+            Parameters.FTCFailure ftc_failure = Parameters.FTCFailure.FAILURE_NONE;
+            Parameters.FTCluteringAlgorithm ftc_method = null;
+
+            /**
+             * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
+             * such that the planner would not override the result of the scheduler
+             */
+            Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.MINMIN;
+            Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
+            ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
+
+            /**
+             * clustering delay must be added, if you don't need it, you can set all the clustering
+             * delay to be zero, but not null
+             */
+            Map<Integer, Double> clusteringDelay = new HashMap();
+            /**
+             * Montage has at most 11 horizontal levels 
+             */
+            int maxLevel = 11;
+            for (int level = 0; level < maxLevel; level++ ){
+                clusteringDelay.put(level, 1.0);//the clustering delay specified to each level is 1.0 seconds
+            }
+            // Add clustering delay to the overhead parameters
+            OverheadParameters op = new OverheadParameters(0, null, null, null, clusteringDelay, 0);;
+            
+            /**
+             * Horizontal Clustering
+             */
+            ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.HORIZONTAL;
+            /**
+             * You can only specify clusters.num or clusters.size
+             * clusters.num is the number of clustered jobs per horizontal level
+             * clusters.size is the number of tasks per clustered job
+             * clusters.num * clusters.size = the number of tasks per horizontal level
+             * In this case, we specify the clusters.num = 20, which means we have 20 jobs per level
+             */
+            ClusteringParameters cp = new ClusteringParameters(20, 0, method, null);
+            
+
+            /**
+             * Initialize static parameters
+             */
+            Parameters.init(ftc_method, ftc_monitor, ftc_failure,
+                    null, vmNum, daxPath, null,
+                    null, op, cp, sch_method, pln_method,
+                    null, 0);
+            ReplicaCatalog.init(file_system);
+
+            FailureMonitor.init();
+            FailureGenerator.init();
+
+            // before creating any entities.
+            int num_user = 1;   // number of grid users
+            Calendar calendar = Calendar.getInstance();
+            boolean trace_flag = false;  // mean trace events
 
             // Initialize the CloudSim library
             CloudSim.init(num_user, calendar, trace_flag);
@@ -170,7 +230,6 @@ public class WorkflowSimExample1 {
         // 2. A Machine contains one or more PEs or CPUs/Cores. Therefore, should
         //    create a list to store these PEs before creating
         //    a Machine.
-        int hostId = 0;
         for (int i = 1; i <= 20; i++) {
             List<Pe> peList1 = new ArrayList<Pe>();
             int mips = 2000;
@@ -179,6 +238,7 @@ public class WorkflowSimExample1 {
             peList1.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
             peList1.add(new Pe(1, new PeProvisionerSimple(mips)));
 
+            int hostId = 0;
             int ram = 2048; //host memory (MB)
             long storage = 1000000; //host storage
             int bw = 10000;
@@ -219,8 +279,7 @@ public class WorkflowSimExample1 {
          * The bandwidth within a data center.
          */
         double intraBandwidth = 1.5e7;// the number comes from the futuregrid site, you can specify your bw
-        intraBandwidth = Parameters.getOverheadParams().getBandwidth();
-
+        
         try {
             ClusterStorage s1 = new ClusterStorage(name, 1e12);
             
