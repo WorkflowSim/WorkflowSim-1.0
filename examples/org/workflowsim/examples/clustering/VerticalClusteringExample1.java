@@ -50,15 +50,14 @@ import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * This HorizontalClusteringExample1 is using horizontal clustering or more specifically
- * using clusters.size to specify the clustering strength. In contrast to HorizontalClust
- * eringExample2 which uses clusters.num to specify the clustering strength. 
+ * This VerticalClusteringExample1 is using vertical clustering. In contrast to 
+ * HorizontalClustering, VerticalClustering merges task at the same branch 
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Dec 29, 2013
  */
-public class HorizontalClusteringExample1 {
+public class VerticalClusteringExample1 {
 
     private static List<CondorVM> createVM(int userId, int vms) {
 
@@ -146,26 +145,21 @@ public class HorizontalClusteringExample1 {
             OverheadParameters op = new OverheadParameters(0, null, null, null, clusteringDelay, 0);;
             
             /**
-             * Horizontal Clustering
+             * Vertical Clustering
              */
-            ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.HORIZONTAL;
-            /**
-             * You can only specify clusters.num or clusters.size
-             * clusters.num is the number of clustered jobs per horizontal level
-             * clusters.size is the number of tasks per clustered job
-             * clusters.num * clusters.size = the number of tasks per horizontal level
-             * In this case, we specify the clusters.size = 2, which means each job has two tasks
-             */
-            ClusteringParameters cp = new ClusteringParameters(0, 2, method, null);
+            ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.VERTICAL;
+            ClusteringParameters cp = new ClusteringParameters(0, 0, method, null);
             
 
             /**
              * Initialize static parameters
+             * The reducer method is set to be "montage" in this case to remove duplicate dependencies
+             * within montage workflow. However, it is just for performance and it is not required. 
              */
             Parameters.init(ftc_method, ftc_monitor, ftc_failure,
                     null, vmNum, daxPath, null,
                     null, op, cp, sch_method, pln_method,
-                    null, 0);
+                    "montage", 0);
             ReplicaCatalog.init(file_system);
 
             FailureMonitor.init();

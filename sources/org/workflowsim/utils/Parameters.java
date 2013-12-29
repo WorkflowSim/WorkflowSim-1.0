@@ -164,7 +164,12 @@ public class Parameters {
      * the bandwidth from one vm to one vm
      */
     private static double[][] bandwidths;
+    
+    /**
+     * Invalid String
+     */
 
+    private static String INVALID = "Invalid";
     /**
      * A static function so that you can specify them in any place
      *
@@ -251,7 +256,11 @@ public class Parameters {
      * @post $none
      */
     public static String getReduceMethod() {
-        return reduceMethod;
+        if(reduceMethod!=null){
+            return reduceMethod;
+        }else{
+            return INVALID;
+        }
     }
 
     /**
