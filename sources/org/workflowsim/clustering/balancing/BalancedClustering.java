@@ -214,22 +214,22 @@ public class BalancedClustering extends BasicClustering {
     }
 
     /**
-     * Check whether a task is an ancessor of another set
+     * Check whether a task is an ancestor of another set
      *
-     * @param ancessor ancessor
+     * @param ancestor ancestor
      * @param set child
      * @return
      */
-    private boolean check(Task ancessor, Task set) {
-        if (ancessor == null || set == null) {
+    private boolean check(Task ancestor, Task set) {
+        if (ancestor == null || set == null) {
             return false;
         }
-        if (ancessor == set) {
+        if (ancestor == set) {
             return true;
         }
         for (Iterator it = set.getParentList().iterator(); it.hasNext();) {
             Task parent = (Task) it.next();
-            if (check(ancessor, parent)) {
+            if (check(ancestor, parent)) {
                 return true;
             } else {
                 //parent.hasChecked = true;
