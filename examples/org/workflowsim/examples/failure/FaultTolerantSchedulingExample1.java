@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.workflowsim.examples.clustering.balancing;
+package org.workflowsim.examples.failure;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -36,9 +36,9 @@ import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
+import org.workflowsim.ClusterStorage;
 import org.workflowsim.CondorVM;
 import org.workflowsim.DatacenterExtended;
-import org.workflowsim.DistributedClusterStorage;
 import org.workflowsim.Job;
 import org.workflowsim.WorkflowEngine;
 import org.workflowsim.WorkflowPlanner;
@@ -50,14 +50,14 @@ import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * This BalancedClusteringExample1 is using balanced horizontal clustering or more specifically
- * using horizontal runtime balancing. 
+ * This FaultTolerantExample1 uses FailureGenerator to create task failures and 
+ * then retry tasks
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
- * @date Dec 29, 2013
+ * @date Dec 31, 2013
  */
-public class BalancedClusteringExample1 {
+public class FaultTolerantSchedulingExample1 {
 
     private static List<CondorVM> createVM(int userId, int vms) {
 
@@ -93,46 +93,6 @@ public class BalancedClusteringExample1 {
 
 
        try {
-           
-           /**
-            * delete in the future
-            * 
-            */
-           String code = "i";
-           String daxPath = "/Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Fake_1.xml";
-           double intraBandwidth = 1.5e5;
-           double c_delay = 0, q_delay = 0, e_delay = 0, p_delay = 0;
-           int interval = 0;
-           
-           for(int i = 0; i < args.length; i ++){
-               char key = args[i].charAt(1);
-               switch(key){
-                   case 'c':
-                       code = args[++i];
-                       break;
-                   case 'd':
-                       daxPath = args[++i];
-                       break;
-                   case 'b':
-                       intraBandwidth = Double.parseDouble(args[++i]);
-                       break;
-                   case 'l':
-                       c_delay = Double.parseDouble(args[++i]);
-                       break;
-                   case 'q':
-                       q_delay = Double.parseDouble(args[++i]);
-                       break;
-                   case 'e':
-                       e_delay = Double.parseDouble(args[++i]);
-                       break;
-                   case 'p':
-                       p_delay = Double.parseDouble(args[++i]);
-                       break;
-                   case 'i':
-                       interval = Integer.parseInt(args[++i]);
-                       break;
-               }
-           }
             // First step: Initialize the WorkflowSim package. 
 
             /**
@@ -144,7 +104,7 @@ public class BalancedClusteringExample1 {
             /**
              * Should change this based on real physical path
              */
-            //String daxPath = "/Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Fake_1.xml";
+            String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
             if(daxPath == null){
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return;
@@ -155,65 +115,65 @@ public class BalancedClusteringExample1 {
                 return;
             }
             /*
-             * Use default Fault Tolerant Parameters
+             *  Fault Tolerant Parameters
              */
-            Parameters.FTCMonitor ftc_monitor = Parameters.FTCMonitor.MONITOR_NONE;
-            Parameters.FTCFailure ftc_failure = Parameters.FTCFailure.FAILURE_NONE;
-            Parameters.FTCluteringAlgorithm ftc_method = null;
+            /**
+             * MONITOR_JOB classifies failures based on the level of jobs; MONITOR_VM classifies failures
+             * based on the vm id; MOINTOR_ALL does not do any classification; MONITOR_NONE does not record
+             * any failiure. 
+             */
+            Parameters.FTCMonitor ftc_monitor = Parameters.FTCMonitor.MONITOR_ALL;
+            /**
+             *  Similar to FTCMonitor, FTCFailure controls the way how we generate failures. 
+             */
+            Parameters.FTCFailure ftc_failure = Parameters.FTCFailure.FAILURE_ALL;
+            /**
+             *  In this example, we have no clustering and thus it is no need to do 
+             * Fault Tolerant Clustering. By default, WorkflowSim will just rety all
+             * the failed task. 
+             */
+            Parameters.FTCluteringAlgorithm ftc_method = Parameters.FTCluteringAlgorithm.FTCLUSTERING_NOOP;
+            /**
+             * Task failure rate for each level 
+             * 
+             */
+            Map<Integer, Double> taskFailureMap = new HashMap();
+            int maxLevel = 11; //most workflows we use has a maximum of 11 levels
+            for(int level = 0; level < maxLevel; level ++ ){
+                /*
+                 * For simplicity, set the task failure rate of each level to be 0.1. Which means 10%
+                 * of submitted tasks will fail. It doesn't have to be the same task 
+                 * failure rate at each level. 
+                 */
+                taskFailureMap.put(level, 0.1);
+            }
+            
+            
 
             /**
              * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
              * such that the planner would not override the result of the scheduler
              */
-            Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.DATA;
+            Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.MINMIN;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
-            ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.LOCAL;
+            ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
 
             /**
-             * clustering delay must be added, if you don't need it, you can set all the clustering
-             * delay to be zero, but not null
+             * No overheads 
              */
-            Map<Integer, Double> clusteringDelay = new HashMap();
-            Map<Integer, Double> queueDelay = new HashMap();
-            Map<Integer, Double> postscriptDelay = new HashMap();
-            Map<Integer, Double> engineDelay = new HashMap();
-            /**
-             * application has at most 11 horizontal levels 
-             */
-            int maxLevel = 11;
-            for (int level = 0; level < maxLevel; level++ ){
-                clusteringDelay.put(level, c_delay);
-                queueDelay.put(level, q_delay);
-                postscriptDelay.put(level, p_delay);
-                engineDelay.put(level, e_delay);
-            }
-            // Add clustering delay to the overhead parameters
-            /**
-             * Map<Integer, Double> wed_delay,
-            Map<Integer, Double> queue_delay,
-            Map<Integer, Double> post_delay,
-            Map<Integer, Double> cluster_delay,
-             */
-            OverheadParameters op = new OverheadParameters(interval, engineDelay, queueDelay, postscriptDelay, clusteringDelay, 0);;
+            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);;
             
             /**
-             * Balanced Clustering
+             * No Clustering
              */
-            ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.BALANCED;
-            /**
-             * r: Horizontal Runtime Balancing (HRB)
-             * d: Horizontal Distance Balancing (HDB)
-             * i: Horizontal Impact Factor Balancing (HIFB)
-             * h: Horizontal Random Balancing , the original horizontal clustering
-             */
-            ClusteringParameters cp = new ClusteringParameters(20, 0, method, code);
-            
+            ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.NONE;
+            ClusteringParameters cp = new ClusteringParameters(0, 0, method, null);
 
             /**
              * Initialize static parameters
              */
             Parameters.init(ftc_method, ftc_monitor, ftc_failure,
-                    null, vmNum, daxPath, null,
+                    taskFailureMap, vmNum, daxPath, null,
                     null, op, cp, sch_method, pln_method,
                     null, 0);
             ReplicaCatalog.init(file_system);
@@ -229,7 +189,7 @@ public class BalancedClusteringExample1 {
             // Initialize the CloudSim library
             CloudSim.init(num_user, calendar, trace_flag);
 
-            DatacenterExtended datacenter0 = createDatacenter("Datacenter_0", intraBandwidth);
+            DatacenterExtended datacenter0 = createDatacenter("Datacenter_0");
 
             /**
              * Create a WorkflowPlanner with one schedulers.
@@ -270,18 +230,17 @@ public class BalancedClusteringExample1 {
         }
     }
 
-    private static DatacenterExtended createDatacenter(String name , double intraBandwidth) {
+    private static DatacenterExtended createDatacenter(String name) {
 
         // Here are the steps needed to create a PowerDatacenter:
         // 1. We need to create a list to store one or more
         //    Machines
-        int vmNumber = 20;
         List<Host> hostList = new ArrayList<Host>();
 
         // 2. A Machine contains one or more PEs or CPUs/Cores. Therefore, should
         //    create a list to store these PEs before creating
         //    a Machine.
-        for (int i = 1; i <= vmNumber; i++) {
+        for (int i = 1; i <= 20; i++) {
             List<Pe> peList1 = new ArrayList<Pe>();
             int mips = 2000;
             // 3. Create PEs and add these into the list.
@@ -329,20 +288,15 @@ public class BalancedClusteringExample1 {
         /**
          * The bandwidth within a data center.
          */
-        //double intraBandwidth = 1.5e3;// the number comes from the futuregrid site, you can specify your bw
+        double intraBandwidth = 1.5e7;// the number comes from the futuregrid site, you can specify your bw
         
         try {
-            DistributedClusterStorage s1 = new DistributedClusterStorage(name, 1e12, vmNumber, intraBandwidth / 2);
+            ClusterStorage s1 = new ClusterStorage(name, 1e12);
             
-            // The bandwidth from one vm to another vm
-            for(int source = 0; source < vmNumber; source ++){
-                for(int destination = 0; destination < vmNumber; destination ++){
-                    if(source == destination){
-                        continue;
-                    }
-                    s1.setBandwidth(source, destination, intraBandwidth);
-                }
-            }
+            // The bandwidth within a data center
+            s1.setBandwidth("local", intraBandwidth);
+            // The bandwidth to the source site 
+            s1.setBandwidth("source", intraBandwidth);
             storageList.add(s1);
             datacenter = new DatacenterExtended(name, characteristics, new VmAllocationPolicySimple(hostList), storageList, 0);
         } catch (Exception e) {

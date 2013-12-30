@@ -96,7 +96,7 @@ public class HorizontalImpactBalancing extends BalancingMethod {
                 //Log.printLine(set.getJobRuntime());
                 TaskSet job = null;
                 try{
-                job = getCandidateTastSet(jobList, set, clusters_size);
+                    job = getCandidateTastSet(jobList, set, clusters_size);
                 }catch(Exception e) {
                     e.printStackTrace();
                 }
@@ -147,17 +147,33 @@ public class HorizontalImpactBalancing extends BalancingMethod {
      * @param taskList taskSets to be sorted
      */
     private void sortListDecreasing(ArrayList taskList) {
+        
         Collections.sort(taskList, new Comparator<TaskSet>() {
-            public int compare(TaskSet t1, TaskSet t2) {
-                //Decreasing order
-                if(Math.abs(t2.getImpactFactor() - t1.getImpactFactor()) > 1.0e-8){
-                    return (int)((t1.getImpactFactor() - t2.getImpactFactor()) * 100);
-                }
-                return (int) (t1.getJobRuntime() - t2.getJobRuntime());
-
+        @Override
+        public int compare(TaskSet t1, TaskSet t2) {
+            //Decreasing order
+            if(Math.abs(t2.getImpactFactor() - t1.getImpactFactor()) > 1.0e-8){
+                if(t1.getImpactFactor() > t2.getImpactFactor()){
+                    return 1;
+                }else if(t1.getImpactFactor() < t2.getImpactFactor()){
+                    return -1;
+                }else{
+                    return 0;
+                }                        
             }
-        });
+            else{
+                if (t1.getJobRuntime() > t2.getJobRuntime()){
+                    return 1;
+                }else if (t1.getJobRuntime() < t2.getJobRuntime()) {
+                    return -1;
+                }else{
+                    return 0;
+                }
+            }
 
+        }
+        });
+    
     }
     
     
