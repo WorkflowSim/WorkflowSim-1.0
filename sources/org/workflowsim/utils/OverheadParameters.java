@@ -158,7 +158,9 @@ public class OverheadParameters {
      */
     public double getClustDelay(Cloudlet cl) {
         double delay = 0.0;
-
+        if(this.CLUST_DELAY == null){
+            return delay;
+        }
         if (cl != null) {
             Job job = (Job) cl;
 
@@ -188,6 +190,9 @@ public class OverheadParameters {
     public double getQueueDelay(Cloudlet cl) {
         double delay = 0.0;
 
+        if(this.QUEUE_DELAY == null){
+            return delay;
+        }
         if (cl != null) {
             Job job = (Job) cl;
 
@@ -217,6 +222,9 @@ public class OverheadParameters {
     public double getPostDelay(Job job) {
         double delay = 0.0;
 
+        if(this.POST_DELAY == null){
+            return delay;
+        }
         if (job != null) {
 
             if (this.POST_DELAY.containsKey(job.getDepth())) {
@@ -246,6 +254,9 @@ public class OverheadParameters {
     public double getWEDDelay(List list) {
         double delay = 0.0;
 
+        if(this.WED_DELAY == null){
+            return delay;
+        }
         if (!list.isEmpty()) {
             Job job = (Job) list.get(0);
             if (this.WED_DELAY.containsKey(job.getDepth())) {
