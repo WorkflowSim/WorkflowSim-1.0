@@ -16,8 +16,10 @@
 package org.workflowsim;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import org.cloudbus.cloudsim.Cloudlet;
+import org.cloudbus.cloudsim.Consts;
 import org.cloudbus.cloudsim.UtilizationModelFull;
 
 /**
@@ -291,5 +293,31 @@ public class Task extends Cloudlet {
      */
     public double getImpact() {
         return this.impact;
+    }
+    
+    /**
+     * Gets the total cost of processing or executing this task The original
+     * getProcessingCost does not take cpu cost into it also the data file in
+     * Task is stored in fileList <tt>Processing Cost = input data transfer +
+     * processing cost + output transfer cost</tt> .
+     *
+     * @return the total cost of processing Cloudlet
+     * @pre $none
+     * @post $result >= 0.0
+     */
+    @Override
+    public double getProcessingCost() {
+        // cloudlet cost: execution cost...
+
+        double cost = getCostPerSec() * getActualCPUTime();
+        
+        // ...plus input data transfer cost...
+        long fileSize = 0;
+        for(Iterator it = getFileList().iterator(); it.hasNext();){
+            org.cloudbus.cloudsim.File file = (org.cloudbus.cloudsim.File) it.next();
+            fileSize += file.getSize() / Consts.MILLION;
+        }
+        cost += costPerBw * fileSize;
+        return cost;
     }
 }
