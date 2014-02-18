@@ -4,64 +4,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.jswarm_pso.FitnessFunction;
-import net.sourceforge.jswarm_pso.Particle;
 import net.sourceforge.jswarm_pso.Swarm;
 
 import org.cloudbus.cloudsim.File;
 import org.workflowsim.CondorVM;
 import org.workflowsim.Task;
+import org.workflowsim.utils.MyFitnessFunction;
+import org.workflowsim.utils.MyParticle;
 import org.workflowsim.utils.Parameters;
 
 public class PSOPlanningAlgorithm extends BasePlanningAlgorithm {
 
-	private class MyParticle extends Particle {
-		private List <Task> tasks;
-		public MyParticle(List<Task> tasks) {
-			super(tasks.size());
-			this.tasks = tasks;
-		}
-	}
-
-	private class MyFitnessFunction extends FitnessFunction {
-		
-		public MyFitnessFunction(boolean maximize) {
-			super(maximize);
-		}
-
-		/**
-		 * Evaluates a particles at a given position
-		 * 
-		 * @param position
-		 *            : Particle's position
-		 * @return Fitness function for a particle
-		 */
-		@Override
-		public double evaluate(double[] position) {
-			return  getCostMaximization(position);
-		}
-		
-		/**
-		 * Equation 4 of the paper
-		 * 
-		 * @param position
-		 *            : Particle's position
-		 * @return Maximum total cost execution of this particle
-		 */
-		private double  getCostMaximization(double[] position) {
-			double maxMappingTotalCost = Double.MIN_VALUE;
-			for (Vm vm : this.vms) {
-				double totalMappingCost = getMappingTotalCost(position, vm);
-				if (maxMappingTotalCost < totalMappingCost) {
-					maxMappingTotalCost = totalMappingCost;
-				}
-			}
-			return maxMappingTotalCost;
-		}
-
-	}
-
 	private static final int MAX_ITERATION = 50;
+
+	public static int DIMENSION = 0;
 
 	private Map<Task, Map<CondorVM, Double>> TP;
 
@@ -112,6 +68,12 @@ public class PSOPlanningAlgorithm extends BasePlanningAlgorithm {
 		 * Call PSO Algorithm
 		 */
 		double bestPosition[] = pso(getTaskList());
+		for (int d = 0; d < bestPosition.length; d++) {
+			System.out
+					.println("Task[" + d + "] => VM[" + bestPosition[d] + "]");
+			Task t = (Task)getTaskList().get(d);
+			t.setVmId(((int)Math.round(bestPosition[d])));
+		}
 
 	}
 
@@ -169,12 +131,11 @@ public class PSOPlanningAlgorithm extends BasePlanningAlgorithm {
 	}
 
 	/**
-	 * Accounts the time in seconds necessary to transfer all files described
-	 * between parent and child
+	 * Accounts the MB to transfer all files described between parent and child
 	 * 
 	 * @param parent
 	 * @param child
-	 * @return Transfer cost in seconds
+	 * @return size of all files
 	 */
 	@SuppressWarnings("unchecked")
 	private double calculateSizeOfAllFilesTransfer(Task parent, Task child) {
@@ -212,16 +173,18 @@ public class PSOPlanningAlgorithm extends BasePlanningAlgorithm {
 		 * Step 1: Set particle dimension as equal to the size of ready tasks
 		 * list
 		 */
-		int dimension = readyTasks.size();
+		DIMENSION = readyTasks.size();
 
-		if (dimension == 0)
+		if (DIMENSION == 0)
 			return null;
 
 		/*
 		 * Step 2: Initialize particles position and velocity randomly
 		 */
-		Swarm swarm = new Swarm(dimension,
-				new MyParticle(readyTasks), new MyFitnessFunction(false));
+		@SuppressWarnings("unchecked")
+		Swarm swarm = new Swarm(Swarm.DEFAULT_NUMBER_OF_PARTICLES,
+				new MyParticle(), new MyFitnessFunction(false, this.TP,
+						this.PP, this.e, getVmList(), readyTasks));
 
 		swarm.setMaxPosition(getVmList().size() - 1);
 		swarm.setMinPosition(0);
