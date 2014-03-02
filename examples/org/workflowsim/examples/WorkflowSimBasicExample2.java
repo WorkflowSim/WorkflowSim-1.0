@@ -22,7 +22,6 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.CloudletSchedulerSpaceShared;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Log;
@@ -34,7 +33,6 @@ import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
-import org.workflowsim.ClusterStorage;
 import org.workflowsim.CondorVM;
 import org.workflowsim.DatacenterExtended;
 import org.workflowsim.DistributedClusterStorage;
@@ -58,32 +56,7 @@ import org.workflowsim.utils.ReplicaCatalog;
  * @since WorkflowSim Toolkit 1.0
  * @date Feb 14, 2014
  */
-public class WorkflowSimBasicExample2 {
-
-    private static List<CondorVM> createVM(int userId, int vms) {
-
-        //Creates a container to store VMs. This list is passed to the broker later
-        LinkedList<CondorVM> list = new LinkedList<CondorVM>();
-
-        //VM Parameters
-        long size = 10000; //image size (MB)
-        int ram = 512; //vm memory (MB)
-        int mips = 1000;
-        long bw = 1000;
-        int pesNumber = 1; //number of cpus
-        String vmm = "Xen"; //VMM name
-
-        //create VMs
-        CondorVM[] vm = new CondorVM[vms];
-
-        for (int i = 0; i < vms; i++) {
-            double ratio = 1.0;
-            vm[i] = new CondorVM(i, userId, mips * ratio, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared());
-            list.add(vm[i]);
-        }
-
-        return list;
-    }
+public class WorkflowSimBasicExample2 extends WorkflowSimBasicExample1{
 
     ////////////////////////// STATIC METHODS ///////////////////////
     /**
@@ -205,7 +178,7 @@ public class WorkflowSimBasicExample2 {
         }
     }
 
-  private static DatacenterExtended createDatacenter(String name , double intraBandwidth) {
+  protected static DatacenterExtended createDatacenter(String name , double intraBandwidth) {
 
         // Here are the steps needed to create a PowerDatacenter:
         // 1. We need to create a list to store one or more
@@ -292,7 +265,7 @@ public class WorkflowSimBasicExample2 {
      *
      * @param list list of jobs
      */
-    private static void printJobList(List<Job> list) {
+    protected static void printJobList(List<Job> list) {
         int size = list.size();
         Job job;
 

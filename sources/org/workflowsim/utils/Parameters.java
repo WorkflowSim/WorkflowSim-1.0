@@ -130,11 +130,17 @@ public class Parameters {
      */
     private static double[][] bandwidths;
     
+    
+    /**
+     * The maximum depth. It is inited manually and used in FailureGenerator
+     */
+    private static int maxDepth;
+    
     /**
      * Invalid String
      */
-
     private static String INVALID = "Invalid";
+    
     /**
      * A static function so that you can specify them in any place
      *
@@ -170,6 +176,7 @@ public class Parameters {
         planningAlgorithm = planner;
         reduceMethod = rMethod;
         deadline = dl;
+        maxDepth = 0;
     }
 
     /**
@@ -333,5 +340,19 @@ public class Parameters {
         return bandwidths;
     }
     
+    /**
+     * Gets the maximum depth
+     * @return the maxDepth
+     */
+    public static int getMaxDepth(){
+        return maxDepth;
+    }
     
+    /**
+     * Sets the maximum depth
+     * @param depth the maxDepth
+     */
+    public static void setMaxDepth(int depth){
+        maxDepth = depth;
+    }
 }

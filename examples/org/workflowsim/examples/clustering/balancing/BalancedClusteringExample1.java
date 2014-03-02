@@ -42,6 +42,7 @@ import org.workflowsim.DistributedClusterStorage;
 import org.workflowsim.Job;
 import org.workflowsim.WorkflowEngine;
 import org.workflowsim.WorkflowPlanner;
+import org.workflowsim.examples.clustering.HorizontalClusteringExample1;
 import org.workflowsim.failure.FailureGenerator;
 import org.workflowsim.failure.FailureMonitor;
 import org.workflowsim.failure.FailureParameters;
@@ -58,32 +59,7 @@ import org.workflowsim.utils.ReplicaCatalog;
  * @since WorkflowSim Toolkit 1.0
  * @date Dec 29, 2013
  */
-public class BalancedClusteringExample1 {
-
-    private static List<CondorVM> createVM(int userId, int vms) {
-
-        //Creates a container to store VMs. This list is passed to the broker later
-        LinkedList<CondorVM> list = new LinkedList<CondorVM>();
-
-        //VM Parameters
-        long size = 10000; //image size (MB)
-        int ram = 512; //vm memory (MB)
-        int mips = 1000;
-        long bw = 1000;
-        int pesNumber = 1; //number of cpus
-        String vmm = "Xen"; //VMM name
-
-        //create VMs
-        CondorVM[] vm = new CondorVM[vms];
-
-        for (int i = 0; i < vms; i++) {
-            double ratio = 1.0;
-            vm[i] = new CondorVM(i, userId, mips * ratio, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared());
-            list.add(vm[i]);
-        }
-
-        return list;
-    }
+public class BalancedClusteringExample1 extends HorizontalClusteringExample1 {
 
     ////////////////////////// STATIC METHODS ///////////////////////
     /**
@@ -100,7 +76,7 @@ public class BalancedClusteringExample1 {
             * 
             */
            String code = "i";
-           String daxPath = "/Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Fake_1.xml";
+           String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
            double intraBandwidth = 1.5e5;
            double c_delay = 0, q_delay = 0, e_delay = 0, p_delay = 0;
            int interval = 0;
@@ -271,7 +247,13 @@ public class BalancedClusteringExample1 {
         }
     }
 
-    private static DatacenterExtended createDatacenter(String name , double intraBandwidth) {
+    /**
+     * Creates a new Data Center object
+     * @param name String name
+     * @param intraBandwidth bandwidth
+     * @return 
+     */
+    protected static DatacenterExtended createDatacenter(String name , double intraBandwidth) {
 
         // Here are the steps needed to create a PowerDatacenter:
         // 1. We need to create a list to store one or more
@@ -352,42 +334,5 @@ public class BalancedClusteringExample1 {
         return datacenter;
     }
 
-    /**
-     * Prints the job objects
-     *
-     * @param list list of jobs
-     */
-    private static void printJobList(List<Job> list) {
-        int size = list.size();
-        Job job;
-
-        String indent = "    ";
-        Log.printLine();
-        Log.printLine("========== OUTPUT ==========");
-        Log.printLine("Cloudlet ID" + indent + "STATUS" + indent
-                + "Data center ID" + indent + "VM ID" + indent + indent + "Time" + indent + "Start Time" + indent + "Finish Time" + indent + "Depth");
-
-        DecimalFormat dft = new DecimalFormat("###.##");
-        for (int i = 0; i < size; i++) {
-            job = list.get(i);
-            Log.print(indent + job.getCloudletId() + indent + indent);
-
-            if (job.getCloudletStatus() == Cloudlet.SUCCESS) {
-                Log.print("SUCCESS");
-
-                Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
-                        + indent + indent + indent + dft.format(job.getActualCPUTime())
-                        + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
-                        + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
-            } else if (job.getCloudletStatus() == Cloudlet.FAILED) {
-                Log.print("FAILED");
-
-                Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
-                        + indent + indent + indent + dft.format(job.getActualCPUTime())
-                        + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
-                        + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
-            }
-        }
-
-    }
+    
 }

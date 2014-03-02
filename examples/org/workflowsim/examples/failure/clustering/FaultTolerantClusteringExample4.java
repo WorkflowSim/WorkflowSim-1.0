@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 University Of Southern California
+ * Copyright 2013-2014 University Of Southern California
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.workflowsim.examples.clustering;
+package org.workflowsim.examples.failure.clustering;
 
 import java.io.File;
 import java.util.Calendar;
@@ -36,14 +36,16 @@ import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * This VerticalClusteringExample1 is using vertical clustering. In contrast to 
- * HorizontalClustering, VerticalClustering merges task at the same branch 
+ * Compared to FaultTolerantClusteringExample1, FaultTolerantClusteringExample4 models task
+ * as a function of vm index
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
- * @date Dec 29, 2013
+ * @date Mar 2, 2014
  */
-public class VerticalClusteringExample1 extends HorizontalClusteringExample1 {
+public class FaultTolerantClusteringExample4 extends FaultTolerantClusteringExample1{
+
+   
 
     ////////////////////////// STATIC METHODS ///////////////////////
     /**
@@ -76,11 +78,37 @@ public class VerticalClusteringExample1 extends HorizontalClusteringExample1 {
                 return;
             }
             /*
-             * Use default Fault Tolerant Parameters
+             *  Fault Tolerant Parameters
              */
-            FailureParameters.FTCMonitor ftc_monitor = FailureParameters.FTCMonitor.MONITOR_NONE;
-            FailureParameters.FTCFailure ftc_failure = FailureParameters.FTCFailure.FAILURE_NONE;
-            FailureParameters.FTCluteringAlgorithm ftc_method = null;
+            /**
+             * MONITOR_JOB classifies failures based on the level of jobs; MONITOR_VM classifies failures
+             * based on the vm id; MOINTOR_ALL does not do any classification; MONITOR_NONE does not record
+             * any failiure. 
+             */
+            FailureParameters.FTCMonitor ftc_monitor = FailureParameters.FTCMonitor.MONITOR_VM;
+            /**
+             *  Similar to FTCMonitor, FTCFailure controls the way how we generate failures. 
+             */
+            FailureParameters.FTCFailure ftc_failure = FailureParameters.FTCFailure.FAILURE_VM;
+            /**
+             *  In this example, we have horizontal clustering and we use Dynamic Clustering. 
+             */
+            FailureParameters.FTCluteringAlgorithm ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_DC;
+            /**
+             * Task failure rate for each level 
+             * 
+             */
+            Map<Integer, Double> taskFailureMap = new HashMap();
+            for(int vmIndex = 0; vmIndex < vmNum; vmIndex ++ ){
+                /*
+                 * For simplicity, set the task failure rate of each level to be 0.1. Which means 10%
+                 * of submitted tasks will fail. It doesn't have to be the same task 
+                 * failure rate at each level. 
+                 */
+                taskFailureMap.put(vmIndex, 0.1);
+            }
+            
+            
 
             /**
              * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
@@ -91,36 +119,23 @@ public class VerticalClusteringExample1 extends HorizontalClusteringExample1 {
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
 
             /**
-             * clustering delay must be added, if you don't need it, you can set all the clustering
-             * delay to be zero, but not null
+             * No overheads 
              */
-            Map<Integer, Double> clusteringDelay = new HashMap();
-            /**
-             * Montage has at most 11 horizontal levels 
-             */
-            int maxLevel = 11;
-            for (int level = 0; level < maxLevel; level++ ){
-                clusteringDelay.put(level, 1.0);//the clustering delay specified to each level is 1.0 seconds
-            }
-            // Add clustering delay to the overhead parameters
-            OverheadParameters op = new OverheadParameters(0, null, null, null, clusteringDelay, 0);;
+            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);;
             
             /**
-             * Vertical Clustering
+             * No Clustering
              */
-            ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.VERTICAL;
+            ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.NONE;
             ClusteringParameters cp = new ClusteringParameters(0, 0, method, null);
-            
 
             /**
              * Initialize static parameters
-             * The reducer method is set to be "montage" in this case to remove duplicate dependencies
-             * within montage workflow. However, it is just for performance and it is not required. 
              */
-            FailureParameters.init(ftc_method, ftc_monitor, ftc_failure, null);
+            FailureParameters.init(ftc_method, ftc_monitor, ftc_failure, taskFailureMap);
             Parameters.init(vmNum, daxPath, null,
                     null, op, cp, sch_method, pln_method,
-                    "montage", 0);
+                    null, 0);
             ReplicaCatalog.init(file_system);
 
             FailureMonitor.init();
@@ -174,6 +189,5 @@ public class VerticalClusteringExample1 extends HorizontalClusteringExample1 {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
     }
-
     
 }

@@ -59,7 +59,7 @@ import org.workflowsim.utils.ReplicaCatalog;
  */
 public class WorkflowSimBasicExample1 {
 
-    private static List<CondorVM> createVM(int userId, int vms) {
+    protected static List<CondorVM> createVM(int userId, int vms) {
 
         //Creates a container to store VMs. This list is passed to the broker later
         LinkedList<CondorVM> list = new LinkedList<CondorVM>();
@@ -201,7 +201,7 @@ public class WorkflowSimBasicExample1 {
         }
     }
 
-    private static DatacenterExtended createDatacenter(String name) {
+    protected static DatacenterExtended createDatacenter(String name) {
 
         // Here are the steps needed to create a PowerDatacenter:
         // 1. We need to create a list to store one or more
@@ -281,7 +281,7 @@ public class WorkflowSimBasicExample1 {
      *
      * @param list list of jobs
      */
-    private static void printJobList(List<Job> list) {
+    protected static void printJobList(List<Job> list) {
         int size = list.size();
         Job job;
 
