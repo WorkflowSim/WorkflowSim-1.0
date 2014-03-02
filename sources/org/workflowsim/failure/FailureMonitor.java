@@ -89,7 +89,7 @@ public class FailureMonitor {
 
         double t = record.length;
         double a = 0.0;
-        switch (Parameters.getMonitorMode()) {
+        switch (FailureParameters.getMonitorMode()) {
             case MONITOR_JOB:
             /**
              * not supported *
@@ -127,7 +127,7 @@ public class FailureMonitor {
             return;
         }
 
-        switch (Parameters.getMonitorMode()) {
+        switch (FailureParameters.getMonitorMode()) {
             case MONITOR_VM:
 
                 if (!vm2record.containsKey(record.vmId)) {
@@ -165,7 +165,7 @@ public class FailureMonitor {
          */
         int sumFailures = 0;
         int sumJobs = 0;
-        switch (Parameters.getMonitorMode()) {
+        switch (FailureParameters.getMonitorMode()) {
             case MONITOR_ALL:
 
                 for (FailureRecord record : recordList) {

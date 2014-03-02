@@ -17,11 +17,14 @@ package org.workflowsim.failure;
 
 import java.util.Iterator;
 import java.util.Random;
+import org.apache.commons.math3.distribution.RealDistribution;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Log;
 import org.workflowsim.Job;
 import org.workflowsim.Task;
 import org.workflowsim.utils.Parameters;
+import org.apache.commons.math3.distribution.WeibullDistribution;
+import org.cloudbus.cloudsim.Vm;
 
 /**
  * FailureGenerator creates a failure when a job returns
@@ -33,15 +36,105 @@ import org.workflowsim.utils.Parameters;
 public class FailureGenerator {
 
     /**
-     * The Random generator.
+     *
      */
+    private static final int FAILURE_SAMPLE_SIZE = 1000;
     private static Random generator;
+    private static double[][][] failureSamples;
+
+    private static void initFailureSamples() {
+        RealDistribution distribution = new WeibullDistribution(1.0, 40.0);
+
+        double[] samples;
+        switch (FailureParameters.getFailureGeneratorMode()) {
+            /**
+             * Every task is considered.
+             */
+            case FAILURE_ALL:
+                //by default
+                failureSamples = new double[Parameters.getVmNum()][FailureParameters.getAlpha().size()][FAILURE_SAMPLE_SIZE];
+                //alpha = (Double) (Parameters.getAlpha().get(0));
+                samples = distribution.sample(FAILURE_SAMPLE_SIZE);
+                for (int vmIndex = 0; vmIndex < Parameters.getVmNum(); vmIndex++) {
+                    for (int taskIndex = 0; taskIndex < FailureParameters.getAlpha().size(); taskIndex++) {
+                        failureSamples[vmIndex][taskIndex] = samples;
+                        for (int sampleId = 1; sampleId < failureSamples[vmIndex][taskIndex].length; sampleId++) {
+                            failureSamples[vmIndex][taskIndex][sampleId] += failureSamples[vmIndex][taskIndex][sampleId - 1];
+                        }
+                    }
+                }
+                break;
+            /**
+             * Generate failures based on the type of job.
+             */
+            case FAILURE_JOB:
+
+                failureSamples = new double[Parameters.getVmNum()][FailureParameters.getAlpha().size()][FAILURE_SAMPLE_SIZE];
+                //alpha = (Double) (Parameters.getAlpha().get(task.getDepth()));
+                for (int taskIndex = 0; taskIndex < FailureParameters.getAlpha().size(); taskIndex++) {
+                    samples = distribution.sample(FAILURE_SAMPLE_SIZE);
+                    for (int vmIndex = 0; vmIndex < Parameters.getVmNum(); vmIndex++) {
+                        failureSamples[vmIndex][taskIndex] = samples;
+                        for (int sampleId = 1; sampleId < failureSamples[vmIndex][taskIndex].length; sampleId++) {
+                            failureSamples[vmIndex][taskIndex][sampleId] += failureSamples[vmIndex][taskIndex][sampleId - 1];
+                        }
+                    }
+                }
+                break;
+            /**
+             * Generate failures based on the index of vm.
+             */
+            case FAILURE_VM:
+
+                failureSamples = new double[Parameters.getVmNum()][FailureParameters.getAlpha().size()][FAILURE_SAMPLE_SIZE];
+                //alpha = (Double) (Parameters.getAlpha().get(job.getVmId()));
+                for (int vmIndex = 0; vmIndex < Parameters.getVmNum(); vmIndex++) {
+                    samples = distribution.sample(FAILURE_SAMPLE_SIZE);
+                    for (int taskIndex = 0; taskIndex < FailureParameters.getAlpha().size(); taskIndex++) {
+                        failureSamples[vmIndex][taskIndex] = samples;
+                        for (int sampleId = 1; sampleId < failureSamples[vmIndex][taskIndex].length; sampleId++) {
+                            failureSamples[vmIndex][taskIndex][sampleId] += failureSamples[vmIndex][taskIndex][sampleId - 1];
+                        }
+                    }
+                }
+
+                break;
+            case FAILURE_NONE:
+                /**
+                 * 0.0 doesn't work.
+                 */
+                //alpha = (-0.1);
+                break;
+        }
+
+    }
 
     /**
      * Initialize a Failure Generator.
      */
     public static void init() {
         generator = new Random(System.currentTimeMillis());
+
+        initFailureSamples();
+    }
+
+    private static boolean checkFailureStatus(Task task, int vmId) {
+
+        double[] samples = failureSamples[vmId][task.getDepth()];
+        double start = task.getExecStartTime();
+        double end = task.getTaskFinishTime();
+        for (int sampleId = 0; sampleId < samples.length; sampleId++) {
+            if (end < samples[sampleId]) {
+                //no failure
+                return false;
+            }
+            if (start <= samples[sampleId]) {
+                //has a failure
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -54,58 +147,56 @@ public class FailureGenerator {
     //false means no failure
     public static boolean generate(Job job) {
         boolean jobFailed = false;
-
+        if (FailureParameters.getFailureGeneratorMode() == FailureParameters.FTCFailure.FAILURE_NONE) {
+            return jobFailed;
+        }
         try {
 
             int randomValue = 0;//randome value
             for (Iterator it = job.getTaskList().iterator(); it.hasNext();) {
                 Task task = (Task) it.next();
                 double alpha = 0.0;
-                switch (Parameters.getFailureGeneratorMode()) {
+                switch (FailureParameters.getFailureGeneratorMode()) {
                     /**
                      * Every task is considered.
                      */
                     case FAILURE_ALL:
                         //by default
 
-                        alpha = (Double) (Parameters.getAlpha().get(0));
+                        alpha = (Double) (FailureParameters.getAlpha().get(0));
                         break;
                     /**
                      * Generate failures based on the type of job.
                      */
                     case FAILURE_JOB:
 
-                        if (Parameters.getAlpha().size() <= task.getDepth()) {
+                        if (FailureParameters.getAlpha().size() <= task.getDepth()) {
                             Log.printLine("Your setting of alpha list job is wrong");
                             System.exit(1);
                         }
 
-                        alpha = (Double) (Parameters.getAlpha().get(task.getDepth()));
+                        alpha = (Double) (FailureParameters.getAlpha().get(task.getDepth()));
                         break;
                     /**
                      * Generate failures based on the type of vm.
                      */
                     case FAILURE_VM:
 
-                        if (!Parameters.getAlpha().containsKey(job.getVmId())) {
+                        if (!FailureParameters.getAlpha().containsKey(job.getVmId())) {
                             Log.printLine("Your setting of alpha list vm is wrong");
                             System.exit(1);
                         }
-                        alpha = (Double) (Parameters.getAlpha().get(job.getVmId()));
+                        alpha = (Double) (FailureParameters.getAlpha().get(job.getVmId()));
 
                         break;
-                    case FAILURE_NONE:
-                        /**
-                         * 0.0 doesn't work.
-                         */
-                        alpha = (-0.1);
-                        break;
+
                 }
 
                 int bound = (int) (alpha * 1000);
                 randomValue = generator.nextInt(1000);
                 int failedTaskSum = 0;
-                if (randomValue <= bound) {
+                if (checkFailureStatus(task, job.getVmId())) {
+                    //if (randomValue <= bound) {
                     //this task fail
                     jobFailed = true;
                     failedTaskSum++;

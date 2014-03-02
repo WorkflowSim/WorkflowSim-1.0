@@ -42,6 +42,7 @@ import org.workflowsim.WorkflowEngine;
 import org.workflowsim.WorkflowPlanner;
 import org.workflowsim.failure.FailureGenerator;
 import org.workflowsim.failure.FailureMonitor;
+import org.workflowsim.failure.FailureParameters;
 import org.workflowsim.utils.ClusteringParameters;
 import org.workflowsim.utils.OverheadParameters;
 import org.workflowsim.utils.Parameters;
@@ -116,9 +117,9 @@ public class WorkflowSimBasicExample1 {
             /*
              * Use default Fault Tolerant Parameters
              */
-            Parameters.FTCMonitor ftc_monitor = Parameters.FTCMonitor.MONITOR_NONE;
-            Parameters.FTCFailure ftc_failure = Parameters.FTCFailure.FAILURE_NONE;
-            Parameters.FTCluteringAlgorithm ftc_method = null;
+            FailureParameters.FTCMonitor ftc_monitor = FailureParameters.FTCMonitor.MONITOR_NONE;
+            FailureParameters.FTCFailure ftc_failure = FailureParameters.FTCFailure.FAILURE_NONE;
+            FailureParameters.FTCluteringAlgorithm ftc_method = null;
 
             /**
              * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
@@ -142,8 +143,8 @@ public class WorkflowSimBasicExample1 {
             /**
              * Initialize static parameters
              */
-            Parameters.init(ftc_method, ftc_monitor, ftc_failure,
-                    null, vmNum, daxPath, null,
+            FailureParameters.init(ftc_method, ftc_monitor, ftc_failure, null);
+            Parameters.init(vmNum, daxPath, null,
                     null, op, cp, sch_method, pln_method,
                     null, 0);
             ReplicaCatalog.init(file_system);

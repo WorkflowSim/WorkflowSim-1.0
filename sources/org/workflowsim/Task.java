@@ -68,6 +68,12 @@ public class Task extends Cloudlet {
     private String type;
 
     /**
+     * The finish time of a task (Because cloudlet does not allow WorkflowSim to 
+     * update finish_time)
+     */
+    private double task_finish_time;
+    
+    /**
      * Allocates a new Task object. The task length should be greater than or
      * equal to 1.
      *
@@ -95,6 +101,7 @@ public class Task extends Cloudlet {
         this.parentList = new ArrayList<Task>();
         this.fileList = new ArrayList<org.cloudbus.cloudsim.File>();
         this.impact = 0.0;
+        this.task_finish_time = -1.0;
     }
 
     /**
@@ -295,6 +302,21 @@ public class Task extends Cloudlet {
         return this.impact;
     }
     
+    /**
+     * Sets the finish time of the task (different to the one used in Cloudlet)
+     * @param time finish time
+     */
+    public void setTaskFinishTime(double time){
+        this.task_finish_time = time;
+    }
+    
+    /**
+     * Gets the finish time of a task (different to the one used in Cloudlet)
+     * @return 
+     */
+    public double getTaskFinishTime(){
+        return this.task_finish_time;
+    }
     /**
      * Gets the total cost of processing or executing this task The original
      * getProcessingCost does not take cpu cost into it also the data file in

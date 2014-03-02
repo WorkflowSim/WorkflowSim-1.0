@@ -17,6 +17,10 @@ package org.workflowsim.utils;
 
 import java.util.Map;
 import org.cloudbus.cloudsim.Log;
+import org.workflowsim.failure.FailureParameters;
+import org.workflowsim.failure.FailureParameters.FTCFailure;
+import org.workflowsim.failure.FailureParameters.FTCMonitor;
+import org.workflowsim.failure.FailureParameters.FTCluteringAlgorithm;
 
 /**
  * This class includes most parameters a user can specify in a configuration
@@ -28,30 +32,7 @@ import org.cloudbus.cloudsim.Log;
  */
 public class Parameters {
 
-    /**
-     * Fault Tolerant Clustering algorithm
-     */
-    public enum FTCluteringAlgorithm {
-
-        FTCLUSTERING_DC, FTCLUSTERING_SR, FTCLUSTERING_DR, FTCLUSTERING_NOOP, 
-        FTCLUSTERING_BLOCK, FTCLUSTERING_BINARY
-    }
-    /*
-     * FTC Monitor mode
-     */
-
-    public enum FTCMonitor {
-
-        MONITOR_NONE, MONITOR_ALL, MONITOR_VM, MONITOR_JOB
-    }
-    /*
-     * FTC Failure Generator mode
-     */
-
-    public enum FTCFailure {
-
-        FAILURE_NONE, FAILURE_ALL, FAILURE_VM, FAILURE_JOB
-    }
+    
     /*
      * Scheduling Algorithm (Local Scheduling Algorithm)
      */
@@ -87,18 +68,7 @@ public class Parameters {
     public static String SOURCE = "source";
     
     public static final int BASE = 0;
-    /**
-     * Fault Tolerant Clustering method
-     */
-    private static FTCluteringAlgorithm FTClusteringAlgorithm;
-    /**
-     * Fault Tolerant Clustering monitor mode
-     */
-    private static FTCMonitor monitorMode;
-    /**
-     * Fault Tolerant Clustering failure generation mode
-     */
-    private static FTCFailure failureMode;
+    
     /**
      * Scheduling mode
      */
@@ -108,12 +78,7 @@ public class Parameters {
      * Planning mode
      */
     private static PlanningAlgorithm planningAlgorithm;
-    /**
-     * Task Failure Rate key = level value = task failure rate
-     *
-     * @pre 0.0<= value <= 1.0
-     */
-    private static Map<Integer, Double> alpha;
+    
     /**
      * Reducer mode
      */
@@ -188,19 +153,13 @@ public class Parameters {
      * @param rMethod , reducer mode
      * @param deadline, deadline of a workflow
      */
-    public static void init(FTCluteringAlgorithm fMethod, FTCMonitor monitor, FTCFailure failure,
-            Map failureList,
+    public static void init(
             int vm, String dax, String runtime, String datasize,
             OverheadParameters op, ClusteringParameters cp,
             SchedulingAlgorithm scheduler, PlanningAlgorithm planner, String rMethod,
             long dl) {
 
         cParams = cp;
-        FTClusteringAlgorithm = fMethod;
-        monitorMode = monitor;
-        failureMode = failure;
-        alpha = failureList;
-
         vmNum = vm;
         daxPath = dax;
         runtimePath = runtime;
@@ -224,29 +183,7 @@ public class Parameters {
         return oParams;
     }
 
-    /**
-     * Gets the task failure rate
-     *
-     * @return the task failure rate
-     * @pre $none
-     * @post $none
-     */
-    public static Map getAlpha() {
-        return alpha;
-
-    }
-
-    /**
-     * Gets the job failure rate (not supported yet)
-     *
-     * @return the job failure rate
-     * @pre $none
-     * @post $none
-     */
-    public static Map getBeta() {
-        Log.printLine("Not supported");
-        return null;
-    }
+    
 
     /**
      * Gets the reducer mode
@@ -263,27 +200,7 @@ public class Parameters {
         }
     }
 
-    /**
-     * Gets the failure generation mode
-     *
-     * @return the failure generation mode
-     * @pre $none
-     * @post $none
-     */
-    public static FTCFailure getFailureGeneratorMode() {
-        return failureMode;
-    }
-
-    /**
-     * Gets the fault tolerant clustering monitor mode
-     *
-     * @return the fault tolerant clustering monitor mode
-     * @pre $none
-     * @post $none
-     */
-    public static FTCMonitor getMonitorMode() {
-        return monitorMode;
-    }
+   
 
     /**
      * Gets the DAX path
@@ -318,17 +235,7 @@ public class Parameters {
         return datasizePath;
     }
 
-    /**
-     * Gets the fault tolerant clustering method
-     *
-     * @return the fault tolerant clustering method
-     * @pre $none
-     * @post $none
-     */
-    public static FTCluteringAlgorithm getFTCluteringAlgorithm() {
-        return FTClusteringAlgorithm;
-    }
-
+    
     /**
      * Gets the vm number
      *
@@ -425,4 +332,6 @@ public class Parameters {
     public static double[][] getBandwidths(){
         return bandwidths;
     }
+    
+    
 }

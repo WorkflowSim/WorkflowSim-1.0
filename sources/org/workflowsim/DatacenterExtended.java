@@ -122,20 +122,21 @@ public class DatacenterExtended extends Datacenter {
              * Add data transfer time (communication cost
              */
             /**
-             * Cast cl to task so as we can use its functions
+             * Cast cl to job so as we can use its functions
              */
-            Task task = (Task) cl;
+            Job job = (Job) cl;
 
             double fileTransferTime = 0.0;
             if (cl.getClassType() != 1) {
-                fileTransferTime = processDataStageIn(task.getFileList(), cl);
+                fileTransferTime = processDataStageIn(job.getFileList(), cl);
             }
 
             Host host = getVmAllocationPolicy().getHost(vmId, userId);
             Vm vm = host.getVm(vmId, userId);
             CloudletScheduler scheduler = vm.getCloudletScheduler();
             double estimatedFinishTime = scheduler.cloudletSubmit(cl, fileTransferTime);
-
+            updateTaskExecTime(job, vm);
+            
             // if this cloudlet is in the exec queue
             if (estimatedFinishTime > 0.0 && !Double.isInfinite(estimatedFinishTime)) {
                 send(getId(), estimatedFinishTime, CloudSimTags.VM_DATACENTER_EVENT);
@@ -163,6 +164,23 @@ public class DatacenterExtended extends Datacenter {
         checkCloudletCompletion();
     }
 
+    /**
+     * Update the submission time/exec time of a task
+     * @param job
+     * @param vm 
+     */
+    private void updateTaskExecTime(Job job, Vm vm){
+        
+        double start_time = job.getExecStartTime();
+        for(Task task: job.getTaskList()){
+            task.setExecStartTime(start_time);
+            double task_runtime = task.getCloudletLength() / vm.getMips();
+            start_time += task_runtime;
+            //Because CloudSim would not let us update end time here
+            task.setTaskFinishTime(start_time);
+        }
+        
+    }
     /**
      * Stage in files for a stage-in job. For a local file system (such as
      * condor-io) add files to the local storage; For a shared file system (such
@@ -211,7 +229,7 @@ public class DatacenterExtended extends Datacenter {
      * If a input file has an output file it does not need stage-in For
      * workflows, we have a rule that a file is written once and read many
      * times, thus if a file is an output file it means it is generated within
-     * this job and then used by another task within the same job (or other jobs
+     * this job and then used by another job within the same job (or other jobs
      * maybe) This is useful when we perform horizontal clustering
      *
      * @param list, the list of all files

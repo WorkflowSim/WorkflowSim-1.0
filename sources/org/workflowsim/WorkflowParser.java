@@ -29,6 +29,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.workflowsim.failure.FailureParameters;
 import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
@@ -183,8 +184,8 @@ public class WorkflowParser {
             setDepth(cTask, task.getDepth() + 1);
         }
 
-        if (Parameters.getAlpha()!=null && !Parameters.getAlpha().containsKey(task.getDepth())) {
-            Parameters.getAlpha().put(task.getDepth(), 0.0);
+        if (FailureParameters.getAlpha()!=null && !FailureParameters.getAlpha().containsKey(task.getDepth())) {
+            FailureParameters.getAlpha().put(task.getDepth(), 0.0);
         }
     }
 

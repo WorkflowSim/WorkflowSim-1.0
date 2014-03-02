@@ -44,6 +44,7 @@ import org.workflowsim.WorkflowEngine;
 import org.workflowsim.WorkflowPlanner;
 import org.workflowsim.failure.FailureGenerator;
 import org.workflowsim.failure.FailureMonitor;
+import org.workflowsim.failure.FailureParameters;
 import org.workflowsim.utils.ClusteringParameters;
 import org.workflowsim.utils.OverheadParameters;
 import org.workflowsim.utils.Parameters;
@@ -122,15 +123,15 @@ public class FaultTolerantClusteringExample1 {
              * based on the vm id; MOINTOR_ALL does not do any classification; MONITOR_NONE does not record
              * any failiure. 
              */
-            Parameters.FTCMonitor ftc_monitor = Parameters.FTCMonitor.MONITOR_JOB;
+            FailureParameters.FTCMonitor ftc_monitor = FailureParameters.FTCMonitor.MONITOR_JOB;
             /**
              *  Similar to FTCMonitor, FTCFailure controls the way how we generate failures. 
              */
-            Parameters.FTCFailure ftc_failure = Parameters.FTCFailure.FAILURE_JOB;
+            FailureParameters.FTCFailure ftc_failure = FailureParameters.FTCFailure.FAILURE_JOB;
             /**
              *  In this example, we have horizontal clustering and we use Dynamic Clustering. 
              */
-            Parameters.FTCluteringAlgorithm ftc_method = Parameters.FTCluteringAlgorithm.FTCLUSTERING_DC;
+            FailureParameters.FTCluteringAlgorithm ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_DC;
             /**
              * Task failure rate for each level 
              * 
@@ -170,8 +171,8 @@ public class FaultTolerantClusteringExample1 {
             /**
              * Initialize static parameters
              */
-            Parameters.init(ftc_method, ftc_monitor, ftc_failure,
-                    taskFailureMap, vmNum, daxPath, null,
+            FailureParameters.init(ftc_method, ftc_monitor, ftc_failure, taskFailureMap);
+            Parameters.init(vmNum, daxPath, null,
                     null, op, cp, sch_method, pln_method,
                     null, 0);
             ReplicaCatalog.init(file_system);

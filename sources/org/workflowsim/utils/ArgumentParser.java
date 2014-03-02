@@ -21,10 +21,11 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 import org.cloudbus.cloudsim.Log;
+import org.workflowsim.failure.FailureParameters;
+import org.workflowsim.failure.FailureParameters.FTCFailure;
+import org.workflowsim.failure.FailureParameters.FTCMonitor;
+import org.workflowsim.failure.FailureParameters.FTCluteringAlgorithm;
 import org.workflowsim.utils.ClusteringParameters.ClusteringMethod;
-import org.workflowsim.utils.Parameters.FTCFailure;
-import org.workflowsim.utils.Parameters.FTCluteringAlgorithm;
-import org.workflowsim.utils.Parameters.FTCMonitor;
 import org.workflowsim.utils.Parameters.PlanningAlgorithm;
 import org.workflowsim.utils.Parameters.SchedulingAlgorithm;
 import org.workflowsim.utils.ReplicaCatalog.FileSystem;
@@ -99,7 +100,7 @@ public class ArgumentParser {
             int interval = 0;
             int vmNum = 0;
             long deadline = 0;
-            
+
             String datasizePath = null;
             String runtimePath = null;
             String daxPath = null;
@@ -158,12 +159,12 @@ public class ArgumentParser {
                     ftc_failure = FTCFailure.valueOf(value);
                 } else if (key.equals("scheduler.method")) {
                     sch_method = SchedulingAlgorithm.valueOf(value);
-                } else if (key.equals("planner.method")){
+                } else if (key.equals("planner.method")) {
                     pln_method = PlanningAlgorithm.valueOf(value);
                 } else if (key.equals("bandwidth")) {
                     bandwidth = Double.parseDouble(value);
                 } else if (key.equals("deadline")) {
-                	deadline = Long.parseLong(value);
+                    deadline = Long.parseLong(value);
                 } else {
                     /**
                      * Set overheads per level(depth)
@@ -281,20 +282,20 @@ public class ArgumentParser {
             if (!failureMap.containsKey((int) 0)) {
                 failureMap.put(0, 0.0);
             }
-            
+
             /**
-             * If a user has specified planner.method, the scheduler.method should 
-             * be set as STATIC to avoid unnecessary change during the runtime
+             * If a user has specified planner.method, the scheduler.method
+             * should be set as STATIC to avoid unnecessary change during the
+             * runtime
              */
-            if(!pln_method.equals(PlanningAlgorithm.INVALID)){
-                if(sch_method != SchedulingAlgorithm.STATIC || sch_method != SchedulingAlgorithm.INVALID){
+            if (!pln_method.equals(PlanningAlgorithm.INVALID)) {
+                if (sch_method != SchedulingAlgorithm.STATIC || sch_method != SchedulingAlgorithm.INVALID) {
                     Log.printLine("Warning: your scheduler.method is reset to be STATIC_SCH");
                 }
                 sch_method = SchedulingAlgorithm.STATIC;
             }
-            
-            Parameters.init(ftc_method, ftc_monitor, ftc_failure,
-                    failureMap, vmNum, daxPath, runtimePath,
+            FailureParameters.init(ftc_method, ftc_monitor, ftc_failure, failureMap);
+            Parameters.init(vmNum, daxPath, runtimePath,
                     datasizePath, op, cp, sch_method, pln_method,
                     rMethod, deadline);
             ReplicaCatalog.init(file_system);

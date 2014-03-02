@@ -25,6 +25,7 @@ import org.cloudbus.cloudsim.Log;
 import org.workflowsim.Job;
 import org.workflowsim.Task;
 import org.workflowsim.failure.FailureMonitor;
+import org.workflowsim.failure.FailureParameters;
 import org.workflowsim.failure.FailureRecord;
 import org.workflowsim.utils.Parameters;
 
@@ -83,7 +84,7 @@ public class ReclusteringEngine {
 
         try {
 
-            switch (Parameters.getFTCluteringAlgorithm()) {
+            switch (FailureParameters.getFTCluteringAlgorithm()) {
                 case FTCLUSTERING_NOOP:
 
                     jobList.add(createJob(id, job, job.getCloudletLength(), job.getTaskList()));
