@@ -57,18 +57,29 @@ public class FailureParameters {
 
         FAILURE_NONE, FAILURE_ALL, FAILURE_VM, FAILURE_JOB
     }
+    
     /**
      * Fault Tolerant Clustering method
      */
     private static FTCluteringAlgorithm FTClusteringAlgorithm;
+    
     /**
      * Fault Tolerant Clustering monitor mode
      */
     private static FTCMonitor monitorMode;
+    
     /**
      * Fault Tolerant Clustering failure generation mode
      */
     private static FTCFailure failureMode;
+    
+    /**
+     * The failure sample size. 
+     * make sure: mean * size > makespan
+     * But don't set it to be too high since it has memory cost
+     * Only used when FAILURE is turn on
+     */
+    private static int FAILURE_SAMPLE_SIZE = 1000;
     
     public static void init(FTCluteringAlgorithm fMethod, FTCMonitor monitor, FTCFailure failure, Map failureList){
          FTClusteringAlgorithm = fMethod;
@@ -131,6 +142,22 @@ public class FailureParameters {
      */
     public static FTCluteringAlgorithm getFTCluteringAlgorithm() {
         return FTClusteringAlgorithm;
+    }
+    
+    /**
+     * Gets the failure sample size (it is related to the makespan)
+     * @return failure sample size
+     */
+    public static int getFailureSampleSize(){
+        return FAILURE_SAMPLE_SIZE;
+    }
+    
+    /**
+     * Sets the failure sample size according to makespan. 
+     * make sure: mean * size > makespan
+     */
+    public static void setFailureSampleSize(int size){
+        FAILURE_SAMPLE_SIZE = size;
     }
 
 }

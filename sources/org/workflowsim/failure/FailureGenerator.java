@@ -38,7 +38,7 @@ public class FailureGenerator {
     /**
      *
      */
-    private static final int FAILURE_SAMPLE_SIZE = 1000;
+    private static int FAILURE_SAMPLE_SIZE;
     private static Random generator;
     private static double[][] failureSamples;
 
@@ -46,21 +46,19 @@ public class FailureGenerator {
         if (FailureParameters.getFailureGeneratorMode() == FailureParameters.FTCFailure.FAILURE_NONE) {
             return;
         }
+        FAILURE_SAMPLE_SIZE = FailureParameters.getFailureSampleSize();
         RealDistribution distribution;
-        //failureSamples = new double[Parameters.getVmNum()][FailureParameters.getAlpha().size()][FAILURE_SAMPLE_SIZE];
-
         double[] samples;
         switch (FailureParameters.getFailureGeneratorMode()) {
-            /**
-             * Every task is considered.
-             */
+
             case FAILURE_ALL:
                 //by default
+                failureSamples = new double[1][FAILURE_SAMPLE_SIZE];
                 double alpha = (Double) (FailureParameters.getAlpha().get(0));
                 distribution = new WeibullDistribution(1.0, 1.0 / alpha); // the same distribution shared by all
                 samples = distribution.sample(FAILURE_SAMPLE_SIZE);
 
-                failureSamples = new double[1][FAILURE_SAMPLE_SIZE];
+                
                 failureSamples[0][0] = samples[0];
                 for (int sampleId = 1; sampleId < failureSamples[0].length; sampleId++) {
                     failureSamples[0][sampleId] = failureSamples[0][sampleId - 1]
@@ -74,11 +72,12 @@ public class FailureGenerator {
              */
             case FAILURE_JOB:
 
+                failureSamples = new double[FailureParameters.getAlpha().size()][FAILURE_SAMPLE_SIZE];
                 for (int taskIndex = 0; taskIndex < FailureParameters.getAlpha().size(); taskIndex++) {
                     alpha = (Double) (FailureParameters.getAlpha().get(taskIndex));
                     distribution = new WeibullDistribution(1.0, 1.0 / alpha);
                     samples = distribution.sample(FAILURE_SAMPLE_SIZE);
-                    failureSamples = new double[FailureParameters.getAlpha().size()][FAILURE_SAMPLE_SIZE];
+                    
                     failureSamples[taskIndex][0] = samples[0];
                     for (int sampleId = 1; sampleId < failureSamples[taskIndex].length; sampleId++) {
                         failureSamples[taskIndex][sampleId] = failureSamples[taskIndex][sampleId - 1]
@@ -92,12 +91,12 @@ public class FailureGenerator {
              */
             case FAILURE_VM:
 
-                //alpha = (Double) (Parameters.getAlpha().get(job.getVmId()));
+                failureSamples = new double[FailureParameters.getAlpha().size()][FAILURE_SAMPLE_SIZE];
                 for (int vmIndex = 0; vmIndex < Parameters.getVmNum(); vmIndex++) {
                     alpha = (Double) (FailureParameters.getAlpha().get(vmIndex));
                     distribution = new WeibullDistribution(1.0, 1.0 / alpha);
                     samples = distribution.sample(FAILURE_SAMPLE_SIZE);
-                    failureSamples = new double[FailureParameters.getAlpha().size()][FAILURE_SAMPLE_SIZE];
+                    
                     failureSamples[vmIndex][0] = samples[0];
                     for (int sampleId = 1; sampleId < failureSamples[vmIndex].length; sampleId++) {
                         failureSamples[vmIndex][sampleId] = failureSamples[vmIndex][sampleId - 1]
