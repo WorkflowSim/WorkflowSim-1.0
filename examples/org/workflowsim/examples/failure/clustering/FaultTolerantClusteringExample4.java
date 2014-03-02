@@ -98,17 +98,18 @@ public class FaultTolerantClusteringExample4 extends FaultTolerantClusteringExam
              * Task failure rate for each level 
              * 
              */
-            Map<Integer, Double> taskFailureMap = new HashMap();
-            for(int vmIndex = 0; vmIndex < vmNum; vmIndex ++ ){
-                /*
-                 * For simplicity, set the task failure rate of each level to be 0.1. Which means 10%
-                 * of submitted tasks will fail. It doesn't have to be the same task 
-                 * failure rate at each level. 
-                 */
-                taskFailureMap.put(vmIndex, 0.1);
-            }
-            
-            
+           double[][] taskFailureRate = new double[vmNum][1];
+           double[][] taskFailureShape = new double[vmNum][1];
+
+           for (int vmIndex = 0; vmIndex < vmNum; vmIndex++) {
+               /*
+                * For simplicity, set the task failure rate of each level to be 0.1. Which means 10%
+                * of submitted tasks will fail. It doesn't have to be the same task 
+                * failure rate at each level. 
+                */
+               taskFailureRate[vmIndex][0] = 0.05;
+               taskFailureShape[vmIndex][0] = 1.0;
+           }
 
             /**
              * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
@@ -132,7 +133,7 @@ public class FaultTolerantClusteringExample4 extends FaultTolerantClusteringExam
             /**
              * Initialize static parameters
              */
-            FailureParameters.init(ftc_method, ftc_monitor, ftc_failure, taskFailureMap);
+            FailureParameters.init(ftc_method, ftc_monitor, ftc_failure, taskFailureRate, taskFailureShape);
             Parameters.init(vmNum, daxPath, null,
                     null, op, cp, sch_method, pln_method,
                     null, 0);

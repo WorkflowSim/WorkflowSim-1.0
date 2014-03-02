@@ -38,9 +38,6 @@ import org.workflowsim.DatacenterExtended;
 import org.workflowsim.Job;
 import org.workflowsim.WorkflowEngine;
 import org.workflowsim.WorkflowPlanner;
-import org.workflowsim.failure.FailureGenerator;
-import org.workflowsim.failure.FailureMonitor;
-import org.workflowsim.failure.FailureParameters;
 import org.workflowsim.utils.ClusteringParameters;
 import org.workflowsim.utils.OverheadParameters;
 import org.workflowsim.utils.Parameters;
@@ -114,12 +111,6 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return;
             }
-            /*
-             * Use default Fault Tolerant Parameters
-             */
-            FailureParameters.FTCMonitor ftc_monitor = FailureParameters.FTCMonitor.MONITOR_NONE;
-            FailureParameters.FTCFailure ftc_failure = FailureParameters.FTCFailure.FAILURE_NONE;
-            FailureParameters.FTCluteringAlgorithm ftc_method = null;
 
             /**
              * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
@@ -143,14 +134,11 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
             /**
              * Initialize static parameters
              */
-            FailureParameters.init(ftc_method, ftc_monitor, ftc_failure, null);
             Parameters.init(vmNum, daxPath, null,
                     null, op, cp, sch_method, pln_method,
                     null, 0);
             ReplicaCatalog.init(file_system);
             
-            FailureMonitor.init();
-            FailureGenerator.init();
             // before creating any entities.
             int num_user = 1;   // number of grid users
             Calendar calendar = Calendar.getInstance();

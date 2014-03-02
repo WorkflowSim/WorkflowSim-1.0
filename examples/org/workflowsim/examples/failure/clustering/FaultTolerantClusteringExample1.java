@@ -17,9 +17,7 @@ package org.workflowsim.examples.failure.clustering;
 
 import java.io.File;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.workflowsim.CondorVM;
@@ -97,20 +95,20 @@ public class FaultTolerantClusteringExample1 extends FaultTolerantSchedulingExam
              * Task failure rate for each level 
              * 
              */
-            Map<Integer, Double> taskFailureMap = new HashMap();
-            int maxLevel = 11; //most workflows we use has a maximum of 11 levels
-            for(int level = 0; level < maxLevel; level ++ ){
-                /*
-                 * For simplicity, set the task failure rate of each level to be 0.1. Which means 10%
-                 * of submitted tasks will fail. It doesn't have to be the same task 
-                 * failure rate at each level. 
-                 */
-                taskFailureMap.put(level, 0.1);
-            }
-            
-            
-
-            /**
+           double[][] taskFailureRate = new double[1][11];
+           double[][] taskFailureShape = new double[1][11];
+           int maxLevel = 11; //most workflows we use has a maximum of 11 levels
+           for (int level = 0; level < maxLevel; level++) {
+               /*
+                * For simplicity, set the task failure rate of each level to be 0.1. Which means 10%
+                * of submitted tasks will fail. It doesn't have to be the same task 
+                * failure rate at each level. 
+                */
+               taskFailureRate [0][level] = 0.05;
+               taskFailureShape[0][level] = 1.0;
+           }
+           
+           /**
              * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
              * such that the planner would not override the result of the scheduler
              */
@@ -132,7 +130,7 @@ public class FaultTolerantClusteringExample1 extends FaultTolerantSchedulingExam
             /**
              * Initialize static parameters
              */
-            FailureParameters.init(ftc_method, ftc_monitor, ftc_failure, taskFailureMap);
+            FailureParameters.init(ftc_method, ftc_monitor, ftc_failure, taskFailureRate, taskFailureShape);
             Parameters.init(vmNum, daxPath, null,
                     null, op, cp, sch_method, pln_method,
                     null, 0);

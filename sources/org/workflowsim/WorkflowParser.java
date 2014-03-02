@@ -183,10 +183,11 @@ public class WorkflowParser {
             Task cTask = (Task) it.next();
             setDepth(cTask, task.getDepth() + 1);
         }
-
-        if (FailureParameters.getAlpha()!=null && !FailureParameters.getAlpha().containsKey(task.getDepth())) {
+        /*
+        if (FailureParameters.getAlpha()!=null && ! FailureParameters.getAlpha().containsKey(task.getDepth() )) {
             FailureParameters.getAlpha().put(task.getDepth(), 0.0);
         }
+        */ 
     }
 
     /**
