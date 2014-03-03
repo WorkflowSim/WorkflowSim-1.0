@@ -59,6 +59,13 @@ public class FailureParameters {
 
         FAILURE_NONE, FAILURE_ALL, FAILURE_VM, FAILURE_JOB, FAILURE_VM_JOB
     }
+    
+    /**
+     * Failure Distribution
+     */
+    public enum FailureDistribution {
+        LOGNORMAL, GAMMA, WEIBULL, NORMAL
+    }
     /**
      * Fault Tolerant Clustering method
      */
@@ -79,10 +86,24 @@ public class FailureParameters {
     private static int FAILURE_SAMPLE_SIZE = 1000;
     
     /**
+     * The distribution of the failure 
+     */
+    private static FailureDistribution distribution = FailureDistribution.WEIBULL;
+    /**
      * Invalid return value
      */
     private static int INVALID = -1;
 
+    /**
+     * 
+     *  Init a FailureParameters
+     * 
+     * @param fMethod Fault Tolerant Clustering Algorithm
+     * @param monitor Fault Tolerant Clustering Monitor mode
+     * @param failure Failure generator mode
+     * @param failureRate Task Failure Rate (alpha)
+     * @param failureShape Task Failure Shape (beta)
+     */
     public static void init(FTCluteringAlgorithm fMethod, FTCMonitor monitor, 
             FTCFailure failure, double[][] failureRate, double[][] failureShape) {
         FTClusteringAlgorithm = fMethod;
@@ -92,6 +113,17 @@ public class FailureParameters {
         beta = failureShape;
     }
 
+    /**
+     * 
+     * Init a FailureParameters with distibution
+     * @param dist 
+     */
+    public static void init(FTCluteringAlgorithm fMethod, FTCMonitor monitor, 
+            FTCFailure failure, double[][] failureRate, double[][] failureShape, 
+            FailureDistribution dist) {
+        distribution = dist;
+        init(fMethod, monitor, failure, failureRate, failureShape);
+    }
     /**
      * Gets the task failure rate
      *
@@ -254,5 +286,13 @@ public class FailureParameters {
      */
     public static void setFailureSampleSize(int size) {
         FAILURE_SAMPLE_SIZE = size;
+    }
+    
+    /**
+     * Gets the failure distribution
+     * @return distribution
+     */
+    public static FailureDistribution getFailureDistribution(){
+        return distribution;
     }
 }
