@@ -203,7 +203,7 @@ public class ReclusteringEngine {
      * @return
      */
     private static List BinaryReclustering(List jobList, Job job, int id) {
-        Log.printLine("Job Id for reclustering" + job.getCloudletId());
+        //Log.printLine("Job Id for reclustering" + job.getCloudletId());
         Map map = getDepthMap(job.getTaskList());
         if (map.size() == 1) {
 
@@ -278,21 +278,14 @@ public class ReclusteringEngine {
     private static List DCReclustering(List jobList, Job job, int id, List allTaskList) {
 
         Task firstTask = (Task) allTaskList.get(0);
-        List tmpList = new ArrayList();
-        tmpList.add(job);
-        double delay = Parameters.getOverheadParams().getQueueDelay(job)
-                + Parameters.getOverheadParams().getWEDDelay(tmpList)
-                + Parameters.getOverheadParams().getPostDelay(job);
         //Definition of FailureRecord(long length, int tasks, int depth, int all, int vm, int job, int workflow)
+        /**
+         * @TODO do not know why it is here
+         */
         double taskLength = (double) firstTask.getCloudletLength() / 1000 + Parameters.getOverheadParams().getClustDelay(job) / getDividend(job.getDepth());
         FailureRecord record = new FailureRecord(taskLength, 0, job.getDepth(), allTaskList.size(), 0, 0, job.getUserId());
-        record.delayLength = delay;
-        Log.printLine("record t:" + record.length + " d: " + record.delayLength);
+        record.delayLength = getCumulativeDelay(job.getDepth());
         int suggestedK = FailureMonitor.getClusteringFactor(record);
-
-        //if(suggestedK > 100) suggestedK = 100;
-        double a = FailureMonitor.analyze(0, job.getDepth());
-        Log.printLine("Depth: " + job.getDepth() + " K " + suggestedK + " a: " + a);
 
         if (suggestedK == 0) {
             //not really k=0, just too big
@@ -353,7 +346,7 @@ public class ReclusteringEngine {
             } else {
             }
         }
-        Log.printLine("Doesn't consider the data transfer problem");
+        Log.printLine("WARNING: Doesn't consider the data transfer problem");
         jobList.add(createJob(id, job, length, newTaskList));
         return jobList;
     }
@@ -416,18 +409,22 @@ public class ReclusteringEngine {
      */
     private static List DRReclustering(List jobList, Job job, int id, List allTaskList) {
         Task firstTask = (Task) allTaskList.get(0);
-        List tmpList = new ArrayList();
-        tmpList.add(job);        
-        double taskLength = (double) firstTask.getCloudletLength() / 1000 + Parameters.getOverheadParams().getClustDelay(job) / getDividend(job.getDepth());
-        if (taskLength > 20) {
-            Log.printLine();
-        }
+      
+        /**
+         * Do not know why it is here. It is hard-coded, right?
+         */
+        double taskLength = (double) firstTask.getCloudletLength() / 1000 ;//+ Parameters.getOverheadParams().getClustDelay(job) / getDividend(job.getDepth());
+        
         FailureRecord record = new FailureRecord(taskLength, 0, job.getDepth(), allTaskList.size(), 0, 0, job.getUserId());
         record.delayLength = getCumulativeDelay(job.getDepth());
-        Log.printLine("record t:" + record.length + " d: " + record.delayLength);
         int suggestedK = FailureMonitor.getClusteringFactor(record);
-        Log.printLine("K: " + suggestedK + " a " + FailureMonitor.analyze(0, job.getDepth()));
+        
+        double theta = FailureParameters.getGenerator(job.getVmId(), job.getDepth()).getMLEMean();
+        
+        suggestedK = ClusteringSizeEstimator.estimateK(taskLength, getCumulativeDelay(job.getDepth()), 
+                theta, 0.78);
 
+        Log.printLine("t=" + taskLength +" d=" +getCumulativeDelay(job.getDepth()) + " theta=" + theta + " k=" + suggestedK);
         if (suggestedK == 0) {
             //not really k=0, just too big
             jobList.add(createJob(id, job, job.getCloudletLength(), allTaskList));

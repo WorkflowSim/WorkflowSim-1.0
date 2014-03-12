@@ -100,16 +100,18 @@ public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExam
             int maxLevel = 11; //most workflows we use has a maximum of 11 levels
 
             DistributionGenerator[][] failureGenerators = new DistributionGenerator[vmNum][maxLevel];
+            DistributionGenerator generator = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL,
+                        5, 0.78, 30, 30*5);
 
             for (int level = 0; level < maxLevel; level++) {
                 /*
+                 * 
                  * For simplicity, set the task failure rate of each level to be 0.1. Which means 10%
                  * of submitted tasks will fail. It doesn't have to be the same task 
                  * failure rate at each level. 
                  */
                 for(int vmId = 0; vmId < vmNum; vmId++ ){
-                    failureGenerators[vmId][level] = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL,
-                        100, 1.0, 30, 300);
+                    failureGenerators[vmId][level] = generator;
                 }
             }
             
@@ -133,32 +135,35 @@ public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExam
             /**
              * application has at most 11 horizontal levels 
              */
-            double c_delay = 0.0, q_delay = 10.0, p_delay = 0.0, e_delay = 0.0;
+            
+            double c_delay = 0.0, q_delay = 100.0, p_delay = 0.0, e_delay = 0.0;
+            DistributionGenerator queue_delay = new DistributionGenerator(
+                    DistributionGenerator.DistributionFamily.WEIBULL, q_delay, 0.78, 100, 100*q_delay);
             for (int level = 0; level < maxLevel; level++ ){
-                if(c_delay == 0.0){
-                    
-                }else{
-                    DistributionGenerator cluster_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, c_delay, 1.0);
-                    clusteringDelay.put(level, cluster_delay);
-                }
+//                if(c_delay == 0.0){
+//                    
+//                }else{
+//                    DistributionGenerator cluster_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, c_delay, 1.0);
+//                    clusteringDelay.put(level, cluster_delay);
+//                }
                 /**
                  * a = 3, b=30 the weight is about 50%
                  */
-                DistributionGenerator queue_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, q_delay, 1.0, 30, 300);
+                
                 queueDelay.put(level, queue_delay);
                 
-                if(p_delay == 0.0){
-                    
-                }else{
-                    DistributionGenerator postscript_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, p_delay, 1.0);
-                    postscriptDelay.put(level, postscript_delay);
-                }
-                if(e_delay == 0.0){
-                    
-                }else{
-                    DistributionGenerator engine_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, e_delay, 1.0);
-                    engineDelay.put(level, engine_delay);
-                }
+//                if(p_delay == 0.0){
+//                    
+//                }else{
+//                    DistributionGenerator postscript_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, p_delay, 1.0);
+//                    postscriptDelay.put(level, postscript_delay);
+//                }
+//                if(e_delay == 0.0){
+//                    
+//                }else{
+//                    DistributionGenerator engine_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, e_delay, 1.0);
+//                    engineDelay.put(level, engine_delay);
+//                }
             }
 
             OverheadParameters op = new OverheadParameters(0, engineDelay, queueDelay, postscriptDelay, clusteringDelay, 0);;

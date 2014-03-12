@@ -116,7 +116,7 @@ public class DistributionGenerator {
     }
     
     /**
-     * Gets the Maximum Likelihood Estimation of samples
+     * Gets the Maximum Likelihood Estimation of samples based on the ftc paper
      * @return the delay
      */
      
@@ -124,7 +124,7 @@ public class DistributionGenerator {
         double a = shape_prior, b = scale_prior;
         double sum = 0.0;
         for(int i = 0; i < cursor; i ++){
-            sum += samples[i];
+            sum += Math.pow(samples[i], 0.78);
         }
         //???
         return (b+sum)/(a + cursor + 1);
