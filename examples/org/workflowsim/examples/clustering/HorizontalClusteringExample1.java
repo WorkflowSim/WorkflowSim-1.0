@@ -28,6 +28,7 @@ import org.workflowsim.Job;
 import org.workflowsim.WorkflowEngine;
 import org.workflowsim.WorkflowPlanner;
 import org.workflowsim.examples.WorkflowSimBasicExample1;
+import org.workflowsim.utils.DistributionGenerator;
 import org.workflowsim.utils.ClusteringParameters;
 import org.workflowsim.utils.OverheadParameters;
 import org.workflowsim.utils.Parameters;
@@ -87,13 +88,14 @@ public class HorizontalClusteringExample1 extends WorkflowSimBasicExample1 {
              * clustering delay must be added, if you don't need it, you can set all the clustering
              * delay to be zero, but not null
              */
-            Map<Integer, Double> clusteringDelay = new HashMap();
+            Map<Integer, DistributionGenerator> clusteringDelay = new HashMap();
             /**
              * Montage has at most 11 horizontal levels 
              */
             int maxLevel = 11;
             for (int level = 0; level < maxLevel; level++ ){
-                clusteringDelay.put(level, 1.0);//the clustering delay specified to each level is 1.0 seconds
+                DistributionGenerator cluster_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, 10.0, 1.0);
+                clusteringDelay.put(level, cluster_delay);//the clustering delay specified to each level is 1.0 seconds
             }
             // Add clustering delay to the overhead parameters
             OverheadParameters op = new OverheadParameters(0, null, null, null, clusteringDelay, 0);;

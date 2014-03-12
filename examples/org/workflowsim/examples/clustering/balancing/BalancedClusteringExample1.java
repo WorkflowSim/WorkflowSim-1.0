@@ -40,6 +40,7 @@ import org.workflowsim.Job;
 import org.workflowsim.WorkflowEngine;
 import org.workflowsim.WorkflowPlanner;
 import org.workflowsim.examples.clustering.HorizontalClusteringExample1;
+import org.workflowsim.utils.DistributionGenerator;
 import org.workflowsim.utils.ClusteringParameters;
 import org.workflowsim.utils.OverheadParameters;
 import org.workflowsim.utils.Parameters;
@@ -72,7 +73,7 @@ public class BalancedClusteringExample1 extends HorizontalClusteringExample1 {
            String code = "i";
            String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
            double intraBandwidth = 1.5e5;
-           double c_delay = 0, q_delay = 0, e_delay = 0, p_delay = 0;
+           double c_delay = 0.0, q_delay = 0.0, e_delay = 0.0, p_delay = 0.0;
            int interval = 0;
            
            for(int i = 0; i < args.length; i ++){
@@ -104,6 +105,11 @@ public class BalancedClusteringExample1 extends HorizontalClusteringExample1 {
                        break;
                }
            }
+           
+           /**
+            * Check overheads
+            */
+           
             // First step: Initialize the WorkflowSim package. 
 
             /**
@@ -138,19 +144,39 @@ public class BalancedClusteringExample1 extends HorizontalClusteringExample1 {
              * clustering delay must be added, if you don't need it, you can set all the clustering
              * delay to be zero, but not null
              */
-            Map<Integer, Double> clusteringDelay = new HashMap();
-            Map<Integer, Double> queueDelay = new HashMap();
-            Map<Integer, Double> postscriptDelay = new HashMap();
-            Map<Integer, Double> engineDelay = new HashMap();
+            Map<Integer, DistributionGenerator> clusteringDelay = new HashMap();
+            Map<Integer, DistributionGenerator> queueDelay = new HashMap();
+            Map<Integer, DistributionGenerator> postscriptDelay = new HashMap();
+            Map<Integer, DistributionGenerator> engineDelay = new HashMap();
             /**
              * application has at most 11 horizontal levels 
              */
             int maxLevel = 11;
             for (int level = 0; level < maxLevel; level++ ){
-                clusteringDelay.put(level, c_delay);
-                queueDelay.put(level, q_delay);
-                postscriptDelay.put(level, p_delay);
-                engineDelay.put(level, e_delay);
+                if(c_delay == 0.0){
+                    
+                }else{
+                    DistributionGenerator cluster_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, c_delay, 1.0);
+                    clusteringDelay.put(level, cluster_delay);
+                }
+                if(q_delay == 0.0){
+                    
+                }else{
+                    DistributionGenerator queue_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, q_delay, 1.0);
+                    queueDelay.put(level, queue_delay);
+                }
+                if(p_delay == 0.0){
+                    
+                }else{
+                    DistributionGenerator postscript_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, p_delay, 1.0);
+                    postscriptDelay.put(level, postscript_delay);
+                }
+                if(e_delay == 0.0){
+                    
+                }else{
+                    DistributionGenerator engine_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, e_delay, 1.0);
+                    engineDelay.put(level, engine_delay);
+                }
             }
             // Add clustering delay to the overhead parameters
             /**

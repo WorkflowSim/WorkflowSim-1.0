@@ -41,19 +41,19 @@ public class OverheadParameters {
     /**
      * The list of workflow engine delay key = level value = delay
      */
-    private Map<Integer, Double> WED_DELAY;
+    private Map<Integer, DistributionGenerator> WED_DELAY;
     /**
      * The list of queue delay key = level value = delay
      */
-    private Map<Integer, Double> QUEUE_DELAY;
+    private Map<Integer, DistributionGenerator> QUEUE_DELAY;
     /**
      * The list of postscript delay key = level value = delay
      */
-    private Map<Integer, Double> POST_DELAY;
+    private Map<Integer, DistributionGenerator> POST_DELAY;
     /**
      * The list of clustering delay key = level value = delay
      */
-    private Map<Integer, Double> CLUST_DELAY;
+    private Map<Integer, DistributionGenerator> CLUST_DELAY;
 
     /**
      * Created a new OverheadParameters object.
@@ -68,10 +68,10 @@ public class OverheadParameters {
      * @post $none
      */
     public OverheadParameters(int wed_interval,
-            Map<Integer, Double> wed_delay,
-            Map<Integer, Double> queue_delay,
-            Map<Integer, Double> post_delay,
-            Map<Integer, Double> cluster_delay,
+            Map<Integer, DistributionGenerator> wed_delay,
+            Map<Integer, DistributionGenerator> queue_delay,
+            Map<Integer, DistributionGenerator> post_delay,
+            Map<Integer, DistributionGenerator> cluster_delay,
             double bandwidth) {
         this.WED_INTERVAL = wed_interval;
         this.WED_DELAY = wed_delay;
@@ -111,7 +111,7 @@ public class OverheadParameters {
      * @pre $none
      * @post $none
      */
-    public Map<Integer, Double> getQueueDelay() {
+    public Map<Integer, DistributionGenerator> getQueueDelay() {
         return this.QUEUE_DELAY;
     }
 
@@ -122,7 +122,7 @@ public class OverheadParameters {
      * @pre $none
      * @post $none
      */
-    public Map<Integer, Double> getPostDelay() {
+    public Map<Integer, DistributionGenerator> getPostDelay() {
         return this.POST_DELAY;
     }
 
@@ -133,7 +133,7 @@ public class OverheadParameters {
      * @pre $none
      * @post $none
      */
-    public Map<Integer, Double> getWEDDelay() {
+    public Map<Integer, DistributionGenerator> getWEDDelay() {
         return this.WED_DELAY;
     }
 
@@ -144,7 +144,7 @@ public class OverheadParameters {
      * @pre $none
      * @post $none
      */
-    public Map<Integer, Double> getClustDelay() {
+    public Map<Integer, DistributionGenerator> getClustDelay() {
         return this.CLUST_DELAY;
     }
 
@@ -165,9 +165,9 @@ public class OverheadParameters {
             Job job = (Job) cl;
 
             if (this.CLUST_DELAY.containsKey(job.getDepth())) {
-                delay = (Double) this.CLUST_DELAY.get(job.getDepth());
+                delay = this.CLUST_DELAY.get(job.getDepth()).getNextSample();
             } else if (this.CLUST_DELAY.containsKey(0)) {
-                delay = (Double) this.CLUST_DELAY.get(0);
+                delay = this.CLUST_DELAY.get(0).getNextSample();
             } else {
                 delay = 0.0;
             }
@@ -197,9 +197,9 @@ public class OverheadParameters {
             Job job = (Job) cl;
 
             if (this.QUEUE_DELAY.containsKey(job.getDepth())) {
-                delay = (Double) this.QUEUE_DELAY.get(job.getDepth());
+                delay = this.QUEUE_DELAY.get(job.getDepth()).getNextSample();
             } else if (this.QUEUE_DELAY.containsKey(0)) {
-                delay = (Double) this.QUEUE_DELAY.get(0);
+                delay = this.QUEUE_DELAY.get(0).getNextSample();
             } else {
                 delay = 0.0;
             }
@@ -228,10 +228,10 @@ public class OverheadParameters {
         if (job != null) {
 
             if (this.POST_DELAY.containsKey(job.getDepth())) {
-                delay = (Double) this.POST_DELAY.get(job.getDepth());
+                delay = this.POST_DELAY.get(job.getDepth()).getNextSample();
             } else if (this.POST_DELAY.containsKey(0)) {
                 //the default one
-                delay = (Double) this.POST_DELAY.get(0);
+                delay = this.POST_DELAY.get(0).getNextSample();
             } else {
                 delay = 0.0;
             }
@@ -260,9 +260,9 @@ public class OverheadParameters {
         if (!list.isEmpty()) {
             Job job = (Job) list.get(0);
             if (this.WED_DELAY.containsKey(job.getDepth())) {
-                delay = (Double) this.WED_DELAY.get(job.getDepth());
+                delay = this.WED_DELAY.get(job.getDepth()).getNextSample();
             } else if (this.WED_DELAY.containsKey(0)) {
-                delay = (Double) this.WED_DELAY.get(0);
+                delay = this.WED_DELAY.get(0).getNextSample();
             } else {
                 delay = 0.0;
             }

@@ -18,6 +18,8 @@
 package org.workflowsim.failure;
 
 import org.cloudbus.cloudsim.Log;
+import org.workflowsim.utils.DistributionGenerator;
+import org.workflowsim.utils.DistributionGenerator.DistributionFamily;
 
 /**
  *
@@ -35,6 +37,7 @@ public class FailureParameters {
      */
     private static double[][] alpha;
     private static double[][] beta;
+    private static DistributionGenerator[][] generators;
     /**
      * Fault Tolerant Clustering algorithm
      */
@@ -59,13 +62,7 @@ public class FailureParameters {
 
         FAILURE_NONE, FAILURE_ALL, FAILURE_VM, FAILURE_JOB, FAILURE_VM_JOB
     }
-    
-    /**
-     * Failure Distribution
-     */
-    public enum FailureDistribution {
-        LOGNORMAL, GAMMA, WEIBULL, NORMAL
-    }
+
     /**
      * Fault Tolerant Clustering method
      */
@@ -88,7 +85,7 @@ public class FailureParameters {
     /**
      * The distribution of the failure 
      */
-    private static FailureDistribution distribution = FailureDistribution.WEIBULL;
+    private static DistributionFamily distribution = DistributionFamily.WEIBULL;
     /**
      * Invalid return value
      */
@@ -120,7 +117,7 @@ public class FailureParameters {
      */
     public static void init(FTCluteringAlgorithm fMethod, FTCMonitor monitor, 
             FTCFailure failure, double[][] failureRate, double[][] failureShape, 
-            FailureDistribution dist) {
+            DistributionFamily dist) {
         distribution = dist;
         init(fMethod, monitor, failure, failureRate, failureShape);
     }
@@ -292,7 +289,7 @@ public class FailureParameters {
      * Gets the failure distribution
      * @return distribution
      */
-    public static FailureDistribution getFailureDistribution(){
+    public static DistributionFamily getFailureDistribution(){
         return distribution;
     }
 }

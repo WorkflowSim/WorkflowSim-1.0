@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.workflowsim.examples.clustering;
+package org.workflowsim.examples.failure.clustering;
 
 import java.io.File;
 import java.util.Calendar;
@@ -27,6 +27,9 @@ import org.workflowsim.DatacenterExtended;
 import org.workflowsim.Job;
 import org.workflowsim.WorkflowEngine;
 import org.workflowsim.WorkflowPlanner;
+import org.workflowsim.failure.FailureGenerator;
+import org.workflowsim.failure.FailureMonitor;
+import org.workflowsim.failure.FailureParameters;
 import org.workflowsim.utils.DistributionGenerator;
 import org.workflowsim.utils.ClusteringParameters;
 import org.workflowsim.utils.OverheadParameters;
@@ -34,15 +37,14 @@ import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * This HorizontalClusteringExample2 is using horizontal clustering or more specifically
- * using clusters.num to specify the clustering strength. In contrast to HorizontalClust
- * eringExample2 which uses clusters.size to specify the clustering strength. 
+ * This FaultTolerantClusteringExample3 uses Dynamic Reclustering to address the fault 
+ * tolerance problem in task clustering
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
- * @date Dec 29, 2013
+ * @date Dec 31, 2013
  */
-public class HorizontalClusteringExample2 extends HorizontalClusteringExample1{
+public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExample1{
 
     ////////////////////////// STATIC METHODS ///////////////////////
     /**
@@ -74,6 +76,41 @@ public class HorizontalClusteringExample2 extends HorizontalClusteringExample1{
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return;
             }
+            /*
+             *  Fault Tolerant Parameters
+             */
+            /**
+             * MONITOR_JOB classifies failures based on the level of jobs; MONITOR_VM classifies failures
+             * based on the vm id; MOINTOR_ALL does not do any classification; MONITOR_NONE does not record
+             * any failiure. 
+             */
+            FailureParameters.FTCMonitor ftc_monitor = FailureParameters.FTCMonitor.MONITOR_JOB;
+            /**
+             *  Similar to FTCMonitor, FTCFailure controls the way how we generate failures. 
+             */
+            FailureParameters.FTCFailure ftc_failure = FailureParameters.FTCFailure.FAILURE_JOB;
+            /**
+             *  In this example, we have horizontal clustering and we use Dynamic Reclustering. 
+             */
+            FailureParameters.FTCluteringAlgorithm ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_DR;
+            /**
+             * Task failure rate for each level 
+             * 
+             */
+           double[][] taskFailureRate = new double[1][11];
+           double[][] taskFailureShape = new double[1][11];
+           int maxLevel = 11; //most workflows we use has a maximum of 11 levels
+           for (int level = 0; level < maxLevel; level++) {
+               /*
+                * For simplicity, set the task failure rate of each level to be 0.1. Which means 10%
+                * of submitted tasks will fail. It doesn't have to be the same task 
+                * failure rate at each level. 
+                */
+               taskFailureRate [0][level] = 0.05;
+               taskFailureShape[0][level] = 1.0;
+           }
+            
+            
 
             /**
              * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
@@ -84,42 +121,62 @@ public class HorizontalClusteringExample2 extends HorizontalClusteringExample1{
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
 
             /**
-             * clustering delay must be added, if you don't need it, you can set all the clustering
-             * delay to be zero, but not null
+             * overheads 
              */
             Map<Integer, DistributionGenerator> clusteringDelay = new HashMap();
+            Map<Integer, DistributionGenerator> queueDelay = new HashMap();
+            Map<Integer, DistributionGenerator> postscriptDelay = new HashMap();
+            Map<Integer, DistributionGenerator> engineDelay = new HashMap();
             /**
-             * Montage has at most 11 horizontal levels 
+             * application has at most 11 horizontal levels 
              */
-            int maxLevel = 11;
+            double c_delay = 0.0, q_delay = 10.0, p_delay = 0.0, e_delay = 0.0;
             for (int level = 0; level < maxLevel; level++ ){
-                DistributionGenerator cluster_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, 1.0, 5.0);
-                clusteringDelay.put(level, cluster_delay);//the clustering delay specified to each level is 1.0 seconds
+                if(c_delay == 0.0){
+                    
+                }else{
+                    DistributionGenerator cluster_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, c_delay, 1.0);
+                    clusteringDelay.put(level, cluster_delay);
+                }
+                /**
+                 * a = 3, b=30 the weight is about 50%
+                 */
+                DistributionGenerator queue_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, q_delay, 1.0, 30, 300);
+                queueDelay.put(level, queue_delay);
+                
+                if(p_delay == 0.0){
+                    
+                }else{
+                    DistributionGenerator postscript_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, p_delay, 1.0);
+                    postscriptDelay.put(level, postscript_delay);
+                }
+                if(e_delay == 0.0){
+                    
+                }else{
+                    DistributionGenerator engine_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, e_delay, 1.0);
+                    engineDelay.put(level, engine_delay);
+                }
             }
-            // Add clustering delay to the overhead parameters
-            OverheadParameters op = new OverheadParameters(0, null, null, null, clusteringDelay, 0);;
+
+            OverheadParameters op = new OverheadParameters(0, engineDelay, queueDelay, postscriptDelay, clusteringDelay, 0);;
             
             /**
-             * Horizontal Clustering
+             * No Clustering
              */
-            ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.HORIZONTAL;
-            /**
-             * You can only specify clusters.num or clusters.size
-             * clusters.num is the number of clustered jobs per horizontal level
-             * clusters.size is the number of tasks per clustered job
-             * clusters.num * clusters.size = the number of tasks per horizontal level
-             * In this case, we specify the clusters.num = 20, which means we have 20 jobs per level
-             */
-            ClusteringParameters cp = new ClusteringParameters(20, 0, method, null);
-            
+            ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.NONE;
+            ClusteringParameters cp = new ClusteringParameters(0, 0, method, null);
 
             /**
              * Initialize static parameters
              */
+            FailureParameters.init(ftc_method, ftc_monitor, ftc_failure, taskFailureRate, taskFailureShape);
             Parameters.init(vmNum, daxPath, null,
                     null, op, cp, sch_method, pln_method,
                     null, 0);
             ReplicaCatalog.init(file_system);
+
+            FailureMonitor.init();
+            FailureGenerator.init();
 
             // before creating any entities.
             int num_user = 1;   // number of grid users

@@ -27,6 +27,7 @@ import org.workflowsim.DatacenterExtended;
 import org.workflowsim.Job;
 import org.workflowsim.WorkflowEngine;
 import org.workflowsim.WorkflowPlanner;
+import org.workflowsim.utils.DistributionGenerator;
 import org.workflowsim.utils.ClusteringParameters;
 import org.workflowsim.utils.OverheadParameters;
 import org.workflowsim.utils.Parameters;
@@ -90,10 +91,10 @@ public class HorizontalClusteringExample3 extends HorizontalClusteringExample1{
              * clustering delay must be added, if you don't need it, you can set all the clustering
              * delay to be zero, but not null
              */
-            Map<Integer, Double> clusteringDelay = new HashMap();
-            Map<Integer, Double> queueDelay = new HashMap();
-            Map<Integer, Double> postscriptDelay = new HashMap();
-            Map<Integer, Double> engineDelay = new HashMap();
+            Map<Integer, DistributionGenerator> clusteringDelay = new HashMap();
+            Map<Integer, DistributionGenerator> queueDelay = new HashMap();
+            Map<Integer, DistributionGenerator> postscriptDelay = new HashMap();
+            Map<Integer, DistributionGenerator> engineDelay = new HashMap();
             /**
              * Interval is the period of workflow engine. For simplicity we set it to be 5, 
              * which is the default value in Condor, which also means we release every 5 
@@ -101,10 +102,14 @@ public class HorizontalClusteringExample3 extends HorizontalClusteringExample1{
              */
             int interval = 5; 
             for (int level = 0; level < maxLevel; level++ ){
-                clusteringDelay.put(level, 1.0);
-                queueDelay.put(level, 10.0);
-                postscriptDelay.put(level, 10.0);
-                engineDelay.put(level, 50.0);
+                DistributionGenerator cluster_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, 1.0, 1.0);
+                clusteringDelay.put(level, cluster_delay);
+                DistributionGenerator queue_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, 10.0, 1.0);
+                queueDelay.put(level, queue_delay);
+                DistributionGenerator postscript_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, 10.0, 1.0);
+                postscriptDelay.put(level, postscript_delay);
+                DistributionGenerator engine_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, 50.0, 1.0);
+                engineDelay.put(level, engine_delay);
             }
             // Add clustering delay to the overhead parameters
             OverheadParameters op = new OverheadParameters(interval, engineDelay, queueDelay, postscriptDelay, clusteringDelay, 0);;

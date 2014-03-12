@@ -27,6 +27,7 @@ import org.workflowsim.Task;
 import org.workflowsim.failure.FailureMonitor;
 import org.workflowsim.failure.FailureParameters;
 import org.workflowsim.failure.FailureRecord;
+import org.workflowsim.utils.DistributionGenerator;
 import org.workflowsim.utils.Parameters;
 
 /**
@@ -395,9 +396,11 @@ public class ReclusteringEngine {
         Task firstTask = (Task) allTaskList.get(0);
         List tmpList = new ArrayList();
         tmpList.add(job);
-        double delay = Parameters.getOverheadParams().getQueueDelay(job)
-                + Parameters.getOverheadParams().getWEDDelay(tmpList)
-                + Parameters.getOverheadParams().getPostDelay(job);
+        
+        double delay = Parameters.getOverheadParams().getQueueDelay().get(job.getDepth()).getMLEMean();
+                //+ Parameters.getOverheadParams().getWEDDelay().get(job.getDepth()).getMLEMean()
+                //+ Parameters.getOverheadParams().getPostDelay().get(job.getDepth()).getMLEMean();
+        System.out.println("MLE " + delay);
         double taskLength = (double) firstTask.getCloudletLength() / 1000 + Parameters.getOverheadParams().getClustDelay(job) / getDividend(job.getDepth());
         if (taskLength > 20) {
             Log.printLine();
