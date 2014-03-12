@@ -39,6 +39,7 @@ public class DistributionGenerator {
     private double scale_prior;
     private double shape_prior;
     private double[] samples;
+    private double[] cumulativeSamples;
     private int cursor;
     private final int SAMPLE_SIZE = 1500;
     public enum DistributionFamily {
@@ -58,6 +59,7 @@ public class DistributionGenerator {
         this.shape_prior = shape;
         RealDistribution distribution = getDistribution(scale, shape);
         samples = distribution.sample(SAMPLE_SIZE);
+        updateCumulativeSamples();
         cursor = 0;
     }
     
@@ -65,6 +67,33 @@ public class DistributionGenerator {
         this(dist, scale, shape);
         this.scale_prior = b;
         this.shape_prior = a;
+    }
+    
+    /**
+     * Gets the sample data
+     * @return samples
+     */
+    public double[] getSamples(){
+        return samples;
+    }
+    
+    /**
+     * Gets the cumulative Samples
+     * @return cumulativeSamples
+     */
+    public double[] getCumulativeSamples(){
+        return cumulativeSamples ;
+    }
+    
+    /**
+     * Update cumulativeSamples from samples
+     */
+    public void updateCumulativeSamples(){
+        cumulativeSamples = new double[samples.length];
+        cumulativeSamples[0] = samples[0];
+        for(int i = 1; i < samples.length ; i++){
+            cumulativeSamples[i] = cumulativeSamples[i-1] + samples[i];
+        }
     }
     
     /**
@@ -111,6 +140,7 @@ public class DistributionGenerator {
         this.shape = shape;
         RealDistribution distribution = getDistribution(scale, shape);
         samples = distribution.sample(SAMPLE_SIZE);
+        updateCumulativeSamples();
         cursor = 0;
     }
     

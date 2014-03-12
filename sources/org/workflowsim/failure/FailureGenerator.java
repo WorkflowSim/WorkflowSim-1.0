@@ -37,9 +37,6 @@ public class FailureGenerator {
     /**
      *
      */
-    private static int FAILURE_SAMPLE_SIZE;
-    private static double[][][] failureSamples;
-
     protected static RealDistribution getDistribution(double alpha, double beta) {
         RealDistribution distribution = null;
         switch (FailureParameters.getFailureDistribution()) {
@@ -63,28 +60,6 @@ public class FailureGenerator {
     }
 
     protected static void initFailureSamples() {
-        if (FailureParameters.getFailureGeneratorMode() == FailureParameters.FTCFailure.FAILURE_NONE) {
-            return;
-        }
-        FAILURE_SAMPLE_SIZE = FailureParameters.getFailureSampleSize();
-        RealDistribution distribution;
-        double[] samples;
-
-        //first index is vm, second is job depth
-        failureSamples = new double[FailureParameters.getAlphaMaxFirstIndex()][FailureParameters.getAlphaMaxSecondIndex()][FAILURE_SAMPLE_SIZE];
-        for (int vmIndex = 0; vmIndex < FailureParameters.getAlphaMaxFirstIndex(); vmIndex++) {
-            for (int taskDepth = 0; taskDepth < FailureParameters.getAlphaMaxSecondIndex(); taskDepth++) {
-                double alpha = FailureParameters.getAlpha(vmIndex, taskDepth);
-                double beta = FailureParameters.getBeta(vmIndex, taskDepth);
-                distribution = new WeibullDistribution(beta, 1.0 / alpha);
-                samples = distribution.sample(FAILURE_SAMPLE_SIZE);
-                failureSamples[vmIndex][taskDepth][0] = samples[0];
-                for (int sampleId = 1; sampleId < failureSamples[vmIndex][taskDepth].length; sampleId++) {
-                    failureSamples[vmIndex][taskDepth][sampleId] = failureSamples[vmIndex][taskDepth][sampleId - 1]
-                            + samples[sampleId];
-                }
-            }
-        }
     }
 
     /**
@@ -100,23 +75,28 @@ public class FailureGenerator {
         double[] samples = null;
         switch (FailureParameters.getFailureGeneratorMode()) {
             /**
-             * Every task is considered.
+             * Every task follows the same distribution.
              */
             case FAILURE_ALL:
-
-                samples = failureSamples[0][0];
+                samples = FailureParameters.getGenerator(0, 0).getCumulativeSamples();
                 break;
             /**
              * Generate failures based on the type of job.
              */
             case FAILURE_JOB:
-                samples = failureSamples[0][task.getDepth()];
+                samples = FailureParameters.getGenerator(0, task.getDepth()).getCumulativeSamples();
                 break;
             /**
              * Generate failures based on the index of vm.
              */
             case FAILURE_VM:
-                samples = failureSamples[vmId][0];
+                samples = FailureParameters.getGenerator(vmId, 0).getCumulativeSamples();
+                break;
+            /**
+             * Generator failures based on vmId and level both
+             */
+            case FAILURE_VM_JOB:
+                samples = FailureParameters.getGenerator(vmId, task.getDepth()).getCumulativeSamples();
                 break;
             default:
                 return false;

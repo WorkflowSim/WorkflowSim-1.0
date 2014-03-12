@@ -384,6 +384,28 @@ public class ReclusteringEngine {
     }
 
     /**
+     * Sum up all the delay for one job
+     * @param depth the depth
+     * @return cumulative delay
+     */
+    private static double getCumulativeDelay(int depth){
+        double delay = 0.0;
+        if(Parameters.getOverheadParams().getQueueDelay()!=null && 
+                Parameters.getOverheadParams().getQueueDelay().containsKey(depth)){
+            delay += Parameters.getOverheadParams().getQueueDelay().get(depth).getMLEMean();
+        }
+        if(Parameters.getOverheadParams().getWEDDelay()!=null &&
+                Parameters.getOverheadParams().getWEDDelay().containsKey(depth)){
+            delay += Parameters.getOverheadParams().getWEDDelay().get(depth).getMLEMean();
+        }
+        if(Parameters.getOverheadParams().getPostDelay()!=null &&
+                Parameters.getOverheadParams().getPostDelay().containsKey(depth)){
+            delay += Parameters.getOverheadParams().getPostDelay().get(depth).getMLEMean();
+        }
+        return delay;
+    }
+    
+    /**
      * Dynamic Reclustering
      *
      * @param jobList, job list
@@ -395,18 +417,13 @@ public class ReclusteringEngine {
     private static List DRReclustering(List jobList, Job job, int id, List allTaskList) {
         Task firstTask = (Task) allTaskList.get(0);
         List tmpList = new ArrayList();
-        tmpList.add(job);
-        
-        double delay = Parameters.getOverheadParams().getQueueDelay().get(job.getDepth()).getMLEMean();
-                //+ Parameters.getOverheadParams().getWEDDelay().get(job.getDepth()).getMLEMean()
-                //+ Parameters.getOverheadParams().getPostDelay().get(job.getDepth()).getMLEMean();
-        System.out.println("MLE " + delay);
+        tmpList.add(job);        
         double taskLength = (double) firstTask.getCloudletLength() / 1000 + Parameters.getOverheadParams().getClustDelay(job) / getDividend(job.getDepth());
         if (taskLength > 20) {
             Log.printLine();
         }
         FailureRecord record = new FailureRecord(taskLength, 0, job.getDepth(), allTaskList.size(), 0, 0, job.getUserId());
-        record.delayLength = delay;
+        record.delayLength = getCumulativeDelay(job.getDepth());
         Log.printLine("record t:" + record.length + " d: " + record.delayLength);
         int suggestedK = FailureMonitor.getClusteringFactor(record);
         Log.printLine("K: " + suggestedK + " a " + FailureMonitor.analyze(0, job.getDepth()));

@@ -35,8 +35,6 @@ public class FailureParameters {
      *
      * @pre 0.0<= value <= 1.0
      */
-    private static double[][] alpha;
-    private static double[][] beta;
     private static DistributionGenerator[][] generators;
     /**
      * Fault Tolerant Clustering algorithm
@@ -75,12 +73,6 @@ public class FailureParameters {
      * Fault Tolerant Clustering failure generation mode
      */
     private static FTCFailure failureMode = FTCFailure.FAILURE_NONE;
-    /**
-     * The failure sample size. make sure: mean * size > makespan But don't set
-     * it to be too high since it has memory cost Only used when FAILURE is turn
-     * on
-     */
-    private static int FAILURE_SAMPLE_SIZE = 1000;
     
     /**
      * The distribution of the failure 
@@ -102,12 +94,11 @@ public class FailureParameters {
      * @param failureShape Task Failure Shape (beta)
      */
     public static void init(FTCluteringAlgorithm fMethod, FTCMonitor monitor, 
-            FTCFailure failure, double[][] failureRate, double[][] failureShape) {
+            FTCFailure failure, DistributionGenerator[][] failureGenerators) {
         FTClusteringAlgorithm = fMethod;
         monitorMode = monitor;
         failureMode = failure;
-        alpha = failureRate;
-        beta = failureShape;
+        generators = failureGenerators;
     }
 
     /**
@@ -116,10 +107,10 @@ public class FailureParameters {
      * @param dist 
      */
     public static void init(FTCluteringAlgorithm fMethod, FTCMonitor monitor, 
-            FTCFailure failure, double[][] failureRate, double[][] failureShape, 
+            FTCFailure failure, DistributionGenerator[][] failureGenerators, 
             DistributionFamily dist) {
         distribution = dist;
-        init(fMethod, monitor, failure, failureRate, failureShape);
+        init(fMethod, monitor, failure, failureGenerators);
     }
     /**
      * Gets the task failure rate
@@ -128,37 +119,37 @@ public class FailureParameters {
      * @pre $none
      * @post $none
      */
-    public static double[][] getAlpha() {
-        if(alpha==null){
+    public static DistributionGenerator[][] getFailureGenerators() {
+        if(generators==null){
             Log.printLine("ERROR: alpha is not initialized");
         }
-        return alpha;
+        return generators;
     }
     
     /**
      * Gets the max first index in alpha
      * @return max
      */
-    public static int getAlphaMaxFirstIndex(){
-        if(alpha==null || alpha.length == 0){
+    public static int getFailureGeneratorsMaxFirstIndex(){
+        if(generators==null || generators.length == 0){
             Log.printLine("ERROR: alpha is not initialized");
             return INVALID;
         }
-        return alpha.length;
+        return generators.length;
     }
     
     /**
      * Gets the max second Index in alpha
      * @return max
      */
-    public static int getAlphaMaxSecondIndex(){
+    public static int getFailureGeneratorsMaxSecondIndex(){
         //Test whether it is valid
-        getAlphaMaxFirstIndex();
-        if(alpha[0]==null || alpha[0].length == 0){
+        getFailureGeneratorsMaxFirstIndex();
+        if(generators[0]==null || generators[0].length == 0){
             Log.printLine("ERROR: alpha is not initialized");
             return INVALID;
         }
-        return alpha[0].length;
+        return generators[0].length;
     }
     
 
@@ -168,71 +159,8 @@ public class FailureParameters {
      * @param taskDepth task depth
      * @return task failure rate
      */
-    public static double getAlpha(int vmIndex, int taskDepth) {
-        return alpha[vmIndex][taskDepth];
-    }
-    
-    /**
-     * Second parameter of failure model
-     *
-     * @return the beta
-     * @pre $none
-     * @post $none
-     */
-    public static double[][] getBeta() {
-        return beta;
-    }
-
-    /**
-     * Gets the second parameter of failure model
-     * @param vmIndex vmIndex
-     * @param taskDepth taskDepth
-     * @return second parameter
-     */
-    public static double getBeta(int vmIndex, int taskDepth){
-        return beta[vmIndex][taskDepth];
-    }
-    
-    
-        /**
-     * Gets the max first index in alpha
-     * @return max
-     */
-    public static int getBetaMaxFirstIndex(){
-        if(beta==null || beta.length == 0){
-            Log.printLine("ERROR: beta is not initialized");
-            return INVALID;
-        }
-        /**
-         * the length of alpha and beta should be the same
-         */
-        if(beta.length != getAlphaMaxFirstIndex()){
-            Log.printLine("ERROR: beta is not initialized correctly");
-            return INVALID;
-        }
-        return beta.length;
-    }
-    
-    /**
-     * Gets the max second Index in alpha
-     * @return max
-     */
-    public static int getBetaMaxSecondIndex(){
-        //Test whether it is valid
-        getBetaMaxFirstIndex();
-        if(beta[0]==null || beta[0].length == 0){
-            Log.printLine("ERROR: beta is not initialized");
-            return INVALID;
-        }
-        
-        /**
-         * the length of alpha and beta should be the same
-         */
-        if(beta[0].length != getBetaMaxFirstIndex()){
-            Log.printLine("ERROR: beta is not initialized correctly");
-            return INVALID;
-        }
-        return beta[0].length;
+    public static DistributionGenerator getGenerator(int vmIndex, int taskDepth) {
+        return generators[vmIndex][taskDepth];
     }
     
     /**
@@ -266,23 +194,6 @@ public class FailureParameters {
      */
     public static FTCluteringAlgorithm getFTCluteringAlgorithm() {
         return FTClusteringAlgorithm;
-    }
-
-    /**
-     * Gets the failure sample size (it is related to the makespan)
-     *
-     * @return failure sample size
-     */
-    public static int getFailureSampleSize() {
-        return FAILURE_SAMPLE_SIZE;
-    }
-
-    /**
-     * Sets the failure sample size according to makespan. make sure: mean *
-     * size > makespan
-     */
-    public static void setFailureSampleSize(int size) {
-        FAILURE_SAMPLE_SIZE = size;
     }
     
     /**

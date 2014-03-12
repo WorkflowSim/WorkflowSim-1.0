@@ -84,11 +84,11 @@ public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExam
              * based on the vm id; MOINTOR_ALL does not do any classification; MONITOR_NONE does not record
              * any failiure. 
              */
-            FailureParameters.FTCMonitor ftc_monitor = FailureParameters.FTCMonitor.MONITOR_JOB;
+            FailureParameters.FTCMonitor ftc_monitor = FailureParameters.FTCMonitor.MONITOR_VM_JOB;
             /**
              *  Similar to FTCMonitor, FTCFailure controls the way how we generate failures. 
              */
-            FailureParameters.FTCFailure ftc_failure = FailureParameters.FTCFailure.FAILURE_JOB;
+            FailureParameters.FTCFailure ftc_failure = FailureParameters.FTCFailure.FAILURE_VM_JOB;
             /**
              *  In this example, we have horizontal clustering and we use Dynamic Reclustering. 
              */
@@ -97,18 +97,21 @@ public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExam
              * Task failure rate for each level 
              * 
              */
-           double[][] taskFailureRate = new double[1][11];
-           double[][] taskFailureShape = new double[1][11];
-           int maxLevel = 11; //most workflows we use has a maximum of 11 levels
-           for (int level = 0; level < maxLevel; level++) {
-               /*
-                * For simplicity, set the task failure rate of each level to be 0.1. Which means 10%
-                * of submitted tasks will fail. It doesn't have to be the same task 
-                * failure rate at each level. 
-                */
-               taskFailureRate [0][level] = 0.05;
-               taskFailureShape[0][level] = 1.0;
-           }
+            int maxLevel = 11; //most workflows we use has a maximum of 11 levels
+
+            DistributionGenerator[][] failureGenerators = new DistributionGenerator[vmNum][maxLevel];
+
+            for (int level = 0; level < maxLevel; level++) {
+                /*
+                 * For simplicity, set the task failure rate of each level to be 0.1. Which means 10%
+                 * of submitted tasks will fail. It doesn't have to be the same task 
+                 * failure rate at each level. 
+                 */
+                for(int vmId = 0; vmId < vmNum; vmId++ ){
+                    failureGenerators[vmId][level] = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL,
+                        100, 1.0, 30, 300);
+                }
+            }
             
             
 
@@ -169,7 +172,7 @@ public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExam
             /**
              * Initialize static parameters
              */
-            FailureParameters.init(ftc_method, ftc_monitor, ftc_failure, taskFailureRate, taskFailureShape);
+            FailureParameters.init(ftc_method, ftc_monitor, ftc_failure, failureGenerators);
             Parameters.init(vmNum, daxPath, null,
                     null, op, cp, sch_method, pln_method,
                     null, 0);

@@ -30,6 +30,7 @@ import org.workflowsim.failure.FailureGenerator;
 import org.workflowsim.failure.FailureMonitor;
 import org.workflowsim.failure.FailureParameters;
 import org.workflowsim.utils.ClusteringParameters;
+import org.workflowsim.utils.DistributionGenerator;
 import org.workflowsim.utils.OverheadParameters;
 import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
@@ -97,10 +98,9 @@ public class FaultTolerantSchedulingExample1 extends WorkflowSimBasicExample1 {
              * Task failure rate for each level 
              * 
              */
-            double[][] taskFailureRate = new double[1][1];
-            double[][] taskFailureShape = new double[1][1];
-            taskFailureRate[0][0] = 0.05;
-            taskFailureShape[0][0]= 1.0;
+            DistributionGenerator[][] failureGenerators = new DistributionGenerator[1][1];
+            failureGenerators[0][0] = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, 
+                    100, 1.0, 30, 300);
 
             /**
              * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
@@ -124,7 +124,7 @@ public class FaultTolerantSchedulingExample1 extends WorkflowSimBasicExample1 {
             /**
              * Initialize static parameters
              */
-            FailureParameters.init(ftc_method, ftc_monitor, ftc_failure, taskFailureRate, taskFailureShape);
+            FailureParameters.init(ftc_method, ftc_monitor, ftc_failure, failureGenerators);
             Parameters.init(vmNum, daxPath, null,
                     null, op, cp, sch_method, pln_method,
                     null, 0);
