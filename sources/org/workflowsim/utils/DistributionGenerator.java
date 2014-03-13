@@ -38,6 +38,7 @@ public class DistributionGenerator {
     protected double shape;
     private double scale_prior;
     private double shape_prior;
+    private double likelihood_prior;
     private double[] samples;
     private double[] cumulativeSamples;
     private int cursor;
@@ -63,10 +64,11 @@ public class DistributionGenerator {
         cursor = 0;
     }
     
-    public DistributionGenerator(DistributionFamily dist, double scale, double shape, double a, double b){
+    public DistributionGenerator(DistributionFamily dist, double scale, double shape, double a, double b, double c){
         this(dist, scale, shape);
         this.scale_prior = b;
         this.shape_prior = a;
+        this.likelihood_prior = c;
     }
     
     /**
@@ -115,7 +117,15 @@ public class DistributionGenerator {
         return sum/cursor;
     }
     
+    
     /**
+     * Gets the likelihood prior
+     * @return likelihood_prior
+     */
+    public double getLikelihoodPrior(){
+        return this.likelihood_prior;
+    }
+        /**
      * Gets the Maximum Likelihood Estimation of samples based on the ftc paper
      * @return the delay
      */
@@ -123,11 +133,29 @@ public class DistributionGenerator {
     public double getMLEMean(){
         double a = shape_prior, b = scale_prior;
         double sum = 0.0;
+        
         for(int i = 0; i < cursor; i ++){
-            sum += Math.pow(samples[i], 0.78);
+            switch (dist){
+                case GAMMA:
+                    sum += samples[i];
+                    break;
+                case WEIBULL:
+                    sum += Math.pow(samples[i], likelihood_prior);
+                    break;
+            }
         }
-        //???
-        return (b+sum)/(a + cursor + 1);
+        double result = 0.0;
+        switch(dist){
+            case GAMMA:
+                result = (b+sum)/(a + cursor * likelihood_prior - 1);
+                break;
+            case WEIBULL:
+                result = (b+sum)/(a + cursor + 1) ;
+                break;
+            default:
+                break;
+        }
+        return result;
     }
     
     /**

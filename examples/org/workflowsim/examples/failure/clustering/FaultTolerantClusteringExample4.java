@@ -102,7 +102,7 @@ public class FaultTolerantClusteringExample4 extends FaultTolerantClusteringExam
             for (int vmId = 0; vmId < vmNum; vmId++) {
 
                 failureGenerators[vmId][0] = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL,
-                        100, 1.0, 30, 300);
+                        100, 1.0, 30, 300, 0.78);
             }
             /**
              * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 

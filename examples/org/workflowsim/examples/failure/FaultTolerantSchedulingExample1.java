@@ -100,7 +100,7 @@ public class FaultTolerantSchedulingExample1 extends WorkflowSimBasicExample1 {
              */
             DistributionGenerator[][] failureGenerators = new DistributionGenerator[1][1];
             failureGenerators[0][0] = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, 
-                    100, 1.0, 30, 300);
+                    100, 1.0, 30, 300, 0.78);
 
             /**
              * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 

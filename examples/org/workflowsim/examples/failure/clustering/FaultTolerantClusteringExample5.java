@@ -66,7 +66,8 @@ public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExam
             /**
              * Should change this based on real physical path
              */
-            String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
+            //String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_1000.xml";
+            String daxPath = "/Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Montage_300.xml";
             if(daxPath == null){
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return;
@@ -100,8 +101,9 @@ public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExam
             int maxLevel = 11; //most workflows we use has a maximum of 11 levels
 
             DistributionGenerator[][] failureGenerators = new DistributionGenerator[vmNum][maxLevel];
+            double theta = 10;
             DistributionGenerator generator = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL,
-                        5, 0.78, 30, 30*5);
+                        theta, 0.78, 30, 30*theta, 0.78);
 
             for (int level = 0; level < maxLevel; level++) {
                 /*
@@ -136,9 +138,11 @@ public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExam
              * application has at most 11 horizontal levels 
              */
             
-            double c_delay = 0.0, q_delay = 100.0, p_delay = 0.0, e_delay = 0.0;
+            double c_delay = 0.0, q_scale = 100.0, p_delay = 0.0, e_delay = 0.0;
+            double q_shape = 2;
+            double avg = q_shape * p_delay;
             DistributionGenerator queue_delay = new DistributionGenerator(
-                    DistributionGenerator.DistributionFamily.WEIBULL, q_delay, 0.78, 100, 100*q_delay);
+                    DistributionGenerator.DistributionFamily.GAMMA, q_scale, q_shape, 10000, 10000 * q_scale * q_shape, q_shape);
             for (int level = 0; level < maxLevel; level++ ){
 //                if(c_delay == 0.0){
 //                    
@@ -171,8 +175,8 @@ public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExam
             /**
              * No Clustering
              */
-            ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.NONE;
-            ClusteringParameters cp = new ClusteringParameters(0, 0, method, null);
+            ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.HORIZONTAL;
+            ClusteringParameters cp = new ClusteringParameters(vmNum, 0, method, null);
 
             /**
              * Initialize static parameters

@@ -110,7 +110,7 @@ public class FaultTolerantClusteringExample1 extends FaultTolerantSchedulingExam
                  * failure rate at each level. 
                  */
                 failureGenerators[0][level] = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL,
-                        50, 1.0, 30, 300);
+                        50, 1.0, 30, 300, 0.78);
             }
 
             /**

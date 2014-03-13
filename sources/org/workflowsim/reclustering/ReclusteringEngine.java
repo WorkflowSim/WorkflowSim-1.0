@@ -27,7 +27,7 @@ import org.workflowsim.Task;
 import org.workflowsim.failure.FailureMonitor;
 import org.workflowsim.failure.FailureParameters;
 import org.workflowsim.failure.FailureRecord;
-import org.workflowsim.utils.DistributionGenerator;
+import org.workflowsim.utils.DistributionGenerator.DistributionFamily;
 import org.workflowsim.utils.Parameters;
 
 /**
@@ -346,7 +346,7 @@ public class ReclusteringEngine {
             } else {
             }
         }
-        Log.printLine("WARNING: Doesn't consider the data transfer problem");
+        //Log.printLine("WARNING: Doesn't consider the data transfer problem");
         jobList.add(createJob(id, job, length, newTaskList));
         return jobList;
     }
@@ -398,6 +398,24 @@ public class ReclusteringEngine {
         return delay;
     }
     
+    private static double getOverheadLikelihoodPrior(int depth){
+        double prior = 0.0;
+
+        if(Parameters.getOverheadParams().getQueueDelay()!=null && 
+                Parameters.getOverheadParams().getQueueDelay().containsKey(depth)){
+            prior = Parameters.getOverheadParams().getQueueDelay().get(depth).getLikelihoodPrior();
+        }else
+        if(Parameters.getOverheadParams().getWEDDelay()!=null &&
+                Parameters.getOverheadParams().getWEDDelay().containsKey(depth)){
+            prior = Parameters.getOverheadParams().getWEDDelay().get(depth).getMLEMean();
+        }else
+        if(Parameters.getOverheadParams().getPostDelay()!=null &&
+                Parameters.getOverheadParams().getPostDelay().containsKey(depth)){
+            prior = Parameters.getOverheadParams().getPostDelay().get(depth).getMLEMean();
+        }
+        return prior;
+    }
+    
     /**
      * Dynamic Reclustering
      *
@@ -415,16 +433,20 @@ public class ReclusteringEngine {
          */
         double taskLength = (double) firstTask.getCloudletLength() / 1000 ;//+ Parameters.getOverheadParams().getClustDelay(job) / getDividend(job.getDepth());
         
-        FailureRecord record = new FailureRecord(taskLength, 0, job.getDepth(), allTaskList.size(), 0, 0, job.getUserId());
-        record.delayLength = getCumulativeDelay(job.getDepth());
-        int suggestedK = FailureMonitor.getClusteringFactor(record);
+        //FailureRecord record = new FailureRecord(taskLength, 0, job.getDepth(), allTaskList.size(), 0, 0, job.getUserId());
+        
+        double phi_ts = getOverheadLikelihoodPrior(job.getDepth());
+        double delay = getCumulativeDelay(job.getDepth());
+        //record.delayLength = getCumulativeDelay(job.getDepth());
+        int suggestedK = 0;//FailureMonitor.getClusteringFactor(record);
         
         double theta = FailureParameters.getGenerator(job.getVmId(), job.getDepth()).getMLEMean();
         
-        suggestedK = ClusteringSizeEstimator.estimateK(taskLength, getCumulativeDelay(job.getDepth()), 
-                theta, 0.78);
+        double phi_gamma = FailureParameters.getGenerator(job.getVmId(), job.getDepth()).getLikelihoodPrior();
+        suggestedK = ClusteringSizeEstimator.estimateK(taskLength, delay, 
+                theta, phi_gamma, phi_ts);
 
-        Log.printLine("t=" + taskLength +" d=" +getCumulativeDelay(job.getDepth()) + " theta=" + theta + " k=" + suggestedK);
+        Log.printLine("t=" + taskLength +" d=" + delay + " theta=" + theta + " k=" + suggestedK);
         if (suggestedK == 0) {
             //not really k=0, just too big
             jobList.add(createJob(id, job, job.getCloudletLength(), allTaskList));
