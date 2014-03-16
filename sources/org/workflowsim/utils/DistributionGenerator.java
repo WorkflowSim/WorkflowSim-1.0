@@ -17,7 +17,7 @@
  */
 package org.workflowsim.utils;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import org.apache.commons.math3.distribution.GammaDistribution;
 import org.apache.commons.math3.distribution.LogNormalDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -25,14 +25,14 @@ import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.distribution.WeibullDistribution;
 
 /**
- * This is a OverheadDistributionGenrator for one typic overhead per level. 
- * 
+ * This is a OverheadDistributionGenrator for one typic overhead per level.
+ *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Mar 11, 2014
  */
 public class DistributionGenerator {
-    
+
     protected DistributionFamily dist;
     protected double scale;
     protected double shape;
@@ -42,17 +42,21 @@ public class DistributionGenerator {
     private double[] samples;
     private double[] cumulativeSamples;
     private int cursor;
-    private final int SAMPLE_SIZE = 1500;
+    private final int SAMPLE_SIZE = 1500 ; //DistributionGenerator will automatically increase the size
+    
+
     public enum DistributionFamily {
+
         LOGNORMAL, GAMMA, WEIBULL, NORMAL
     }
+
     /**
-     * 
+     *
      * @param dist
      * @param scale
-     * @param shape 
+     * @param shape
      */
-    public DistributionGenerator(DistributionFamily dist, double scale, double shape){
+    public DistributionGenerator(DistributionFamily dist, double scale, double shape) {
         this.dist = dist;
         this.scale = scale;
         this.shape = shape;
@@ -63,79 +67,91 @@ public class DistributionGenerator {
         updateCumulativeSamples();
         cursor = 0;
     }
-    
-    public DistributionGenerator(DistributionFamily dist, double scale, double shape, double a, double b, double c){
+
+    public DistributionGenerator(DistributionFamily dist, double scale, double shape, double a, double b, double c) {
         this(dist, scale, shape);
         this.scale_prior = b;
         this.shape_prior = a;
         this.likelihood_prior = c;
     }
-    
+
     /**
      * Gets the sample data
+     *
      * @return samples
      */
-    public double[] getSamples(){
+    public double[] getSamples() {
         return samples;
     }
-    
+
     /**
      * Gets the cumulative Samples
+     *
      * @return cumulativeSamples
      */
-    public double[] getCumulativeSamples(){
-        return cumulativeSamples ;
+    public double[] getCumulativeSamples() {
+        return cumulativeSamples;
     }
-    
+
+    public void extendSamples() {
+        double[] new_samples = getDistribution(scale, shape).sample(SAMPLE_SIZE);
+        samples = concat(samples, new_samples);
+        updateCumulativeSamples();
+    }
+
     /**
      * Update cumulativeSamples from samples
      */
-    public void updateCumulativeSamples(){
+    public void updateCumulativeSamples() {
         cumulativeSamples = new double[samples.length];
         cumulativeSamples[0] = samples[0];
-        for(int i = 1; i < samples.length ; i++){
-            cumulativeSamples[i] = cumulativeSamples[i-1] + samples[i];
+        for (int i = 1; i < samples.length; i++) {
+            cumulativeSamples[i] = cumulativeSamples[i - 1] + samples[i];
         }
     }
-    
+
     /**
      * Gets the Prior Knowledge based Estimation of samples
+     *
      * @return delay
      */
-    public double getPKEMean(){
-        return this.shape_prior/this.scale_prior;
+    public double getPKEMean() {
+        return this.shape_prior / this.scale_prior;
     }
+
     /**
      * Gets the average of samples
+     *
      * @return average
      */
-    public double getMean(){
+    public double getMean() {
         double sum = 0.0;
-        for(int i = 0; i < cursor; i ++){
+        for (int i = 0; i < cursor; i++) {
             sum += samples[i];
         }
-        return sum/cursor;
+        return sum / cursor;
     }
-    
-    
+
     /**
      * Gets the likelihood prior
+     *
      * @return likelihood_prior
      */
-    public double getLikelihoodPrior(){
+    public double getLikelihoodPrior() {
         return this.likelihood_prior;
     }
-        /**
+
+    /**
      * Gets the Maximum Likelihood Estimation of samples based on the ftc paper
+     *
      * @return the delay
      */
-     
-    public double getMLEMean(){
+    public double getMLEMean() {
         double a = shape_prior, b = scale_prior;
         double sum = 0.0;
-        
-        for(int i = 0; i < cursor; i ++){
-            switch (dist){
+
+        for (int i = 0; i < cursor; i++) {
+            switch (dist) {
                 case GAMMA:
                     sum += samples[i];
                     break;
@@ -145,25 +161,26 @@ public class DistributionGenerator {
             }
         }
         double result = 0.0;
-        switch(dist){
+        switch (dist) {
             case GAMMA:
-                result = (b+sum)/(a + cursor * likelihood_prior - 1);
+                result = (b + sum) / (a + cursor * likelihood_prior - 1);
                 break;
             case WEIBULL:
-                result = (b+sum)/(a + cursor + 1) ;
+                result = (b + sum) / (a + cursor + 1);
                 break;
             default:
                 break;
         }
         return result;
     }
-    
+
     /**
      * Vary the distribution parameters but not the prior knowledge
+     *
      * @param scale the first param
-     * @param shape  the second param
+     * @param shape the second param
      */
-    public void varyDistribution(double scale, double shape){
+    public void varyDistribution(double scale, double shape) {
         this.scale = scale;
         this.shape = shape;
         RealDistribution distribution = getDistribution(scale, shape);
@@ -171,20 +188,41 @@ public class DistributionGenerator {
         updateCumulativeSamples();
         cursor = 0;
     }
-    
+
+    /**
+     * Merge two arrays
+     *
+     * @param <T> array type
+     * @param first first array
+     * @param second second array
+     * @return new array
+     */
+    public double[] concat(double[] first, double[] second) {
+        double[] result = Arrays.copyOf(first, first.length + second.length);
+        System.arraycopy(second, 0, result, first.length, second.length);
+        return result;
+    }
+
     /**
      * Gets the next sample from samples
+     *
      * @return delay
      */
-    public double getNextSample(){
+    public double getNextSample() {
+        if (cursor >= samples.length) {
+            double[] new_samples = getDistribution(scale, shape).sample(SAMPLE_SIZE);
+            samples = concat(samples, new_samples);
+            updateCumulativeSamples();
+        }
         double delay = samples[cursor];
-        cursor ++ ;
+        cursor++;
         return delay;
-    }    
-    
+    }
+
     /**
      * Gets the RealDistribution with two parameters
-     * @param scale the first param scale 
+     *
+     * @param scale the first param scale
      * @param shape the second param shape
      * @return the RealDistribution Object
      */
@@ -198,7 +236,7 @@ public class DistributionGenerator {
                 distribution = new WeibullDistribution(shape, scale);
                 break;
             case GAMMA:
-                distribution = new GammaDistribution(shape,  scale);
+                distribution = new GammaDistribution(shape, scale);
                 break;
             case NORMAL:
                 //shape is the std, scale is the mean

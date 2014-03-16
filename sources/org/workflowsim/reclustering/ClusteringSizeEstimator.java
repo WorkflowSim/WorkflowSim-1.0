@@ -39,7 +39,7 @@ public class ClusteringSizeEstimator {
      * @return the makespan
      */
     protected static double f(double k, double t, double s, double theta, double phi_gamma, double phi_ts) {
-        double d = (k * t + s) / (phi_ts - 1);
+        double d = (k * t + s) * (phi_ts - 1);
         return d / k * Math.exp(Math.pow(d / theta, phi_gamma));
     }
 

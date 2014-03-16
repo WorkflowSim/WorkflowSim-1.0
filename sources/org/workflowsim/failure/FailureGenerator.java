@@ -24,6 +24,7 @@ import org.cloudbus.cloudsim.Cloudlet;
 import org.workflowsim.Job;
 import org.workflowsim.Task;
 import org.apache.commons.math3.distribution.WeibullDistribution;
+import org.workflowsim.utils.DistributionGenerator;
 
 /**
  * FailureGenerator creates a failure when a job returns
@@ -34,6 +35,13 @@ import org.apache.commons.math3.distribution.WeibullDistribution;
  */
 public class FailureGenerator {
 
+    /**
+     * FailureGenerator doubles the size of distribution samples each time 
+     * but only limits to maxFailureSizeExtension. Otherwise your failure rate 
+     * is too high for this workflow
+     */
+    private static final int maxFailureSizeExtension = 20;
+    private static int failureSizeExtension = 0;
     /**
      *
      */
@@ -70,40 +78,52 @@ public class FailureGenerator {
         initFailureSamples();
     }
 
-    protected static boolean checkFailureStatus(Task task, int vmId) {
+    protected static boolean checkFailureStatus(Task task, int vmId) throws Exception {
 
-        double[] samples = null;
+
+        DistributionGenerator generator = null;
         switch (FailureParameters.getFailureGeneratorMode()) {
             /**
              * Every task follows the same distribution.
              */
             case FAILURE_ALL:
-                samples = FailureParameters.getGenerator(0, 0).getCumulativeSamples();
+                generator = FailureParameters.getGenerator(0, 0);
                 break;
             /**
              * Generate failures based on the type of job.
              */
             case FAILURE_JOB:
-                samples = FailureParameters.getGenerator(0, task.getDepth()).getCumulativeSamples();
+                generator = FailureParameters.getGenerator(0, task.getDepth());
                 break;
             /**
              * Generate failures based on the index of vm.
              */
             case FAILURE_VM:
-                samples = FailureParameters.getGenerator(vmId, 0).getCumulativeSamples();
+                generator = FailureParameters.getGenerator(vmId, 0);
                 break;
             /**
              * Generator failures based on vmId and level both
              */
             case FAILURE_VM_JOB:
-                samples = FailureParameters.getGenerator(vmId, task.getDepth()).getCumulativeSamples();
+                generator = FailureParameters.getGenerator(vmId, task.getDepth());
                 break;
             default:
                 return false;
         }
-
+        double[] samples = generator.getCumulativeSamples();
         double start = task.getExecStartTime();
         double end = task.getTaskFinishTime();
+        
+        while (samples[samples.length - 1] < start) {
+            generator.extendSamples();
+            samples = generator.getCumulativeSamples();
+            failureSizeExtension++;
+            if (failureSizeExtension >= maxFailureSizeExtension) {
+                throw new Exception("Error rate is too high such that the simulator terminates");
+
+            }
+        }
+
         for (int sampleId = 0; sampleId < samples.length; sampleId++) {
             if (end < samples[sampleId]) {
                 //no failure

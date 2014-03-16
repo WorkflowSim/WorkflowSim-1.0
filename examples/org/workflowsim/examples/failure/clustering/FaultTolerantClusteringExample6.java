@@ -46,14 +46,14 @@ import org.workflowsim.utils.ReplicaCatalog;
  * @since WorkflowSim Toolkit 1.0
  * @date Dec 31, 2013
  */
-public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExample1{
+public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExample1{
 
     ////////////////////////// STATIC METHODS ///////////////////////
     /**
      * Creates main() to run this example
      * This example has only one datacenter and one storage
      */
-    public static double main2(String[] args) {
+    public static void main(String[] args) {
 
 
        try {
@@ -69,10 +69,15 @@ public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExam
              * Should change this based on real physical path
              */
             //String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_1000.xml";
-           String daxPath = "/Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Montage_300.xml";
-            
-           double q_scale = 50.0, q_weight = 10, q_shape = 2;
-           String clustering = "DR";
+            String daxPath = "/Users/chenweiwei/Research/balanced_clustering/data/scan/SIPHT.n.1000.9.dax";
+            //String daxPath = "/Users/chenweiwei/Research/balanced_clustering/data/scan-1/LIGO.n.800.8.dax";
+            //String daxPath ="/Users/chenweiwei/Research/balanced_clustering/data/scan-1/GENOME.d.702049732.5.dax";
+            //String daxPath = "/Users/chenweiwei/Research/balanced_clustering/data/scan-1/CYBERSHAKE.n.700.10.dax";
+           //String daxPath = "/Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Montage_300.xml";
+            //This controls k if q_shape is large it is good
+           double q_scale = 50, q_weight = 3, q_shape = 3;
+           double t_scale = 1.0;
+           String clustering = "NOOP";
            
            double theta = 10, theta_weight = 30;
 
@@ -87,6 +92,7 @@ public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExam
                        daxPath = args[++i];
                        break;
                    case 'b':
+                       t_scale = Double.parseDouble(args[++i]);
                        break;
                    case 'w':
                        q_weight = Double.parseDouble(args[++i]);
@@ -108,12 +114,12 @@ public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExam
             
             if(daxPath == null){
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
-                return 0.0;
+                return ;
             }
             File daxFile = new File(daxPath);
             if(!daxFile.exists()){
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
-                return 0.0;
+                return ;
             }
             /*
              *  Fault Tolerant Parameters
@@ -187,7 +193,7 @@ public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExam
             
             DistributionGenerator queue_delay = new DistributionGenerator(
                     DistributionGenerator.DistributionFamily.GAMMA, q_scale, q_shape, 
-                    q_weight, q_weight * q_scale * q_shape, q_shape);
+                    q_weight, q_weight * q_scale, q_shape);
             for (int level = 0; level < maxLevel; level++ ){
 //                if(c_delay == 0.0){
 //                    
@@ -276,13 +282,13 @@ public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExam
 
             CloudSim.stopSimulation();
 
-            return printJobList2(outputList0);
+            printJobList2(outputList0);
             
 
         } catch (Exception e) {
+            e.printStackTrace();
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
-       return 0.0;
     }
     
     /**
