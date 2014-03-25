@@ -186,7 +186,7 @@ public class DistributionGenerator {
         RealDistribution distribution = getDistribution(scale, shape);
         samples = distribution.sample(SAMPLE_SIZE);
         updateCumulativeSamples();
-        cursor = 0;
+        //cursor = 0;
     }
 
     /**
@@ -209,7 +209,7 @@ public class DistributionGenerator {
      * @return delay
      */
     public double getNextSample() {
-        if (cursor >= samples.length) {
+        while (cursor >= samples.length) {
             double[] new_samples = getDistribution(scale, shape).sample(SAMPLE_SIZE);
             samples = concat(samples, new_samples);
             updateCumulativeSamples();
@@ -246,5 +246,22 @@ public class DistributionGenerator {
                 break;
         }
         return distribution;
+    }
+    
+    /**
+     * Gets the scale parameter
+     * @return scale
+     */
+    public double getScale()
+    {
+        return this.scale;
+    }
+    
+    /**
+     * Gets the shape parameter
+     * @return shape
+     */
+    public double getShape(){
+        return this.shape;
     }
 }

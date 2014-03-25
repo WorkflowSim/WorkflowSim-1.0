@@ -42,7 +42,7 @@ public class FailureParameters {
     public enum FTCluteringAlgorithm {
 
         FTCLUSTERING_DC, FTCLUSTERING_SR, FTCLUSTERING_DR, FTCLUSTERING_NOOP,
-        FTCLUSTERING_BLOCK, FTCLUSTERING_BINARY
+        FTCLUSTERING_BLOCK, FTCLUSTERING_VERTICAL
     }
     /*
      * FTC Monitor mode

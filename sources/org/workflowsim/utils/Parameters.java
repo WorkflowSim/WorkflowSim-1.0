@@ -15,12 +15,7 @@
  */
 package org.workflowsim.utils;
 
-import java.util.Map;
 import org.cloudbus.cloudsim.Log;
-import org.workflowsim.failure.FailureParameters;
-import org.workflowsim.failure.FailureParameters.FTCFailure;
-import org.workflowsim.failure.FailureParameters.FTCMonitor;
-import org.workflowsim.failure.FailureParameters.FTCluteringAlgorithm;
 
 /**
  * This class includes most parameters a user can specify in a configuration
@@ -124,7 +119,10 @@ public class Parameters {
      */
     private static long deadline;
     
-    
+    /**
+     */
+    public static double changeTime;
+    public static double changeScale;
     /**
      * the bandwidth from one vm to one vm
      */
@@ -140,6 +138,11 @@ public class Parameters {
      * Invalid String
      */
     private static String INVALID = "Invalid";
+    
+    /**
+     * The scale of runtime. Multiple runtime by this
+     */
+    private static double runtime_scale = 1.0;
     
     /**
      * A static function so that you can specify them in any place
@@ -354,5 +357,21 @@ public class Parameters {
      */
     public static void setMaxDepth(int depth){
         maxDepth = depth;
+    }
+    
+    /**
+     * Sets the runtime scale
+     * @param scale 
+     */
+    public static void setRuntimeScale(double scale){
+        runtime_scale = scale;
+    }
+    
+    /**
+     * Gets the runtime scale
+     * @return 
+     */
+    public static double getRuntimeScale(){
+        return runtime_scale;
     }
 }

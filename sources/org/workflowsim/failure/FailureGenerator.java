@@ -25,6 +25,7 @@ import org.workflowsim.Job;
 import org.workflowsim.Task;
 import org.apache.commons.math3.distribution.WeibullDistribution;
 import org.workflowsim.utils.DistributionGenerator;
+import org.workflowsim.utils.Parameters;
 
 /**
  * FailureGenerator creates a failure when a job returns
@@ -40,8 +41,9 @@ public class FailureGenerator {
      * but only limits to maxFailureSizeExtension. Otherwise your failure rate 
      * is too high for this workflow
      */
-    private static final int maxFailureSizeExtension = 20;
+    private static final int maxFailureSizeExtension = 50;
     private static int failureSizeExtension = 0;
+    private static boolean hasChangeTime = false;
     /**
      *
      */
@@ -110,9 +112,18 @@ public class FailureGenerator {
             default:
                 return false;
         }
-        double[] samples = generator.getCumulativeSamples();
+        
         double start = task.getExecStartTime();
         double end = task.getTaskFinishTime();
+        
+        if(!hasChangeTime){
+            if(start > Parameters.changeTime){
+                hasChangeTime = true;
+                generator.varyDistribution(generator.getScale() * Parameters.changeScale, generator.getShape());
+            }
+        }
+        
+        double[] samples = generator.getCumulativeSamples();
         
         while (samples[samples.length - 1] < start) {
             generator.extendSamples();
@@ -131,6 +142,8 @@ public class FailureGenerator {
             }
             if (start <= samples[sampleId]) {
                 //has a failure
+                /** The idea is we need to update the cursor in generator**/
+                generator.getNextSample();
                 return true;
             }
         }

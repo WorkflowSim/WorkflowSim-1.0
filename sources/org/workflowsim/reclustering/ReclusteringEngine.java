@@ -119,8 +119,8 @@ public class ReclusteringEngine {
                 /**
                  * Binary reclustering.
                  */
-                case FTCLUSTERING_BINARY:
-                    jobList = BinaryReclustering(jobList, job, id);
+                case FTCLUSTERING_VERTICAL:
+                    jobList = VerticalReclustering(jobList, job, id);
                     break;
                 default:
                     break;
@@ -195,16 +195,19 @@ public class ReclusteringEngine {
     }
 
     /**
-     * Binary Reclustering
+     * Vertical Reclustering
      *
      * @param jobList, job list
      * @param job, job
      * @param id, job id
      * @return
      */
-    private static List BinaryReclustering(List jobList, Job job, int id) {
-        //Log.printLine("Job Id for reclustering" + job.getCloudletId());
+    private static List VerticalReclustering(List jobList, Job job, int id) {
         Map map = getDepthMap(job.getTaskList());
+        
+        /**
+         * If it has just one level
+         */
         if (map.size() == 1) {
 
             jobList = DCReclustering(jobList, job, id, job.getTaskList());

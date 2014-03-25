@@ -69,17 +69,18 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
              * Should change this based on real physical path
              */
             //String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_1000.xml";
-            String daxPath = "/Users/chenweiwei/Research/balanced_clustering/data/scan/SIPHT.n.1000.9.dax";
-            //String daxPath = "/Users/chenweiwei/Research/balanced_clustering/data/scan-1/LIGO.n.800.8.dax";
+            //String daxPath = "/Users/chenweiwei/Research/balanced_clustering/data/scan/SIPHT.n.1000.9.dax";
+            String daxPath = "/Users/chenweiwei/Research/balanced_clustering/data/scan-1/LIGO.n.800.8.dax";
             //String daxPath ="/Users/chenweiwei/Research/balanced_clustering/data/scan-1/GENOME.d.702049732.5.dax";
             //String daxPath = "/Users/chenweiwei/Research/balanced_clustering/data/scan-1/CYBERSHAKE.n.700.10.dax";
            //String daxPath = "/Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Montage_300.xml";
             //This controls k if q_shape is large it is good
            double q_scale = 50, q_weight = 3, q_shape = 3;
-           double t_scale = 1.0;
-           String clustering = "NOOP";
-           
-           double theta = 10, theta_weight = 30;
+           double t_scale = 10;//default is 1.0
+           String clustering = "VR";
+           double change_time = 1e9;
+           double change_scale = 10;
+           double theta = 700, theta_weight = 30 * 100;
 
            
            for(int i = 0; i < args.length; i ++){
@@ -109,9 +110,16 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
                    case 't':
                        theta_weight = Double.parseDouble(args[++i]);
                        break;
+                   case 'g':
+                       change_time = Double.parseDouble(args[++i]);
+                       break;
+                   case 'l':
+                       change_scale = Double.parseDouble(args[++i]);
+                       break;
                }
            }
-            
+            t_scale /= 10;
+            change_scale /= 10;
             if(daxPath == null){
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return ;
@@ -121,6 +129,13 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return ;
             }
+            
+            /**
+             * Runtime Parameters
+             */
+            Parameters.setRuntimeScale(t_scale);
+            Parameters.changeTime = change_time;
+            Parameters.changeScale = change_scale;
             /*
              *  Fault Tolerant Parameters
              */
@@ -137,6 +152,14 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
             /**
              *  In this example, we have horizontal clustering and we use Dynamic Reclustering. 
              */
+            
+             /**
+             * No Clustering
+             */
+            ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.HORIZONTAL;
+            
+            
+            
             FailureParameters.FTCluteringAlgorithm ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_NOOP;
             if(clustering.equalsIgnoreCase("SR")){
                 ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_SR;
@@ -146,7 +169,12 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
                 ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_NOOP;
             }else if(clustering.equalsIgnoreCase("DC")){
                 ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_DC;
+            }else if(clustering.equalsIgnoreCase("VR")){
+                ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_VERTICAL;
+                method = ClusteringParameters.ClusteringMethod.VERTICAL;
             }
+            ClusteringParameters cp = new ClusteringParameters(vmNum, 0, method, null);
+            
             /**
              * Task failure rate for each level 
              * 
@@ -223,11 +251,7 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
 
             OverheadParameters op = new OverheadParameters(0, engineDelay, queueDelay, postscriptDelay, clusteringDelay, 0);
             
-            /**
-             * No Clustering
-             */
-            ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.HORIZONTAL;
-            ClusteringParameters cp = new ClusteringParameters(vmNum, 0, method, null);
+
 
             /**
              * Initialize static parameters

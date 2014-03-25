@@ -226,7 +226,9 @@ public class WorkflowParser {
                     } else {
                         Log.printLine("Cannot find runtime for " + nodeName + ",set it to be 0");
                     }
-
+                    //multiple the scale, by default it is 1.0
+                    length *= Parameters.getRuntimeScale();
+                    
                     List fileList = node.getChildren();
 
                     List mFileList = new ArrayList<org.cloudbus.cloudsim.File>();
