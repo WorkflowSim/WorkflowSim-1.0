@@ -24,6 +24,7 @@ import java.util.List;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletSchedulerSpaceShared;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
+import org.cloudbus.cloudsim.HarddriveStorage;
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.Pe;
@@ -242,22 +243,19 @@ public class WorkflowSimBasicExample1 {
                 arch, os, vmm, hostList, time_zone, cost, costPerMem, costPerStorage, costPerBw);
 
 
-        // 6. Finally, we need to create a cluster storage object.
+        // 6. Finally, we need to create a storage object.
         /**
-         * The bandwidth within a data center.
+         * The bandwidth within a data center in MB/s.
          */
-        double intraBandwidth = 1.5e7;// the number comes from the futuregrid site, you can specify your bw
+        int maxTransferRate = 15;// the number comes from the futuregrid site, you can specify your bw
         
         try {
-            ClusterStorage s1 = new ClusterStorage(name, 1e12);
-            
-            // The bandwidth within a data center
-            s1.setBandwidth("local", intraBandwidth);
-            // The bandwidth to the source site 
-            s1.setBandwidth("source", intraBandwidth);
+            HarddriveStorage s1 = new HarddriveStorage(name, 1e12);
+            s1.setMaxTransferRate(maxTransferRate);
             storageList.add(s1);
             datacenter = new DatacenterExtended(name, characteristics, new VmAllocationPolicySimple(hostList), storageList, 0);
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return datacenter;

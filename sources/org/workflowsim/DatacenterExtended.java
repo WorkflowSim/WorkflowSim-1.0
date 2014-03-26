@@ -283,20 +283,16 @@ public class DatacenterExtended extends Datacenter {
                         /**
                          * Picks up the site that is closest
                          */
-                        ClusterStorage clStorage = (ClusterStorage) getStorageList().get(0);
                         if (cl.getClassType() == ClassType.STAGE_IN.value) {
-                            for (Iterator it = siteList.iterator(); it.hasNext();) {
-                                //site is where one replica of this data is located at
-                                String site = (String) it.next();
-                                if (site.equals(this.getName())) {
-                                    continue;
-                                }
-                                double bwth = clStorage.getMaxTransferRate(site);
-                                if (bwth > maxBwth) {
-                                    maxBwth = bwth;
+                            double maxRate = Double.MIN_VALUE;
+                            for(Storage storage: getStorageList()){
+                                double rate = storage.getMaxTransferRate();
+                                if(rate > maxRate){
+                                    rate = maxRate;
                                 }
                             }
-                            time += file.getSize() / maxBwth;
+                            //Storage storage = getStorageList().get(0);
+                            time += file.getSize() / maxRate;
                         }
                         break;
                     case LOCAL:
@@ -305,8 +301,6 @@ public class DatacenterExtended extends Datacenter {
                         int userId = cl.getUserId();
                         Host host = getVmAllocationPolicy().getHost(vmId, userId);
                         Vm vm = host.getVm(vmId, userId);
-                        //CondorVM condorVm = (CondorVM) vm;
-                        //DistributedClusterStorage dcStorage = (DistributedClusterStorage) getStorageList().get(0);
 
                         boolean requiredFileStagein = true;
 
