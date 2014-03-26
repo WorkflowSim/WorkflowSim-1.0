@@ -116,12 +116,6 @@ public class FailureGenerator {
         double start = task.getExecStartTime();
         double end = task.getTaskFinishTime();
         
-        if(!hasChangeTime){
-            if(start > Parameters.changeTime){
-                hasChangeTime = true;
-                generator.varyDistribution(generator.getScale() * Parameters.changeScale, generator.getShape());
-            }
-        }
         
         double[] samples = generator.getCumulativeSamples();
         

@@ -23,6 +23,8 @@ import java.util.Map;
 import org.workflowsim.Job;
 import org.workflowsim.Task;
 import org.workflowsim.utils.Parameters;
+import org.workflowsim.utils.Parameters.ClassType;
+import org.workflowsim.utils.Parameters.FileType;
 
 /**
  * The default clustering does no clustering at all, just map a task to a job
@@ -168,6 +170,7 @@ public class BasicClustering implements ClusteringInterface {
             int depth = 0;
             /// a bug of cloudsim makes it final of input file size and output file size
             Job job = new Job(idIndex, length/*, inputFileSize, outputFileSize*/);
+            job.setClassType(ClassType.COMPUTE.value);
             for (Iterator it = taskList.iterator(); it.hasNext();) {
                 Task task = (Task) it.next();
                 length += task.getCloudletLength();
@@ -189,12 +192,12 @@ public class BasicClustering implements ClusteringInterface {
                     if (!hasFile) {
 
                         job.getFileList().add(file);
-                        if (file.getType() == 1) {
+                        if (file.getType() == FileType.INPUT.value) {
                             //for stag-in jobs to be used
                             if (!this.allFileList.contains(file)) {
                                 this.allFileList.add(file);
                             }
-                        } else if (file.getType() == 2) {
+                        } else if (file.getType() == FileType.OUTPUT.value) {
                             this.allFileList.add(file);
                         }
                     }

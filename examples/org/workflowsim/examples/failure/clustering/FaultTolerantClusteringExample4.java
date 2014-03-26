@@ -92,17 +92,22 @@ public class FaultTolerantClusteringExample4 extends FaultTolerantClusteringExam
             /**
              *  In this example, we have horizontal clustering and we use Dynamic Clustering. 
              */
-            FailureParameters.FTCluteringAlgorithm ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_DC;
+            FailureParameters.FTCluteringAlgorithm ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_DR;
             /**
              * Task failure rate for each level 
              * 
              */
-            DistributionGenerator[][] failureGenerators = new DistributionGenerator[vmNum][1];
-
+            int maxLevel = 11;
+            DistributionGenerator[][] failureGenerators = new DistributionGenerator[vmNum][maxLevel];
+            /**
+             * Model failures as a function of VM (each VM has its own independent distribution
+             */
             for (int vmId = 0; vmId < vmNum; vmId++) {
-
-                failureGenerators[vmId][0] = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL,
+                DistributionGenerator generator = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL,
                         100, 1.0, 30, 300, 0.78);
+                for( int level = 0; level < maxLevel; level++){
+                    failureGenerators[vmId][level] = generator;
+                }
             }
             /**
              * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 

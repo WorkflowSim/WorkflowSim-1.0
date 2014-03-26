@@ -100,7 +100,7 @@ public class FaultTolerantClusteringExample3 extends FaultTolerantClusteringExam
              */
             int maxLevel = 11; //most workflows we use has a maximum of 11 levels
 
-            DistributionGenerator[][] failureGenerators = new DistributionGenerator[1][maxLevel];
+            DistributionGenerator[][] failureGenerators = new DistributionGenerator[vmNum][maxLevel];
 
             for (int level = 0; level < maxLevel; level++) {
                 /*
@@ -108,8 +108,11 @@ public class FaultTolerantClusteringExample3 extends FaultTolerantClusteringExam
                  * of submitted tasks will fail. It doesn't have to be the same task 
                  * failure rate at each level. 
                  */
-                failureGenerators[0][level] = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL,
+                DistributionGenerator generator = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL,
                         100, 1.0, 30, 300, 0.78);
+                for(int vmId = 0; vmId < vmNum; vmId++){
+                    failureGenerators[vmId][level] = generator;
+                }
             }
 
 

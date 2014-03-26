@@ -18,23 +18,12 @@
 package org.workflowsim.examples;
 
 import org.cloudbus.cloudsim.Log;
-import org.workflowsim.examples.clustering.HorizontalClusteringExample1;
-import org.workflowsim.examples.clustering.HorizontalClusteringExample2;
-import org.workflowsim.examples.clustering.HorizontalClusteringExample3;
-import org.workflowsim.examples.clustering.VerticalClusteringExample1;
-import org.workflowsim.examples.clustering.balancing.BalancedClusteringExample1;
-import org.workflowsim.examples.failure.FaultTolerantSchedulingExample1;
-import org.workflowsim.examples.failure.clustering.FaultTolerantClusteringExample1;
-import org.workflowsim.examples.failure.clustering.FaultTolerantClusteringExample2;
-import org.workflowsim.examples.failure.clustering.FaultTolerantClusteringExample3;
-import org.workflowsim.examples.failure.clustering.FaultTolerantClusteringExample4;
-import org.workflowsim.examples.planning.DHEFTPlanningAlgorithmExample1;
-import org.workflowsim.examples.planning.HEFTPlanningAlgorithmExample1;
-import org.workflowsim.examples.scheduling.DataAwareSchedulingAlgorithmExample;
-import org.workflowsim.examples.scheduling.FCFSSchedulingAlgorithmExample;
-import org.workflowsim.examples.scheduling.MAXMINSchedulingAlgorithmExample;
-import org.workflowsim.examples.scheduling.MCTSchedulingAlgorithmExample;
-import org.workflowsim.examples.scheduling.MINMINSchedulingAlgorithmExample;
+import org.workflowsim.examples.clustering.*;
+import org.workflowsim.examples.clustering.balancing.*;
+import org.workflowsim.examples.failure.*;
+import org.workflowsim.examples.failure.clustering.*;
+import org.workflowsim.examples.planning.*;
+import org.workflowsim.examples.scheduling.*;
 
 /**
  * Test all the workflow examples
@@ -82,6 +71,8 @@ public class WorkflowSimAllExamplesTester {
             FaultTolerantClusteringExample2.main(args);
             FaultTolerantClusteringExample3.main(args);
             FaultTolerantClusteringExample4.main(args);
+            FaultTolerantClusteringExample5.main(args);
+            FaultTolerantClusteringExample6.main(args);
             
             /**
              * Planning Algorithms

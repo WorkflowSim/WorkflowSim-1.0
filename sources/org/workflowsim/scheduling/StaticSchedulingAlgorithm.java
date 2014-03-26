@@ -23,10 +23,10 @@ import org.workflowsim.CondorVM;
 import org.workflowsim.WorkflowSimTags;
 
 /**
- * Static algorithm. Do not schedule at all and reply on Workflow Planner to set 
- * the mapping relationship. But StaticSchedulingAlgorithm would check whether a job has been
- * assigned a VM in this stage (in case your implementation of planning algorithm 
- * forgets it)
+ * Static algorithm. Do not schedule at all and reply on Workflow Planner to set
+ * the mapping relationship. But StaticSchedulingAlgorithm would check whether a
+ * job has been assigned a VM in this stage (in case your implementation of
+ * planning algorithm forgets it)
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
@@ -39,49 +39,39 @@ public class StaticSchedulingAlgorithm extends BaseSchedulingAlgorithm {
     }
 
     @Override
-    public void run() throws Exception{
-        
-        Map mId2Vm = new HashMap<Integer, CondorVM> ();
-        
-        for(int i = 0; i < getVmList().size();i++ ) {
-            CondorVM vm = (CondorVM)getVmList().get(i);
-            if(vm!=null){
+    public void run() throws Exception {
+
+        Map mId2Vm = new HashMap<Integer, CondorVM>();
+
+        for (int i = 0; i < getVmList().size(); i++) {
+            CondorVM vm = (CondorVM) getVmList().get(i);
+            if (vm != null) {
                 mId2Vm.put(vm.getId(), vm);
             }
         }
-        
+
         int size = getCloudletList().size();
 
-        for(int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             Cloudlet cloudlet = (Cloudlet) getCloudletList().get(i);
             /**
              * Make sure cloudlet is matched to a VM. It should be done in the
-             * Workflow Planner. If not, throws an exception because StaticSchedulingAlgorithm
-             * itself does not do the mapping. 
+             * Workflow Planner. If not, throws an exception because
+             * StaticSchedulingAlgorithm itself does not do the mapping.
              */
-
-            if(cloudlet.getVmId() < 0 || ! mId2Vm.containsKey(cloudlet.getVmId())){
-//                throw(new Exception("Cloudlet " + cloudlet.getCloudletId() + " is not matched."
-//                        + "Please configure scheduler_method in your config file"));
+            if (cloudlet.getVmId() < 0 || !mId2Vm.containsKey(cloudlet.getVmId())) {
                 Log.printLine("Cloudlet " + cloudlet.getCloudletId() + " is not matched."
                         + "It is possible a stage-in job");
                 cloudlet.setVmId(0);
-                
-            }
-            CondorVM vm = (CondorVM)mId2Vm.get(cloudlet.getVmId());
-            if(vm.getState() == WorkflowSimTags.VM_STATUS_IDLE){   
-               vm.setState(WorkflowSimTags.VM_STATUS_BUSY);
-               getScheduledList().add(cloudlet);
-               Log.printLine("Schedules " + cloudlet.getCloudletId() + " with "
-                    + cloudlet.getCloudletLength() + " to VM " + cloudlet.getVmId() );
-            }
 
-            
-
+            }
+            CondorVM vm = (CondorVM) mId2Vm.get(cloudlet.getVmId());
+            if (vm.getState() == WorkflowSimTags.VM_STATUS_IDLE) {
+                vm.setState(WorkflowSimTags.VM_STATUS_BUSY);
+                getScheduledList().add(cloudlet);
+                Log.printLine("Schedules " + cloudlet.getCloudletId() + " with "
+                        + cloudlet.getCloudletLength() + " to VM " + cloudlet.getVmId());
+            }
         }
-
-
-
-
     }
 }

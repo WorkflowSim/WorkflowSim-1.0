@@ -29,6 +29,8 @@ import org.workflowsim.clustering.VerticalClustering;
 import org.workflowsim.clustering.balancing.BalancedClustering;
 import org.workflowsim.utils.ClusteringParameters;
 import org.workflowsim.utils.Parameters;
+import org.workflowsim.utils.Parameters.ClassType;
+import org.workflowsim.utils.Parameters.FileType;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
@@ -203,7 +205,7 @@ public final class ClusteringEngine extends SimEntity {
         /**
          * if the type is input file)
          */
-        if (file.getType() == 1) {
+        if (file.getType() == FileType.INPUT.value) {
 
             for (org.cloudbus.cloudsim.File another : list) {
                 /**
@@ -214,7 +216,7 @@ public final class ClusteringEngine extends SimEntity {
                         /**
                          * It is output file
                          */
-                        && another.getType() == 2) {
+                        && another.getType() == FileType.OUTPUT.value) {
                     return false;
                 }
             }
@@ -260,7 +262,7 @@ public final class ClusteringEngine extends SimEntity {
             }
         }
         job.setFileList(fileList);
-        job.setClassType(1);
+        job.setClassType(ClassType.STAGE_IN.value);
 
         /**
          * stage-in is always first level job

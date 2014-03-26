@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.cloudbus.cloudsim.Consts;
 import org.cloudbus.cloudsim.File;
 import org.cloudbus.cloudsim.Log;
 import org.workflowsim.CondorVM;
@@ -193,6 +194,8 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
             }
         }
 
+        //file Size is in Bytes, acc in MB
+        acc = acc / Consts.MILLION;
         // acc in MB, averageBandwidth in Mb/s
         return acc * 8 / averageBandwidth;
     }

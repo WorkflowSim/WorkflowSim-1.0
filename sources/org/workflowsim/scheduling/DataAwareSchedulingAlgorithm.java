@@ -23,6 +23,7 @@ import org.cloudbus.cloudsim.Log;
 import org.workflowsim.CondorVM;
 import org.workflowsim.Job;
 import org.workflowsim.WorkflowSimTags;
+import org.workflowsim.utils.Parameters.FileType;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
@@ -48,9 +49,6 @@ public class DataAwareSchedulingAlgorithm extends BaseSchedulingAlgorithm {
         for (int i = 0; i < size; i++) {
 
             Cloudlet cloudlet = (Cloudlet) getCloudletList().get(i);
-            if(cloudlet.getCloudletId() == 38){
-                Log.printLine();
-            }
 
             int vmSize = getVmList().size();
             CondorVM closestVm = null;//(CondorVM)getVmList().get(0);
@@ -101,14 +99,14 @@ public class DataAwareSchedulingAlgorithm extends BaseSchedulingAlgorithm {
      * @post $none
      */
     private boolean isRealInputFile(List<File> list, File file) {
-        if (file.getType() == 1)//input file
+        if (file.getType() == FileType.INPUT.value)//input file
         {
             for (File another : list) {
                 if (another.getName().equals(file.getName())
                         /**
                          * if another file is output file
                          */
-                        && another.getType() == 2) {
+                        && another.getType() == FileType.OUTPUT.value) {
                     return false;
                 }
             }

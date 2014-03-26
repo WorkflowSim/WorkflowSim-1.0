@@ -16,25 +16,15 @@
 package org.workflowsim.examples.planning;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import org.cloudbus.cloudsim.DatacenterCharacteristics;
-import org.cloudbus.cloudsim.Host;
+import org.cloudbus.cloudsim.CloudletSchedulerSpaceShared;
 import org.cloudbus.cloudsim.Log;
-import org.cloudbus.cloudsim.Pe;
-import org.cloudbus.cloudsim.Storage;
-import org.cloudbus.cloudsim.VmAllocationPolicySimple;
-import org.cloudbus.cloudsim.VmSchedulerTimeShared;
 import org.cloudbus.cloudsim.core.CloudSim;
-import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
-import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
-import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 import org.workflowsim.CondorVM;
 import org.workflowsim.DatacenterExtended;
-import org.workflowsim.DistributedClusterStorage;
 import org.workflowsim.Job;
 import org.workflowsim.WorkflowEngine;
 import org.workflowsim.WorkflowPlanner;
@@ -56,13 +46,40 @@ import org.workflowsim.utils.ReplicaCatalog;
 public class HEFTPlanningAlgorithmExample1 extends WorkflowSimBasicExample1{
 
     ////////////////////////// STATIC METHODS ///////////////////////
+    protected static List<CondorVM> createVM(int userId, int vms) {
+
+        //Creates a container to store VMs. This list is passed to the broker later
+        LinkedList<CondorVM> list = new LinkedList<CondorVM>();
+
+        //VM Parameters
+        long size = 10000; //image size (MB)
+        int ram = 512; //vm memory (MB)
+        int mips = 1000;
+        long bw = 1000;
+        int pesNumber = 1; //number of cpus
+        String vmm = "Xen"; //VMM name
+
+        //create VMs
+        CondorVM[] vm = new CondorVM[vms];
+
+        Random bwRandom = new Random(System.currentTimeMillis());
+
+        for (int i = 0; i < vms; i++) {
+            double ratio = bwRandom.nextDouble();
+            vm[i] = new CondorVM(i, userId, mips * ratio, pesNumber, ram, (long) (bw * ratio), size, vmm, new CloudletSchedulerSpaceShared());
+            list.add(vm[i]);
+        }
+
+        return list;
+    }
+
     /**
      * Creates main() to run this example This example has only one datacenter
      * and one storage
      */
     public static void main(String[] args) {
 
-
+        
         try {
             // First step: Initialize the WorkflowSim package. 
 
@@ -157,94 +174,5 @@ public class HEFTPlanningAlgorithmExample1 extends WorkflowSimBasicExample1{
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
-    }
-    
-    /**
-     * Creates a Data center
-     * @param name data center name
-     * @return DatacenterExntended
-     */
-    protected static DatacenterExtended createDatacenter(String name) {
-
-        // Here are the steps needed to create a PowerDatacenter:
-        // 1. We need to create a list to store one or more
-        //    Machines
-        List<Host> hostList = new ArrayList<Host>();
-
-        // 2. A Machine contains one or more PEs or CPUs/Cores. Therefore, should
-        //    create a list to store these PEs before creating
-        //    a Machine.
-        for (int i = 1; i <= 20; i++) {
-            List<Pe> peList1 = new ArrayList<Pe>();
-            int mips = 2000;
-            // 3. Create PEs and add these into the list.
-            //for a quad-core machine, a list of 4 PEs is required:
-            peList1.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
-            peList1.add(new Pe(1, new PeProvisionerSimple(mips)));
-
-            int hostId = 0;
-            int ram = 2048; //host memory (MB)
-            long storage = 1000000; //host storage
-            int bw = 10000;
-            hostList.add(
-                    new Host(
-                    hostId,
-                    new RamProvisionerSimple(ram),
-                    new BwProvisionerSimple(bw),
-                    storage,
-                    peList1,
-                    new VmSchedulerTimeShared(peList1))); // This is our first machine
-            hostId++;
-
-        }
-
-        // 5. Create a DatacenterCharacteristics object that stores the
-        //    properties of a data center: architecture, OS, list of
-        //    Machines, allocation policy: time- or space-shared, time zone
-        //    and its price (G$/Pe time unit).
-        String arch = "x86";      // system architecture
-        String os = "Linux";          // operating system
-        String vmm = "Xen";
-        double time_zone = 10.0;         // time zone this resource located
-        double cost = 3.0;              // the cost of using processing in this resource
-        double costPerMem = 0.05;		// the cost of using memory in this resource
-        double costPerStorage = 0.1;	// the cost of using storage in this resource
-        double costPerBw = 0.1;			// the cost of using bw in this resource
-        LinkedList<Storage> storageList = new LinkedList<Storage>();	//we are not adding SAN devices by now
-        DatacenterExtended datacenter = null;
-
-
-        DatacenterCharacteristics characteristics = new DatacenterCharacteristics(
-                arch, os, vmm, hostList, time_zone, cost, costPerMem, costPerStorage, costPerBw);
-
-
-        // 6. Finally, we need to create a cluster storage object.
-        /**
-         * The bandwidth within a data center.
-         */
-        double intraBandwidth = 1.5e7;// the number comes from the futuregrid site, you can specify your bw
-
-        Random bwRandom = new Random(System.currentTimeMillis());
-
-        try {
-            DistributedClusterStorage s1 = new DistributedClusterStorage(name, 1e12, Parameters.getVmNum(), intraBandwidth);
-            double[][] bws = new double[Parameters.getVmNum()][Parameters.getVmNum()];
-            for (int src = 0; src < Parameters.getVmNum(); src++) {
-                bws[src][src] = Double.MAX_VALUE;
-                for (int dest = src; dest < Parameters.getVmNum(); dest++) {
-                    double bw = intraBandwidth * bwRandom.nextDouble();
-                    bws[src][dest] = bw;
-                    bws[dest][src] = bw;
-                }
-            }
-            s1.setBandwidth(bws);
-            //such that the planning algorithms can know the bandwidths
-            Parameters.setBandwidths(bws);
-            storageList.add(s1);
-            datacenter = new DatacenterExtended(name, characteristics, new VmAllocationPolicySimple(hostList), storageList, 0);
-        } catch (Exception e) {
-        }
-
-        return datacenter;
     }
 }

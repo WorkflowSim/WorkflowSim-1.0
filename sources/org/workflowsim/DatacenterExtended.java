@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletScheduler;
+import org.cloudbus.cloudsim.Consts;
 import org.cloudbus.cloudsim.Datacenter;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
 import org.cloudbus.cloudsim.File;
@@ -32,6 +33,8 @@ import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEvent;
 import org.workflowsim.utils.ReplicaCatalog;
 import org.workflowsim.utils.Parameters;
+import org.workflowsim.utils.Parameters.ClassType;
+import org.workflowsim.utils.Parameters.FileType;
 
 /**
  * DatacenterExtended extends Datacenter so as we can use CondorVM and other
@@ -114,7 +117,7 @@ public class DatacenterExtended extends Datacenter {
             /**
              * Stage-in file && Shared based on the file.system
              */
-            if (cl.getClassType() == 1) {
+            if (cl.getClassType() == ClassType.STAGE_IN.value) {
                 stageInFile2FileSystem(cl);
             }
 
@@ -127,7 +130,7 @@ public class DatacenterExtended extends Datacenter {
             Job job = (Job) cl;
 
             double fileTransferTime = 0.0;
-            if (cl.getClassType() != 1) {
+            if (cl.getClassType() == ClassType.COMPUTE.value) {
                 fileTransferTime = processDataStageIn(job.getFileList(), cl);
             }
 
@@ -158,6 +161,7 @@ public class DatacenterExtended extends Datacenter {
 
         } catch (Exception e) {
             Log.printLine(getName() + ".processCloudletSubmit(): " + "Exception error.");
+            e.printStackTrace();
 
         }
 
@@ -238,14 +242,14 @@ public class DatacenterExtended extends Datacenter {
      * @post $none
      */
     private boolean isRealInputFile(List<File> list, File file) {
-        if (file.getType() == 1)//input file
+        if (file.getType() == FileType.INPUT.value)//input file
         {
             for (File another : list) {
                 if (another.getName().equals(file.getName())
                         /**
                          * if another file is output file
                          */
-                        && another.getType() == 2) {
+                        && another.getType() == FileType.OUTPUT.value) {
                     return false;
                 }
             }
@@ -280,7 +284,7 @@ public class DatacenterExtended extends Datacenter {
                          * Picks up the site that is closest
                          */
                         ClusterStorage clStorage = (ClusterStorage) getStorageList().get(0);
-                        if (cl.getClassType() == 1) {
+                        if (cl.getClassType() == ClassType.STAGE_IN.value) {
                             for (Iterator it = siteList.iterator(); it.hasNext();) {
                                 //site is where one replica of this data is located at
                                 String site = (String) it.next();
@@ -301,8 +305,8 @@ public class DatacenterExtended extends Datacenter {
                         int userId = cl.getUserId();
                         Host host = getVmAllocationPolicy().getHost(vmId, userId);
                         Vm vm = host.getVm(vmId, userId);
-                        CondorVM condorVm = (CondorVM) vm;
-                        DistributedClusterStorage dcStorage = (DistributedClusterStorage) getStorageList().get(0);
+                        //CondorVM condorVm = (CondorVM) vm;
+                        //DistributedClusterStorage dcStorage = (DistributedClusterStorage) getStorageList().get(0);
 
                         boolean requiredFileStagein = true;
 
@@ -322,16 +326,20 @@ public class DatacenterExtended extends Datacenter {
                             }
                             double bwth;
                             if (site.equals(Parameters.SOURCE)) {
-                                bwth = dcStorage.getBaseBandwidth();
+                                //transfers from the source to the VM is limited to the VM bw only
+                                bwth = vm.getBw();
+                                //bwth = dcStorage.getBaseBandwidth();
                             } else {
-                                bwth = dcStorage.getBandwidth(Integer.parseInt(site), vmId);
+                                //transfers between two VMs is limited to both VMs
+                                bwth = Math.min(vm.getBw(), getVmAllocationPolicy().getHost(Integer.parseInt(site), userId).getVm(Integer.parseInt(site), userId).getBw());
+                                //bwth = dcStorage.getBandwidth(Integer.parseInt(site), vmId);
                             }
                             if (bwth > maxBwth) {
                                 maxBwth = bwth;
                             }
                         }
                         if (requiredFileStagein && maxBwth > 0.0) {
-                            time += file.getSize() / maxBwth;
+                            time += file.getSize() / Consts.MILLION * 8 / maxBwth;
                         }
 
                         /**
@@ -415,7 +423,7 @@ public class DatacenterExtended extends Datacenter {
         List fList = tl.getFileList();
         for (Iterator it = fList.iterator(); it.hasNext();) {
             org.cloudbus.cloudsim.File file = (org.cloudbus.cloudsim.File) it.next();
-            if (file.getType() == 2)//output file
+            if (file.getType() == FileType.OUTPUT.value)//output file
             {
 
                 switch (ReplicaCatalog.getFileSystem()) {

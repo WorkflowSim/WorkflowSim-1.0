@@ -57,6 +57,17 @@ public class Parameters {
         }
     }
     
+        /**
+     * File Type
+     */
+    public enum ClassType{
+        STAGE_IN(1), COMPUTE(2), STAGE_OUT(3), CLEAN_UP(4);
+        public final int value;
+        private ClassType(int cType){
+            this.value = cType;
+        }
+    }
+    
     /** 
      * Source Host (submit host)
      */
@@ -119,10 +130,6 @@ public class Parameters {
      */
     private static long deadline;
     
-    /**
-     */
-    public static double changeTime;
-    public static double changeScale;
     /**
      * the bandwidth from one vm to one vm
      */
@@ -315,32 +322,6 @@ public class Parameters {
      */
     public static long getDeadline(){
     	return deadline;
-    }
-    
-    /**
-     * Sets the bandwidth between vms
-     * @param bw bandwidth
-     */
-    public static void setBandwidths(double[][] bw){
-        bandwidths = bw;
-    }
-    
-    /**
-     * Gets the bandwidth from src to dest
-     * @param src the source vm id
-     * @param dest the destination vm id
-     * @return the bandwidth from the source vm to the destination vm
-     */
-    public static double getBandwidth(int src, int dest){
-        return bandwidths[src][dest];
-    }
-    
-    /**
-     * Gets the bandwidths
-     * @return the bandwidths
-     */
-    public static double[][] getBandwidths(){
-        return bandwidths;
     }
     
     /**

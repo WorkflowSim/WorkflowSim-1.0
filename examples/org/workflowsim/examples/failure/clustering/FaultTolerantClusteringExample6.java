@@ -134,8 +134,7 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
              * Runtime Parameters
              */
             Parameters.setRuntimeScale(t_scale);
-            Parameters.changeTime = change_time;
-            Parameters.changeScale = change_scale;
+
             /*
              *  Fault Tolerant Parameters
              */

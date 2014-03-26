@@ -31,7 +31,7 @@ import org.cloudbus.cloudsim.ParameterException;
 public class ClusterStorage extends HarddriveStorage {
 
     /**
-     * The map stores the bandwidth from this clusterstorage to others
+     * The map stores the bandwidth from this cluster-storage to others
      */
     Map bandwidthMap;
 

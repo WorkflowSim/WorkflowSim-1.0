@@ -16,42 +16,29 @@
 package org.workflowsim.examples.scheduling;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
-import org.cloudbus.cloudsim.DatacenterCharacteristics;
-import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Log;
-import org.cloudbus.cloudsim.Pe;
-import org.cloudbus.cloudsim.Storage;
-import org.cloudbus.cloudsim.VmAllocationPolicySimple;
-import org.cloudbus.cloudsim.VmSchedulerTimeShared;
 import org.cloudbus.cloudsim.core.CloudSim;
-import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
-import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
-import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 import org.workflowsim.CondorVM;
 import org.workflowsim.DatacenterExtended;
-import org.workflowsim.DistributedClusterStorage;
 import org.workflowsim.Job;
 import org.workflowsim.WorkflowEngine;
 import org.workflowsim.WorkflowPlanner;
-import org.workflowsim.examples.WorkflowSimBasicExample1;
+import org.workflowsim.examples.planning.DHEFTPlanningAlgorithmExample1;
 import org.workflowsim.utils.ClusteringParameters;
 import org.workflowsim.utils.OverheadParameters;
 import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * This MINMIN Scheduling Algorithm 
+ * This MINMIN Scheduling Algorithm
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.1
  * @date Nov 9, 2013
  */
-public class DataAwareSchedulingAlgorithmExample extends WorkflowSimBasicExample1 {
+public class DataAwareSchedulingAlgorithmExample extends DHEFTPlanningAlgorithmExample1 {
 
     ////////////////////////// STATIC METHODS ///////////////////////
     /**
@@ -74,26 +61,27 @@ public class DataAwareSchedulingAlgorithmExample extends WorkflowSimBasicExample
              * Should change this based on real physical path
              */
             String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
-            
+
             File daxFile = new File(daxPath);
-            if(!daxFile.exists()){
+            if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return;
             }
 
             /**
-             * Since we are using HEFT planning algorithm, the scheduling algorithm should be static 
-             * such that the scheduler would not override the result of the planner
+             * Since we are using HEFT planning algorithm, the scheduling
+             * algorithm should be static such that the scheduler would not
+             * override the result of the planner
              */
             Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.DATA;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.LOCAL;
 
             /**
-             * No overheads 
+             * No overheads
              */
             OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);;
-            
+
             /**
              * No Clustering
              */
@@ -144,111 +132,14 @@ public class DataAwareSchedulingAlgorithmExample extends WorkflowSimBasicExample
 
             CloudSim.startSimulation();
 
-
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
 
             CloudSim.stopSimulation();
 
             printJobList(outputList0);
 
-
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
     }
-
-    /**
-     * Creates a Data center
-     * @param name data center name
-     * @return DatacenterExntended
-     */
-    protected static DatacenterExtended createDatacenter(String name) {
-
-        // Here are the steps needed to create a PowerDatacenter:
-        // 1. We need to create a list to store one or more
-        //    Machines
-        List<Host> hostList = new ArrayList<Host>();
-
-        // 2. A Machine contains one or more PEs or CPUs/Cores. Therefore, should
-        //    create a list to store these PEs before creating
-        //    a Machine.
-        for (int i = 1; i <= 20; i++) {
-            List<Pe> peList1 = new ArrayList<Pe>();
-            int mips = 2000;
-            // 3. Create PEs and add these into the list.
-            //for a quad-core machine, a list of 4 PEs is required:
-            peList1.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
-            peList1.add(new Pe(1, new PeProvisionerSimple(mips)));
-
-            int hostId = 0;
-            int ram = 2048; //host memory (MB)
-            long storage = 1000000; //host storage
-            int bw = 10000;
-            hostList.add(
-                    new Host(
-                    hostId,
-                    new RamProvisionerSimple(ram),
-                    new BwProvisionerSimple(bw),
-                    storage,
-                    peList1,
-                    new VmSchedulerTimeShared(peList1))); // This is our first machine
-            hostId++;
-
-        }
-
-        // 5. Create a DatacenterCharacteristics object that stores the
-        //    properties of a data center: architecture, OS, list of
-        //    Machines, allocation policy: time- or space-shared, time zone
-        //    and its price (G$/Pe time unit).
-        String arch = "x86";      // system architecture
-        String os = "Linux";          // operating system
-        String vmm = "Xen";
-        double time_zone = 10.0;         // time zone this resource located
-        double cost = 3.0;              // the cost of using processing in this resource
-        double costPerMem = 0.05;		// the cost of using memory in this resource
-        double costPerStorage = 0.1;	// the cost of using storage in this resource
-        double costPerBw = 0.1;			// the cost of using bw in this resource
-        LinkedList<Storage> storageList = new LinkedList<Storage>();	//we are not adding SAN devices by now
-        DatacenterExtended datacenter = null;
-
-
-        DatacenterCharacteristics characteristics = new DatacenterCharacteristics(
-                arch, os, vmm, hostList, time_zone, cost, costPerMem, costPerStorage, costPerBw);
-
-
-        // 6. Finally, we need to create a cluster storage object.
-        /**
-         * The bandwidth within a data center.
-         */
-        double intraBandwidth = 1.5e7;// the number comes from the futuregrid site, you can specify your bw
-
-        Random bwRandom = new Random(System.currentTimeMillis());
-
-        try {
-            DistributedClusterStorage s1 = new DistributedClusterStorage(name, 1e12, Parameters.getVmNum(), intraBandwidth);
-            double[][] bws = new double[Parameters.getVmNum()][Parameters.getVmNum()];
-            for (int src = 0; src < Parameters.getVmNum(); src++) {
-                bws[src][src] = Double.MAX_VALUE;
-                for (int dest = src; dest < Parameters.getVmNum(); dest++) {
-                    double bw = intraBandwidth * 1.0;
-                    /**
-                     * To create a heterogeneous environment we can change the bandwidth distribution
-                     */
-                    //double bw = intraBandwidth * bwRandom.nextDouble();
-                    bws[src][dest] = bw;
-                    bws[dest][src] = bw;
-                }
-            }
-            s1.setBandwidth(bws);
-            //such that the planning algorithms can know the bandwidths
-            Parameters.setBandwidths(bws);
-            storageList.add(s1);
-            datacenter = new DatacenterExtended(name, characteristics, new VmAllocationPolicySimple(hostList), storageList, 0);
-        } catch (Exception e) {
-        }
-
-        return datacenter;
-    }
-
-    
 }
