@@ -161,7 +161,7 @@ public class VerticalClustering extends BasicClustering {
         }
         mHasChecked.clear();
         super.clean();
-
+        
         updateDependencies();
         addClustDelay();
     }

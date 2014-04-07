@@ -27,7 +27,6 @@ import org.workflowsim.Task;
 import org.workflowsim.failure.FailureMonitor;
 import org.workflowsim.failure.FailureParameters;
 import org.workflowsim.failure.FailureRecord;
-import org.workflowsim.utils.DistributionGenerator.DistributionFamily;
 import org.workflowsim.utils.Parameters;
 
 /**
