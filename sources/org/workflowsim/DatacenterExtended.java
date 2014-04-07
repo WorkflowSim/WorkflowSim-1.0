@@ -107,12 +107,26 @@ public class DatacenterExtended extends Datacenter {
                 return;
             }
 
-            // process this Cloudlet to this CloudResource
-            cl.setResourceParameter(getId(), getCharacteristics().getCostPerSecond(), getCharacteristics()
-                    .getCostPerBw());
-
             int userId = cl.getUserId();
             int vmId = cl.getVmId();
+            Host host = getVmAllocationPolicy().getHost(vmId, userId);
+            CondorVM vm = (CondorVM)host.getVm(vmId, userId);
+
+            switch (Parameters.getCostModel()) {
+                case DATACENTER:
+                    // process this Cloudlet to this CloudResource
+                    cl.setResourceParameter(getId(), getCharacteristics().getCostPerSecond(), 
+                            getCharacteristics().getCostPerBw());
+                    break;
+                case VM:
+                    cl.setResourceParameter(getId(), vm.getCost(), vm.getCostPerBW());
+                    break;
+                default:
+                    break;
+            }
+
+
+
 
             /**
              * Stage-in file && Shared based on the file.system
@@ -134,12 +148,11 @@ public class DatacenterExtended extends Datacenter {
                 fileTransferTime = processDataStageIn(job.getFileList(), cl);
             }
 
-            Host host = getVmAllocationPolicy().getHost(vmId, userId);
-            Vm vm = host.getVm(vmId, userId);
+
             CloudletScheduler scheduler = vm.getCloudletScheduler();
             double estimatedFinishTime = scheduler.cloudletSubmit(cl, fileTransferTime);
             updateTaskExecTime(job, vm);
-            
+
             // if this cloudlet is in the exec queue
             if (estimatedFinishTime > 0.0 && !Double.isInfinite(estimatedFinishTime)) {
                 send(getId(), estimatedFinishTime, CloudSimTags.VM_DATACENTER_EVENT);
@@ -170,21 +183,23 @@ public class DatacenterExtended extends Datacenter {
 
     /**
      * Update the submission time/exec time of a task
+     *
      * @param job
-     * @param vm 
+     * @param vm
      */
-    private void updateTaskExecTime(Job job, Vm vm){
-        
+    private void updateTaskExecTime(Job job, Vm vm) {
+
         double start_time = job.getExecStartTime();
-        for(Task task: job.getTaskList()){
+        for (Task task : job.getTaskList()) {
             task.setExecStartTime(start_time);
             double task_runtime = task.getCloudletLength() / vm.getMips();
             start_time += task_runtime;
             //Because CloudSim would not let us update end time here
             task.setTaskFinishTime(start_time);
         }
-        
+
     }
+
     /**
      * Stage in files for a stage-in job. For a local file system (such as
      * condor-io) add files to the local storage; For a shared file system (such
@@ -285,9 +300,9 @@ public class DatacenterExtended extends Datacenter {
                          */
                         if (cl.getClassType() == ClassType.STAGE_IN.value) {
                             double maxRate = Double.MIN_VALUE;
-                            for(Storage storage: getStorageList()){
+                            for (Storage storage : getStorageList()) {
                                 double rate = storage.getMaxTransferRate();
-                                if(rate > maxRate){
+                                if (rate > maxRate) {
                                     rate = maxRate;
                                 }
                             }

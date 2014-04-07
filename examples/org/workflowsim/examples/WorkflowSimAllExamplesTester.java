@@ -24,6 +24,8 @@ import org.workflowsim.examples.failure.*;
 import org.workflowsim.examples.failure.clustering.*;
 import org.workflowsim.examples.planning.*;
 import org.workflowsim.examples.scheduling.*;
+import org.workflowsim.examples.cost.*;
+
 
 /**
  * Test all the workflow examples
@@ -43,6 +45,7 @@ public class WorkflowSimAllExamplesTester {
              */
             WorkflowSimBasicExample1.main(args);
             WorkflowSimBasicExample2.main(args);
+            WorkflowSimBasicExample3.main(args);
             DynamicWorkloadExample1.main(args);
             WorkflowSimMultipleClusterExample1.main(args);
             

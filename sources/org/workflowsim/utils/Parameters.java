@@ -57,7 +57,7 @@ public class Parameters {
         }
     }
     
-        /**
+    /**
      * File Type
      */
     public enum ClassType{
@@ -65,6 +65,19 @@ public class Parameters {
         public final int value;
         private ClassType(int cType){
             this.value = cType;
+        }
+    }
+    
+    /**
+     * The cost model
+     * DATACENTER: specify the cost per data center
+     * VM: specify the cost per VM
+     */
+    public enum CostModel{
+        DATACENTER(1), VM(2);
+        public final int value;
+        private CostModel(int model){
+            this.value = model;
         }
     }
     
@@ -150,6 +163,11 @@ public class Parameters {
      * The scale of runtime. Multiple runtime by this
      */
     private static double runtime_scale = 1.0;
+    
+    /**
+     * The default cost model is based on datacenter, similar to CloudSim
+     */
+    private static CostModel costModel = CostModel.DATACENTER;
     
     /**
      * A static function so that you can specify them in any place
@@ -264,6 +282,16 @@ public class Parameters {
         return vmNum;
     }
 
+    
+    /**
+     * Gets the cost model
+     * 
+     * @return costModel
+     */
+    public static CostModel getCostModel(){
+        return costModel;
+    }
+    
     /**
      * Sets the vm number
      *
@@ -346,6 +374,14 @@ public class Parameters {
      */
     public static void setRuntimeScale(double scale){
         runtime_scale = scale;
+    }
+    
+    /**
+     * Sets the cost model
+     * @param model
+     */
+    public static void setCostModel(CostModel model){
+        costModel = model;
     }
     
     /**

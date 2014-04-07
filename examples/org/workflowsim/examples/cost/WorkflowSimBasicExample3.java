@@ -13,13 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.workflowsim.examples;
+package org.workflowsim.examples.cost;
 
 import java.io.File;
-import java.text.DecimalFormat;
 import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.List;
-import org.cloudbus.cloudsim.Cloudlet;
+import org.cloudbus.cloudsim.CloudletSchedulerSpaceShared;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.workflowsim.CondorVM;
@@ -33,15 +33,14 @@ import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * This WorkflowSimExample2 is different to WorkflowSimExample1 in that it shows cost
- * the cost= (communication cost + computation cost) = (data (both input and output) * 
- * unit cost of data + runtime * cpu cost) for each task 
+ * This WorkflowSimExample3 is different to WorkflowSimExample2 in that it shows cost
+ * per VM instead of cost per Datacenter
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
- * @date Feb 14, 2014
+ * @date Apr 6, 2014
  */
-public class WorkflowSimBasicExample2 extends WorkflowSimBasicExample1{
+public class WorkflowSimBasicExample3 extends WorkflowSimBasicExample2{
 
     ////////////////////////// STATIC METHODS ///////////////////////
     /**
@@ -82,6 +81,11 @@ public class WorkflowSimBasicExample2 extends WorkflowSimBasicExample1{
             Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.MINMIN;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.LOCAL;
+            
+            /**
+             * Set the cost model to be VM (the default is Datacenter
+             */
+            Parameters.setCostModel(Parameters.CostModel.VM);
 
             /**
              * No overheads 
@@ -151,49 +155,34 @@ public class WorkflowSimBasicExample2 extends WorkflowSimBasicExample1{
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
     }
+    
+    protected static List<CondorVM> createVM(int userId, int vms) {
 
-    /**
-     * Prints the job objects
-     *
-     * @param list list of jobs
-     */
-    protected static void printJobList(List<Job> list) {
-        int size = list.size();
-        Job job;
+        //Creates a container to store VMs. This list is passed to the broker later
+        LinkedList<CondorVM> list = new LinkedList<CondorVM>();
 
-        String indent = "    ";
-        Log.printLine();
-        Log.printLine("========== OUTPUT ==========");
-        Log.printLine("Cloudlet ID" + indent + "STATUS" + indent
-                + "Data center ID" + indent + "VM ID" + indent + indent + "Time" + indent +
-                "Start Time" + indent + "Finish Time" + indent + "Depth" + indent + "Cost");
+        //VM Parameters
+        long size = 10000; //image size (MB)
+        int ram = 512; //vm memory (MB)
+        int mips = 1000;
+        long bw = 1000;
+        int pesNumber = 1; //number of cpus
+        String vmm = "Xen"; //VMM name
 
-        DecimalFormat dft = new DecimalFormat("###.##");
-        double cost = 0.0;
-        for (int i = 0; i < size; i++) {
-            job = list.get(i);
-            Log.print(indent + job.getCloudletId() + indent + indent);
-
-            cost += job.getProcessingCost();
-            if (job.getCloudletStatus() == Cloudlet.SUCCESS) {
-                Log.print("SUCCESS");
-
-                Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
-                        + indent + indent + indent + dft.format(job.getActualCPUTime())
-                        + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
-                        + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth() 
-                        + indent + indent + indent + dft.format(job.getProcessingCost()));
-            } else if (job.getCloudletStatus() == Cloudlet.FAILED) {
-                Log.print("FAILED");
-
-                Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
-                        + indent + indent + indent + dft.format(job.getActualCPUTime())
-                        + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
-                        + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth()
-                        + indent + indent + indent + dft.format(job.getProcessingCost()));
-            }
+        //create VMs
+        CondorVM[] vm = new CondorVM[vms];
+        double cost = 3.0;              // the cost of using processing in this resource
+        double costPerMem = 0.05;		// the cost of using memory in this resource
+        double costPerStorage = 0.1;	// the cost of using storage in this resource
+        double costPerBw = 0.1;			// the cost of using bw in this resource
+        for (int i = 0; i < vms; i++) {
+            double ratio = 1.0;
+            vm[i] = new CondorVM(i, userId, mips * ratio, pesNumber, ram, bw, size, vmm, 
+                    cost, costPerMem, costPerStorage, costPerBw, new CloudletSchedulerSpaceShared());
+            list.add(vm[i]);
         }
-        Log.printLine("The total cost is " + dft.format(cost));
 
+        return list;
     }
+
 }
