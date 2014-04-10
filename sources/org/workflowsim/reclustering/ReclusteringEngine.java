@@ -79,7 +79,7 @@ public class ReclusteringEngine {
      * @param id, job id
      * @return a list of new jobs
      */
-    public static List<Job> process(Job job, int id) {
+    public static List<Job> process(Job job, int id) {        
         List jobList = new ArrayList();
 
         try {

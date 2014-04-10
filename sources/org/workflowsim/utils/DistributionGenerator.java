@@ -36,13 +36,13 @@ public class DistributionGenerator {
     protected DistributionFamily dist;
     protected double scale;
     protected double shape;
-    private double scale_prior;
-    private double shape_prior;
-    private double likelihood_prior;
-    private double[] samples;
-    private double[] cumulativeSamples;
-    private int cursor;
-    private final int SAMPLE_SIZE = 1500 ; //DistributionGenerator will automatically increase the size
+    protected double scale_prior;
+    protected double shape_prior;
+    protected double likelihood_prior;
+    protected double[] samples;
+    protected double[] cumulativeSamples;
+    protected int cursor;
+    protected final int SAMPLE_SIZE = 1500 ; //DistributionGenerator will automatically increase the size
     
 
     public enum DistributionFamily {
@@ -93,6 +93,9 @@ public class DistributionGenerator {
         return cumulativeSamples;
     }
 
+    /**
+     * Extends the sample size
+     */
     public void extendSamples() {
         double[] new_samples = getDistribution(scale, shape).sample(SAMPLE_SIZE);
         samples = concat(samples, new_samples);

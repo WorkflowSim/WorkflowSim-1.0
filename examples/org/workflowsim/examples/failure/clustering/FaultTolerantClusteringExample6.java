@@ -77,7 +77,7 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
             //This controls k if q_shape is large it is good
            double q_scale = 50, q_weight = 3, q_shape = 3;
            double t_scale = 10;//default is 1.0
-           String clustering = "NOOP";
+           String clustering = "DR";
            double theta = 100, theta_weight = 30 * 100;
 
            
