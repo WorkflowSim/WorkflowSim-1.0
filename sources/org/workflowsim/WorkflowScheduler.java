@@ -33,6 +33,7 @@ import org.workflowsim.scheduling.FCFSSchedulingAlgorithm;
 import org.workflowsim.scheduling.MCTSchedulingAlgorithm;
 import org.workflowsim.scheduling.MaxMinSchedulingAlgorithm;
 import org.workflowsim.scheduling.MinMinSchedulingAlgorithm;
+import org.workflowsim.scheduling.RoundRobinSchedulingAlgorithm;
 import org.workflowsim.scheduling.StaticSchedulingAlgorithm;
 import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.Parameters.SchedulingAlgorithm;
@@ -162,6 +163,9 @@ public class WorkflowScheduler extends DatacenterBroker {
                 break;
             case STATIC:
                 algorithm = new StaticSchedulingAlgorithm();
+                break;
+            case ROUNDROBIN:
+                algorithm = new RoundRobinSchedulingAlgorithm();
                 break;
             default:
                 algorithm = new StaticSchedulingAlgorithm();
