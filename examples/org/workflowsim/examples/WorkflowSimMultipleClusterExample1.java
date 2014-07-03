@@ -34,7 +34,7 @@ import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 import org.workflowsim.ClusterStorage;
 import org.workflowsim.CondorVM;
-import org.workflowsim.DatacenterExtended;
+import org.workflowsim.WorkflowDatacenter;
 import org.workflowsim.Job;
 import org.workflowsim.WorkflowEngine;
 import org.workflowsim.WorkflowPlanner;
@@ -147,8 +147,8 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
             // Initialize the CloudSim library
             CloudSim.init(num_user, calendar, trace_flag);
 
-            DatacenterExtended datacenter0 = createDatacenter("Datacenter_0");
-            DatacenterExtended datacenter1 = createDatacenter("Datacenter_1");
+            WorkflowDatacenter datacenter0 = createDatacenter("Datacenter_0");
+            WorkflowDatacenter datacenter1 = createDatacenter("Datacenter_1");
 
             /**
              * Create a WorkflowPlanner with one scheduler.
@@ -194,7 +194,7 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
         }
     }
 
-    protected static DatacenterExtended createDatacenter(String name) {
+    protected static WorkflowDatacenter createDatacenter(String name) {
 
         // Here are the steps needed to create a PowerDatacenter:
         // 1. We need to create a list to store one or more
@@ -249,7 +249,7 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
         double costPerStorage = 0.1;	// the cost of using storage in this resource
         double costPerBw = 0.1;			// the cost of using bw in this resource
         LinkedList<Storage> storageList = new LinkedList<Storage>();	//we are not adding SAN devices by now
-        DatacenterExtended datacenter = null;
+        WorkflowDatacenter datacenter = null;
 
 
         DatacenterCharacteristics characteristics = new DatacenterCharacteristics(
@@ -285,7 +285,7 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
             // The bandwidth to the source site 
             s1.setBandwidth("source", interBandwidth);
             storageList.add(s1);
-            datacenter = new DatacenterExtended(name, characteristics, new VmAllocationPolicySimple(hostList), storageList, 0);
+            datacenter = new WorkflowDatacenter(name, characteristics, new VmAllocationPolicySimple(hostList), storageList, 0);
         } catch (Exception e) {
         }
 

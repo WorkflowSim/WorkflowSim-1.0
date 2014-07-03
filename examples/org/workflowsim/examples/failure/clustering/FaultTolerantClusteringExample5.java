@@ -25,7 +25,7 @@ import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.workflowsim.CondorVM;
-import org.workflowsim.DatacenterExtended;
+import org.workflowsim.WorkflowDatacenter;
 import org.workflowsim.Job;
 import org.workflowsim.WorkflowEngine;
 import org.workflowsim.WorkflowPlanner;
@@ -243,7 +243,7 @@ public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExam
             // Initialize the CloudSim library
             CloudSim.init(num_user, calendar, trace_flag);
 
-            DatacenterExtended datacenter0 = createDatacenter("Datacenter_0");
+            WorkflowDatacenter datacenter0 = createDatacenter("Datacenter_0");
 
             /**
              * Create a WorkflowPlanner with one schedulers.

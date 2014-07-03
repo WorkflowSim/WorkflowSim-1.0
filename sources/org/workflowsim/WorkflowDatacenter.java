@@ -37,16 +37,16 @@ import org.workflowsim.utils.Parameters.ClassType;
 import org.workflowsim.utils.Parameters.FileType;
 
 /**
- * DatacenterExtended extends Datacenter so as we can use CondorVM and other
+ * WorkflowDatacenter extends Datacenter so as we can use CondorVM and other
  * components
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public class DatacenterExtended extends Datacenter {
+public class WorkflowDatacenter extends Datacenter {
 
-    public DatacenterExtended(String name,
+    public WorkflowDatacenter(String name,
             DatacenterCharacteristics characteristics,
             VmAllocationPolicy vmAllocationPolicy,
             List<Storage> storageList,
