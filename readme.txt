@@ -109,7 +109,7 @@ This page is written by Weiwei Chen @chenww05. For details or bug reports, pleas
 
 ### Support or Contact
 Please send an email to support@workflowsim.org. We appreciate your contribution to this project and please go to github to submit your bug report.  
-
+Many of the questions may have been answered in our wiki pages: https://github.com/WorkflowSim/WorkflowSim-1.0/wiki/_pages
 ### Mailing Lists
 
 WorkflowSim Announce
