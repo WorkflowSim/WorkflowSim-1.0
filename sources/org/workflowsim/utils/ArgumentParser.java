@@ -52,7 +52,11 @@ public class ArgumentParser {
         String code = null;
         String dax = null;
         double bandwidth = 2e8; // by default 
+        int heartbeat = 0;
+        double d0 = 0;
         String clustering = null;
+        SCHMethod sch_config = SCHMethod.INVALID_SCH;
+        RLSMethod rls_config = RLSMethod.INVALID_RLS;
         while (i < args.length) {
             switch (args[i].charAt(1)) {
                 case 'p':
@@ -69,6 +73,18 @@ public class ArgumentParser {
                     break;
                 case 'b':
                     bandwidth = Double.parseDouble(args[++i]);
+                    break;
+                case 'x':
+                    heartbeat = Integer.parseInt(args[++i]);
+                    break;
+                case 'y':
+                    d0 = Double.parseDouble(args[++i]);
+                    break;
+                case 'r':
+                    rls_config = RLSMethod.valueOf(args[++i]);
+                    break;
+                case 's':
+                    sch_config = SCHMethod.valueOf(args[++i]);
                     break;
                 case 'h':
 
@@ -241,9 +257,6 @@ public class ArgumentParser {
                             break;
                         default:
                             throw new Exception("Not Supported:key=" + key + " value=" + value);
-
-
-
                     }
                 }
             }
@@ -255,6 +268,12 @@ public class ArgumentParser {
 
             br.close();
 
+            if(heartbeat!=0){
+                interval = heartbeat;
+            }
+            if(d0!=0){
+                WEDelay.put(0, d0);
+            }
             /**
              * Initialize a new OverheadParameters
              */
@@ -293,7 +312,12 @@ public class ArgumentParser {
                 }
                 sch_method = SCHMethod.STATIC_SCH;
             }
-            
+            if(!rls_config.equals(RLSMethod.INVALID_RLS)){
+                rls_method = rls_config;
+            }
+            if(!sch_config.equals(SCHMethod.INVALID_SCH)){
+                sch_method = sch_config;
+            }
             Parameters.init(ftc_method, ftc_monitor, ftc_failure,
                     failureMap, vmNum, daxPath, runtimePath,
                     datasizePath, op, cp, sch_method, pln_method,

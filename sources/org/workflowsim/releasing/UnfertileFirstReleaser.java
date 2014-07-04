@@ -23,25 +23,25 @@ import java.util.List;
 import org.workflowsim.Job;
 
 /**
- * The DFS Releaser 
+ * The UFFS Releaser 
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Jul 7, 2013
  */
-public class DFSReleaser extends BaseReleaser{
+public class UnfertileFirstReleaser extends BaseReleaser{
     
     
 
     /**
-     * Sort jobs in an descending order of cloudlet length
+     * Sort jobs in an ascending order of number of children
      * @param jobList jobs to be sorted
      */
     private void sortList(List list) {
         Collections.sort(list, new Comparator<Job>() {
             public int compare(Job t1, Job t2) {
                 //Decreasing order
-                return (int) (t2.getDepth()- t1.getDepth());
+                return (int) (t1.getChildList().size() - t2.getChildList().size());
 
             }
         });

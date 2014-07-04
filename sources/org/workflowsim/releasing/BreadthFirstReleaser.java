@@ -29,12 +29,12 @@ import org.workflowsim.Job;
  * @since WorkflowSim Toolkit 1.0
  * @date Jul 7, 2013
  */
-public class BFSReleaser extends BaseReleaser{
+public class BreadthFirstReleaser extends BaseReleaser{
     
     
 
     /**
-     * Sort jobs in an descending order of cloudlet length
+     * Sort jobs in an ascending order of cloudlet depth
      * @param jobList jobs to be sorted
      */
     private void sortList(List list) {

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adag xmlns="http://pegasus.isi.edu/schema/DAX" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pegasus.isi.edu/schema/DAX http://pegasus.isi.edu/schema/dax-2.1.xsd" version="2.1" count="1" index="0" name="test" jobCount="11" fileCount="0" childCount="28">
+       <job id="ID1" namespace="CyberShake" name="ZipPSA" version="1.0" runtime="10">
+    <uses file="1.zip" link="output" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+  </job>
+  <job id="ID2" namespace="CyberShake" name="ZipPSA" version="1.0" runtime="10">
+    <uses file="2.zip" link="output" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+  </job>
+  <job id="ID3" namespace="CyberShake" name="ZipPSA" version="1.0" runtime="10">
+    <uses file="3.zip" link="output" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+  </job>
+  <job id="ID4" namespace="CyberShake" name="ZipPSA" version="1.0" runtime="10">
+    <uses file="4.zip" link="output" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+  </job>
+  <job id="ID5" namespace="CyberShake" name="ZipPSA" version="1.0" runtime="10">
+<uses file="2.zip" link="input" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+    <uses file="2.rar" link="output" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+  </job>
+
+  <job id="ID6" namespace="CyberShake" name="ZipPSA" version="1.0" runtime="10">
+<uses file="3.zip" link="input" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+    <uses file="3.rar" link="output" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+  </job>
+
+  <job id="ID7" namespace="CyberShake" name="ZipPSA" version="1.0" runtime="10">
+<uses file="1.zip" link="input" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+    <uses file="1.rar" link="output" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+  </job>
+
+  <job id="ID8" namespace="CyberShake" name="ZipPSA" version="1.0" runtime="10">
+<uses file="4.zip" link="input" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+    <uses file="4.rar" link="output" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+  </job>
+
+  <job id="ID9" namespace="CyberShake" name="ZipPSA" version="1.0" runtime="10">
+<uses file="2.rar" link="input" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+<uses file="4.rar" link="input" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+    <uses file="24.rar" link="output" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+  </job>
+  <job id="ID10" namespace="CyberShake" name="ZipPSA" version="1.0" runtime="10">
+<uses file="3.rar" link="input" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+<uses file="1.rar" link="input" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+    <uses file="13.rar" link="output" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+  </job>
+  <job id="ID11" namespace="CyberShake" name="ZipPSA" version="1.0" runtime="10">
+<uses file="13.rar" link="input" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+<uses file="24.rar" link="input" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+    <uses file="1234.rar" link="output" register="true" transfer="true" optional="false" type="data" size="10000000"/>
+  </job>
+<!-- part 3: list of control-flow dependencies (may be empty) -->
+<child ref="ID8">
+    <parent ref="ID4"/>
+  </child>
+<child ref="ID7">
+    <parent ref="ID1"/>
+  </child>
+<child ref="ID6">
+    <parent ref="ID3"/>
+  </child>  
+<child ref="ID5">
+    <parent ref="ID2"/>
+  </child>
+  <child ref="ID9">
+    <parent ref="ID5"/>
+    <parent ref="ID8"/>
+  </child>
+  <child ref="ID10">
+    <parent ref="ID7"/>
+    <parent ref="ID6"/>
+  </child>
+  <child ref="ID11">
+    <parent ref="ID10"/>
+    <parent ref="ID9"/>
+  </child>
+</adag>

@@ -27,11 +27,15 @@ import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.core.SimEvent;
 import org.workflowsim.reclustering.ReclusteringEngine;
-import org.workflowsim.releasing.BFSReleaser;
+import org.workflowsim.releasing.BreadthFirstReleaser;
 import org.workflowsim.releasing.BaseReleaser;
-import org.workflowsim.releasing.DFSReleaser;
+import org.workflowsim.releasing.DepthFirstReleaser;
+import org.workflowsim.releasing.FertileFirstReleaser;
+import org.workflowsim.releasing.ImportantFirstReleaser;
 import org.workflowsim.releasing.MaxMinReleaser;
 import org.workflowsim.releasing.MinMinReleaser;
+import org.workflowsim.releasing.UnfertileFirstReleaser;
+import org.workflowsim.releasing.UnimportantFirstReleaser;
 import org.workflowsim.utils.Parameters;
 
 /**
@@ -165,7 +169,7 @@ public class WorkflowEngine extends SimEntity {
                 break;
             //this call is from workflow scheduler when all vms are created
             case CloudSimTags.CLOUDLET_SUBMIT:
-                submitJobs();
+                releaseJobs();
                 break;
 
             case CloudSimTags.CLOUDLET_RETURN:
@@ -257,7 +261,7 @@ public class WorkflowEngine extends SimEntity {
                 sendNow(getSchedulerId(i), CloudSimTags.END_OF_SIMULATION, null);
             }
         } else {
-            sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+            //sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
         }
 
 
@@ -315,10 +319,22 @@ public class WorkflowEngine extends SimEntity {
                 releaser = new MinMinReleaser();
                 break;
             case BFS_RLS:
-                releaser = new BFSReleaser();
+                releaser = new BreadthFirstReleaser();
                 break;
             case DFS_RLS:
-                releaser = new DFSReleaser();
+                releaser = new DepthFirstReleaser();
+                break;
+            case FFS_RLS:
+                releaser = new FertileFirstReleaser();
+                break;
+            case UFFS_RLS:
+                releaser = new UnfertileFirstReleaser();
+                break;
+            case IFS_RLS:
+                releaser = new ImportantFirstReleaser();
+                break;
+            case UIFS_RLS:
+                releaser = new UnimportantFirstReleaser();
                 break;
             default:
                 return list;
@@ -335,13 +351,13 @@ public class WorkflowEngine extends SimEntity {
     }
 
     /**
-     * Submit jobs to the created VMs.
+     * Release jobs to the Scheduler.
      *
      * @pre $none
      * @post $none
      */
-    protected void submitJobs() {
-
+    protected void releaseJobs() {
+    
         List<Job> list = getJobsList();
         Map allocationList = new HashMap<Integer, List>();
         for (int i = 0; i < getSchedulers().size(); i++) {
@@ -349,6 +365,9 @@ public class WorkflowEngine extends SimEntity {
             allocationList.put(getSchedulerId(i), submittedList);
         }
         int num = list.size();
+      
+        List<Job> readyList = new ArrayList<Job>();
+        
         for (int i = 0; i < num; i++) {
             //at the beginning
             Job job = list.get(i);
@@ -361,64 +380,88 @@ public class WorkflowEngine extends SimEntity {
                         flag = false;
                         break;
                     }
-
                 }
                 /**
                  * This job's parents have all completed successfully. Should
-                 * submit.
+                 * release.
                  */
                 if (flag) {
-
-                    List submittedList = (List) allocationList.get(job.getUserId());
-                    submittedList.add(job);
-                    jobsSubmitted++;
-                    getJobsSubmittedList().add(job);
-                    list.remove(job);
-                    i--;
-                    num--;
+                    readyList.add(job);
                 }
             }
-
         }
+        
+        int period = Parameters.getOverheadParams().getWEDInterval();
+
+        int jobsInQueue = 0;
+
+        readyList = sortJobs(readyList);
+        
+        /**
+         * It is critical here, even when readyList is empty should not return, still 
+         * we should send an update message to ourself
+         */
+        if(readyList.isEmpty() && jobsSubmitted == 0){
+            
+            sendNow(this.getId(), CloudSimTags.END_OF_SIMULATION, null);
+            return;
+        }
+
+        for(Job job: readyList){
+            if (period <= 0 || ( period >0 && jobsInQueue < period )){
+                List submittedList = (List) allocationList.get(job.getUserId());
+                submittedList.add(job);
+                jobsSubmitted++;
+                getJobsSubmittedList().add(job);
+                list.remove(job);
+                jobsInQueue ++;
+            }
+        }
+       
         /**
          * If we have multiple schedulers. Divide them equally.
          */
         for (int i = 0; i < getSchedulers().size(); i++) {
 
             List submittedList = (List) allocationList.get(getSchedulerId(i));
-            
-            submittedList = sortJobs(submittedList);
-            
-            int interval = Parameters.getOverheadParams().getWEDInterval();
-            double delay = Parameters.getOverheadParams().getWEDDelay(submittedList);
-
-
-            double delaybase = delay;
-            int size = submittedList.size();
-            if (interval > 0 && interval <= size) {
-
-                int index = 0;
-                List subList = new ArrayList();
-                while (index < size) {
-                    subList.add(submittedList.get(index));
-                    index++;
-                    if (index % interval == 0) {
-                        //create a new one
-                        schedule(getSchedulerId(i), delay, CloudSimTags.CLOUDLET_SUBMIT, subList);
-                        delay += delaybase;
-                        subList = new ArrayList();
-
-                    }
-
-                }
-                if (!subList.isEmpty()) {
-                    schedule(getSchedulerId(i), delay, CloudSimTags.CLOUDLET_SUBMIT, subList);
-                }
-
-
-            } else if (!submittedList.isEmpty()) {
+            if(!submittedList.isEmpty()){
                 sendNow(this.getSchedulerId(i), CloudSimTags.CLOUDLET_SUBMIT, submittedList);
             }
+            
+//            int interval = Parameters.getOverheadParams().getWEDInterval();
+            double delay = Parameters.getOverheadParams().getWEDDelay(submittedList);
+
+            if(period > 0){
+                //send(this.getId(), delay, CloudSimTags.CLOUDLET_SUBMIT);
+               schedule(this.getId(), delay, CloudSimTags.CLOUDLET_SUBMIT);
+            }
+            
+//            double delaybase = delay;
+//            int size = submittedList.size();
+//            if (interval > 0 && interval <= size) {
+//
+//                int index = 0;
+//                List subList = new ArrayList();
+//                while (index < size) {
+//                    subList.add(submittedList.get(index));
+//                    index++;
+//                    if (index % interval == 0) {
+//                        //create a new one
+//                        schedule(getSchedulerId(i), delay, CloudSimTags.CLOUDLET_SUBMIT, subList);
+//                        delay += delaybase;
+//                        subList = new ArrayList();
+//
+//                    }
+//
+//                }
+//                if (!subList.isEmpty()) {
+//                    schedule(getSchedulerId(i), delay, CloudSimTags.CLOUDLET_SUBMIT, subList);
+//                }
+//
+//
+//            } else if (!submittedList.isEmpty()) {
+//                sendNow(this.getSchedulerId(i), CloudSimTags.CLOUDLET_SUBMIT, submittedList);
+//            }
         }
 
     }

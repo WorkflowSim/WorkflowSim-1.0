@@ -75,7 +75,8 @@ public class Parameters {
     public enum RLSMethod {
 
         MAXMIN_RLS, MINMIN_RLS, BFS_RLS, DFS_RLS, 
-        MCT_RLS, FCFS_RLS, INVALID_RLS
+        MCT_RLS, FCFS_RLS, INVALID_RLS, UFFS_RLS, FFS_RLS,
+        IFS_RLS, UIFS_RLS
     }
     
     public static final int BASE = 0;

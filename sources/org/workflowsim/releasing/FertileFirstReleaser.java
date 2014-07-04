@@ -19,29 +19,31 @@ package org.workflowsim.releasing;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import org.cloudbus.cloudsim.Log;
 import org.workflowsim.Job;
 
 /**
- * The DFS Releaser 
+ * The FFS Releaser 
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Jul 7, 2013
  */
-public class DFSReleaser extends BaseReleaser{
+public class FertileFirstReleaser extends BaseReleaser{
     
     
 
     /**
-     * Sort jobs in an descending order of cloudlet length
+     * Sort jobs in an descending order of number of children
      * @param jobList jobs to be sorted
      */
     private void sortList(List list) {
         Collections.sort(list, new Comparator<Job>() {
             public int compare(Job t1, Job t2) {
                 //Decreasing order
-                return (int) (t2.getDepth()- t1.getDepth());
+                return (int) (t2.getChildList().size() - t1.getChildList().size());
 
             }
         });
@@ -52,9 +54,15 @@ public class DFSReleaser extends BaseReleaser{
      * the main function.
      */
     public void run() throws Exception{
+
         if(! getJobList().isEmpty()){
             sortList(getJobList());
         }
+        List list = getJobList();
+        System.out.println(list.size());
+
     }
+    
+    
     
 }

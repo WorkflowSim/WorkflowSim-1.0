@@ -256,10 +256,14 @@ public class OverheadParameters {
                 delay = 0.0;
             }
 
-        } else {
+        } else  {
+            delay = (Double) this.WED_DELAY.get(0);
+            
             //actuall set it to be 0.0;
             //Log.printLine("Not yet supported");
         }
         return delay;
     }
+    
+    
 }
