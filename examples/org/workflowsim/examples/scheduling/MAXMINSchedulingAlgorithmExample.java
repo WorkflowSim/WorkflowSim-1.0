@@ -31,7 +31,7 @@ import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * This MINMIN Scheduling Algorithm 
+ * This MAXMIN Scheduling Algorithm 
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.1
