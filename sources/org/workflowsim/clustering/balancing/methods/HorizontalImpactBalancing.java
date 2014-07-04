@@ -60,16 +60,18 @@ public class HorizontalImpactBalancing extends BalancingMethod {
 
     }
 
-//    protected TaskSet getCandidateTastSet(ArrayList<TaskSet> taskList, TaskSet checkSet) {
-//        long min = taskList.get(0).getJobRuntime();
-//        for (TaskSet set : taskList) {
-//            if (set.getJobRuntime() == min && checkSet.getImpactFactor() == set.getImpactFactor()) {
-//                return set;
-//            }
-//        }
-//        return taskList.get(0);
-//
-//    }
+    private double getHIFV(ArrayList<TaskSet> jobList){
+        double sum = 0.0;
+        double sumSquare = 0.0;
+        for(TaskSet taskSet : jobList){
+            sum += taskSet.getImpactFactor();
+            sumSquare += taskSet.getImpactFactor() * taskSet.getImpactFactor();
+        }
+        double avg = sum / jobList.size();
+        double avgSquare = sumSquare / jobList.size();
+        double variance = avgSquare - avg * avg;
+        return variance ; 
+    }
 
     /**
      * Sort taskSet based on their impact factors and then merge similar taskSet together
@@ -79,48 +81,66 @@ public class HorizontalImpactBalancing extends BalancingMethod {
 
         if (taskList.size() > getClusterNum()) {
             ArrayList<TaskSet> jobList = new ArrayList<TaskSet>();
-            for (int i = 0; i < getClusterNum(); i++) {
-                jobList.add(new TaskSet());
-            }
-            int clusters_size = taskList.size() / getClusterNum();
-            if(clusters_size * getClusterNum() < taskList.size()){
-                clusters_size ++;
-            }
-            sortListDecreasing(taskList);
-            //preprocessing(taskList, jobList);
             
-            
-
-            for (TaskSet set : taskList) {
-                //sortListIncreasing(jobList);
-                //Log.printLine(set.getJobRuntime());
-                TaskSet job = null;
-                try{
-                    job = getCandidateTastSet(jobList, set, clusters_size);
-                }catch(Exception e) {
-                    e.printStackTrace();
+            if( Math.abs(getHIFV(taskList)) < 0.0001 )
+            {
+                for (int i = 0; i < getClusterNum(); i++) {
+                    jobList.add(new TaskSet());
                 }
-                addTaskSet2TaskSet(set, job);
-                job.addTask(set.getTaskList());
-                job.setImpactFafctor(set.getImpactFactor());
-                //update dependency
-                for (Task task : set.getTaskList()) {
-                    getTaskMap().put(task, job);//this is enough
-                    //impact factor is not updated
+                sortListDecreasing(taskList);
+                for (TaskSet set : taskList) {
+                    //MinHeap is required 
+                    sortListIncreasing(jobList);
+                    TaskSet job = (TaskSet) jobList.get(0);
+                    job.addTask(set.getTaskList());
+                    //update dependency
+                    for (Task task : set.getTaskList()) {
+                        getTaskMap().put(task, job);//this is enough
+                    }
+
                 }
 
-            }
+                taskList.clear();//you sure?
+            }else{
+            
+                for (int i = 0; i < getClusterNum(); i++) {
+                    jobList.add(new TaskSet());
+                }
+                int clusters_size = taskList.size() / getClusterNum();
+                if(clusters_size * getClusterNum() < taskList.size()){
+                    clusters_size ++;
+                }
+                sortListDecreasing(taskList);
+                //preprocessing(taskList, jobList);
 
-//            Log.printLine("level");
-//            for(int i = 0; i < taskList.size();i++){
-//                TaskSet set = (TaskSet) (taskList.get(i));
-//                Log.printLine("TaskSet ");
-//                for(int j = 0; j < set.getTaskList().size(); j++){
-//                    Task task = set.getTaskList().get(j);
-//                    Log.printLine("Task: " + task.getImpact());
-//                }
-//            }
-            taskList.clear();//you sure?
+                //In the case if you do vertical first you need to multiple clusters_size with your vertical strength
+                //If you do vertical clustering after you don't have to adjust this
+                //For LIGO it is 2 for genome it is 4
+                //clusters_size *= 4;
+
+                for (TaskSet set : taskList) {
+                    //sortListIncreasing(jobList);
+                    //Log.printLine(set.getJobRuntime());
+                    TaskSet job = null;
+                    try{
+
+                        job = getCandidateTastSet(jobList, set, clusters_size);
+                    }catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                    addTaskSet2TaskSet(set, job);
+                    job.addTask(set.getTaskList());
+                    job.setImpactFafctor(set.getImpactFactor());
+                    //update dependency
+                    for (Task task : set.getTaskList()) {
+                        getTaskMap().put(task, job);//this is enough
+                        //impact factor is not updated
+                    }
+
+                }
+
+                taskList.clear();//you sure?
+            }
         } else {
             //do nothing since 
         }
@@ -246,7 +266,7 @@ public class HorizontalImpactBalancing extends BalancingMethod {
                                             TaskSet checkSet, int clusters_size){
 
         HashMap map = new HashMap<Double, ArrayList>();
-        
+
         for (TaskSet set : taskList) {
                 double factor = set.getImpactFactor();
 
@@ -267,7 +287,6 @@ public class HorizontalImpactBalancing extends BalancingMethod {
                 }
             }
         }
-        
         if(returnList.isEmpty()){
             ArrayList<TaskSet> zeros = (ArrayList<TaskSet>)map.get(0.0);
             if(zeros!=null && !zeros.isEmpty())
@@ -275,7 +294,6 @@ public class HorizontalImpactBalancing extends BalancingMethod {
                 returnList.addAll(zeros);
             }
         }
-        
         if(returnList.isEmpty()){
             returnList.clear();//?
             for (TaskSet set : taskList) {

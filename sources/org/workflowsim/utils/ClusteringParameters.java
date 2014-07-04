@@ -39,7 +39,7 @@ public class ClusteringParameters {
      */
     public enum ClusteringMethod {
 
-        HORIZONTAL, VERTICAL, NONE, BLOCK, BALANCED
+        HORIZONTAL, VERTICAL, NONE, BLOCK, BALANCED, DFJS, AFJS
     }
     /**
      * Used for balanced clustering to tell which specific balanced clustering
@@ -51,6 +51,17 @@ public class ClusteringParameters {
      */
     private ClusteringMethod method;
 
+    /**
+     * The granularity size of computational resource 
+     * used in AFJS and DFJS clustering algorithm
+     */
+    private double granularity_time;
+    
+    /**
+     * The granularity size of communicational resource
+     * used in AFJS clustering algorithm
+     */
+    private double granularity_data;
     /**
      * Gets the code for balanced clustering Please refer to our balanced
      * clustering paper for details
@@ -88,7 +99,44 @@ public class ClusteringParameters {
     public ClusteringMethod getClusteringMethod() {
         return method;
     }
+    
+    /**
+     * Gets the granularity data size
+     * 
+     * @return granularity data
+     */
+    public double getGranularityDataSize()
+    {
+        return this.granularity_data;
+    }
+    
+    /**
+     * Gets the granularity time size
+     * @return granularity  time 
+     */
+    public double getGranularityTimeSize()
+    {
+        return this.granularity_time;
+    }
 
+    /**
+     * Sets the granularity time size
+     * @param granularity the granularity time size
+     */
+    public void setGranularityTimeSize(double granularity)
+    {
+        this.granularity_time = granularity;
+    }
+    
+    /**
+     * Sets the granularity data size
+     * @param granularity the granularity data size
+     */
+    public void setGranularityDataSize(double granularity)
+    {
+        this.granularity_data = granularity;
+    }
+    
     /**
      * Initialize a ClusteringParameters
      *

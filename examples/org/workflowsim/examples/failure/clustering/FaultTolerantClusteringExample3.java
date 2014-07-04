@@ -130,7 +130,7 @@ public class FaultTolerantClusteringExample3 {
             /**
              *  In this example, we have horizontal clustering and we use Dynamic Clustering. 
              */
-            Parameters.FTCluteringAlgorithm ftc_method = Parameters.FTCluteringAlgorithm.FTCLUSTERING_SR;
+            Parameters.FTCluteringAlgorithm ftc_method = Parameters.FTCluteringAlgorithm.FTCLUSTERING_DR;
             /**
              * Task failure rate for each level 
              * 

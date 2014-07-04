@@ -79,6 +79,8 @@ public class BalancingMethod {
         return this.clusterNum;
     }
     
+    
+    
     /**
      * Add all the tasks in tail to head and then clean tail. Can be reused with 
      * verticalClustering()
@@ -86,6 +88,16 @@ public class BalancingMethod {
      * @param head 
      */
     public void addTaskSet2TaskSet(TaskSet tail, TaskSet head) {
+        addTaskSet2TaskSet(tail, head, false);
+    }
+    /**
+     * Add all the tasks in tail to head and then clean tail. Can be reused with 
+     * verticalClustering()
+     * @param tail
+     * @param head 
+     * @param vertical 
+     */
+    public void addTaskSet2TaskSet(TaskSet tail, TaskSet head, boolean vertical) {
         head.addTask(tail.getTaskList());
         head.getParentList().remove(tail);
         //update manually, beautifully, I like it here
@@ -94,9 +106,13 @@ public class BalancingMethod {
         }
         /*
          * At the same level you can do so, but for vc it doens't, 
-         * while usually for vc we don't need to calculate impact
+         * 
          */
-        head.setImpactFafctor(head.getImpactFactor() + tail.getImpactFactor());
+        if(vertical){
+            //do not need to change Impact Factor
+        }else{
+            head.setImpactFafctor(head.getImpactFactor() + tail.getImpactFactor());
+        }
         for (TaskSet taskSet : tail.getParentList()) {
             taskSet.getChildList().remove(tail);
             if (!taskSet.getChildList().contains(head)) {
@@ -109,10 +125,11 @@ public class BalancingMethod {
 
         for (TaskSet taskSet : tail.getChildList()) {
             taskSet.getParentList().remove(tail);
-            if (!taskSet.getParentList().contains(head)) {
+            //A big bug fixed 
+            if (!taskSet.getParentList().contains(head) && !taskSet.equals(head)) {
                 taskSet.getParentList().add(head);
             }
-            if (!head.getChildList().contains(taskSet)) {
+            if (!head.getChildList().contains(taskSet) && !taskSet.equals(head)) {
                 head.getChildList().add(taskSet);
             }
         }

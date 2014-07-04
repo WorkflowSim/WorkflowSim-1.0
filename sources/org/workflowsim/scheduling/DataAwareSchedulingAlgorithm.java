@@ -77,9 +77,9 @@ public class DataAwareSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             
             
             
-            Log.printLine("Schedules " + cloudlet.getCloudletId() + " with "
-                    + cloudlet.getCloudletLength() + " to VM " + closestVm.getId() 
-                    +" with " + closestVm.getCurrentRequestedTotalMips() + " and data is " + minTime);
+            //Log.printLine("Schedules " + cloudlet.getCloudletId() + " with "
+            //        + cloudlet.getCloudletLength() + " to VM " + closestVm.getId() 
+            //        +" with " + closestVm.getCurrentRequestedTotalMips() + " and data is " + minTime);
             }
 
 

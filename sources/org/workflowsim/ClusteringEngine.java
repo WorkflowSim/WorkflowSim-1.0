@@ -22,8 +22,10 @@ import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.core.SimEvent;
+import org.workflowsim.clustering.AFJSClustering;
 import org.workflowsim.clustering.BasicClustering;
 import org.workflowsim.clustering.BlockClustering;
+import org.workflowsim.clustering.DFJSClustering;
 import org.workflowsim.clustering.HorizontalClustering;
 import org.workflowsim.clustering.VerticalClustering;
 import org.workflowsim.clustering.balancing.BalancedClustering;
@@ -177,6 +179,19 @@ public final class ClusteringEngine extends SimEntity {
              */
             case BALANCED:
                 this.engine = new BalancedClustering(params.getClustersNum());
+                break;
+            /**
+             * Perform DFJS Clustering
+             */
+            case DFJS:
+                this.engine = new DFJSClustering(params.getGranularityTimeSize());
+                break;
+                
+            /**
+             * Perform AFJS Clustering
+             */
+            case AFJS:
+                this.engine = new AFJSClustering(params.getGranularityTimeSize(), params.getGranularityDataSize());
                 break;
             /**
              * By default, it does no clustering

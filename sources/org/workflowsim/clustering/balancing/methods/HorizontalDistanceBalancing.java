@@ -19,13 +19,14 @@ package org.workflowsim.clustering.balancing.methods;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import org.workflowsim.Task;
 import org.workflowsim.clustering.TaskSet;
-import sun.net.www.http.KeepAliveCache;
 
 /**
  *  HorizontalDistanceBalancing is a method that merges tasks based on distance metric
@@ -58,6 +59,7 @@ public class HorizontalDistanceBalancing extends HorizontalImpactBalancing {
 
     }
     
+
     /**
      * Sort taskSet based on their impact factors and then merge similar taskSet together
      * @param taskList 
@@ -66,31 +68,39 @@ public class HorizontalDistanceBalancing extends HorizontalImpactBalancing {
 
         if (taskList.size() > getClusterNum()) {
             ArrayList<TaskSet> jobList = new ArrayList<TaskSet>();
-            for (int i = 0; i < getClusterNum(); i++) {
-                jobList.add(new TaskSet());
-            }
-            int clusters_size = taskList.size() / getClusterNum();
-            if(clusters_size * getClusterNum() < taskList.size()){
-                clusters_size ++;
-            }
-            //sortListDecreasing(taskList);
-            preprocessing(taskList, jobList);
-
-            for (TaskSet set : taskList) {
-                //sortListIncreasing(jobList);
-                TaskSet job = getCandidateTastSet(jobList, set, clusters_size);
-                addTaskSet2TaskSet(set, job);
-                job.addTask(set.getTaskList());
-                job.setImpactFafctor(set.getImpactFactor());
-                //update dependency
-                for (Task task : set.getTaskList()) {
-                    getTaskMap().put(task, job);//this is enough
-                    //impact factor is not updated
+            
+            
+            
+                for (int i = 0; i < getClusterNum(); i++) {
+                    jobList.add(new TaskSet());
+                }
+                int clusters_size = taskList.size() / getClusterNum();
+                if(clusters_size * getClusterNum() < taskList.size()){
+                    clusters_size ++;
                 }
 
-            }
+                //If you have vertical before horizontal make sure adjust this
+                //for LIGO it is 2 for Genome  & CyberShake it is 4
+                //clusters_size *= 2;
+                //sortListDecreasing(taskList);
+                preprocessing(taskList, jobList);
 
-            taskList.clear();//you sure?
+                for (TaskSet set : taskList) {
+                    //sortListIncreasing(jobList);
+                    TaskSet job = getCandidateTastSet(jobList, set, clusters_size);
+                    addTaskSet2TaskSet(set, job);
+                    job.addTask(set.getTaskList());
+                    job.setImpactFafctor(set.getImpactFactor());
+                    //update dependency
+                    for (Task task : set.getTaskList()) {
+                        getTaskMap().put(task, job);//this is enough
+                        //impact factor is not updated
+                    }
+
+                }
+
+                taskList.clear();//you sure?
+            
         } else {
             //do nothing since 
         }
@@ -98,7 +108,6 @@ public class HorizontalDistanceBalancing extends HorizontalImpactBalancing {
 
     }
 
-   
         /**
      * Sort taskSet in an ascending order of impact factor
      * @param taskList taskSets to be sorted

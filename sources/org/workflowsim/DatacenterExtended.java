@@ -49,7 +49,7 @@ public class DatacenterExtended extends Datacenter {
             List<Storage> storageList,
             double schedulingInterval) throws Exception {
         super(name, characteristics, vmAllocationPolicy, storageList, schedulingInterval);
-
+        
     }
 
     @Override

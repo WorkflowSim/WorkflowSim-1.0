@@ -50,14 +50,14 @@ import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * This BalancedClusteringExample1 is using balanced horizontal clustering or more specifically
- * using horizontal runtime balancing. 
+ * This BalancedClusteringExample3 is using balanced horizontal clustering or
+ * more specifically using horizontal runtime balancing.
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Dec 29, 2013
  */
-public class BalancedClusteringExample1 {
+public class BalancedClusteringExample3 {
 
     private static List<CondorVM> createVM(int userId, int vms) {
 
@@ -86,75 +86,81 @@ public class BalancedClusteringExample1 {
 
     ////////////////////////// STATIC METHODS ///////////////////////
     /**
-     * Creates main() to run this example
-     * This example has only one datacenter and one storage
+     * Creates main() to run this example This example has only one datacenter
+     * and one storage
      */
     public static void main(String[] args) {
 
 
-       try {
-           
-           /**
-            * delete in the future
-            * 
-            */
-           String code = "n";
-           String daxPath = "/Users/chenweiwei/NetBeansProjects/BhWorkflowGen/Inspiral_8000.xml";
-           double intraBandwidth = 1.5e7;
-           double c_delay = 0, q_delay = 100, e_delay = 100, p_delay = 0;
-           int interval = 5;
-           int vmNum = 200;//number of vms;
-           
-           for(int i = 0; i < args.length; i ++){
-               char key = args[i].charAt(1);
-               switch(key){
-                   case 'c':
-                       code = args[++i];
-                       break;
-                   case 'd':
-                       daxPath = args[++i];
-                       break;
-                   case 'b':
-                       intraBandwidth = Double.parseDouble(args[++i]);
-                       break;
-                   case 'l':
-                       c_delay = Double.parseDouble(args[++i]);
-                       break;
-                   case 'q':
-                       q_delay = Double.parseDouble(args[++i]);
-                       break;
-                   case 'e':
-                       e_delay = Double.parseDouble(args[++i]);
-                       break;
-                   case 'p':
-                       p_delay = Double.parseDouble(args[++i]);
-                       break;
-                   case 'i':
-                       interval = Integer.parseInt(args[++i]);
-                       break;
-                   case 'v':
-                       vmNum = Integer.parseInt(args[++i]);
-                       break;
-               }
-           }
-            // First step: Initialize the WorkflowSim package. 
-
+        try {
+            
             /**
              * However, the exact number of vms may not necessarily be vmNum If
              * the data center or the host doesn't have sufficient resources the
              * exact vmNum would be smaller than that. Take care.
              */
-            
+            int vmNum = 20;//number of vms;
+            int jobNum = 20;
+            String code = "i";
+            String daxPath = "/Users/chenweiwei/Research/balanced_clustering/data/scan-1/GENOME.d.702049732.5.dax";
+            double intraBandwidth = 1.5e7;
+            double c_delay = 0, q_delay = 100, e_delay = 100, p_delay = 0;
+            int interval = 5;
+            double communication_graunlarity = 0.0, computation_granularity = 0.0;
+            for (int i = 0; i < args.length; i++) {
+                char key = args[i].charAt(1);
+                switch (key) {
+                    case 'c':
+                        code = args[++i];
+                        break;
+                    case 'd':
+                        daxPath = args[++i];
+                        break;
+                    case 'b':
+                        intraBandwidth = Double.parseDouble(args[++i]);
+                        break;
+                    case 'l':
+                        c_delay = Double.parseDouble(args[++i]);
+                        break;
+                    case 'q':
+                        q_delay = Double.parseDouble(args[++i]);
+                        break;
+                    case 'e':
+                        e_delay = Double.parseDouble(args[++i]);
+                        break;
+                    case 'p':
+                        p_delay = Double.parseDouble(args[++i]);
+                        break;
+                    case 'i':
+                        interval = Integer.parseInt(args[++i]);
+                        break;
+                    case 's':
+                        computation_granularity = Double.parseDouble(args[++i]);
+                        break;
+                    case 'm':
+                        communication_graunlarity = Double.parseDouble(args[++i]);
+                        break;
+                    case 'v':
+                        vmNum = Integer.parseInt(args[++i]);
+                        break;
+                    case 'j':
+                        jobNum = Integer.parseInt(args[++i]);
+                        break;
+                }
+            }
+            // First step: Initialize the WorkflowSim package. 
+
+
             /**
              * Should change this based on real physical path
              */
             //String daxPath = "/Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Fake_1.xml";
-            if(daxPath == null){
+            if (daxPath == null) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return;
             }
             File daxFile = new File(daxPath);
-            if(!daxFile.exists()){
+            if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return;
             }
@@ -166,26 +172,27 @@ public class BalancedClusteringExample1 {
             Parameters.FTCluteringAlgorithm ftc_method = null;
 
             /**
-             * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
-             * such that the planner would not override the result of the scheduler
+             * Since we are using MINMIN scheduling algorithm, the planning
+             * algorithm should be INVALID such that the planner would not
+             * override the result of the scheduler
              */
             Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.DATA;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.LOCAL;
 
             /**
-             * clustering delay must be added, if you don't need it, you can set all the clustering
-             * delay to be zero, but not null
+             * clustering delay must be added, if you don't need it, you can set
+             * all the clustering delay to be zero, but not null
              */
             Map<Integer, Double> clusteringDelay = new HashMap();
             Map<Integer, Double> queueDelay = new HashMap();
             Map<Integer, Double> postscriptDelay = new HashMap();
             Map<Integer, Double> engineDelay = new HashMap();
             /**
-             * application has at most 11 horizontal levels 
+             * application has at most 11 horizontal levels
              */
             int maxLevel = 11;
-            for (int level = 0; level < maxLevel; level++ ){
+            for (int level = 0; level < maxLevel; level++) {
                 clusteringDelay.put(level, c_delay);
                 queueDelay.put(level, q_delay);
                 postscriptDelay.put(level, p_delay);
@@ -193,25 +200,38 @@ public class BalancedClusteringExample1 {
             }
             // Add clustering delay to the overhead parameters
             /**
-             * Map<Integer, Double> wed_delay,
-            Map<Integer, Double> queue_delay,
-            Map<Integer, Double> post_delay,
-            Map<Integer, Double> cluster_delay,
+             * Map<Integer, Double> wed_delay, Map<Integer, Double> queue_delay,
+             * Map<Integer, Double> post_delay, Map<Integer, Double>
+             * cluster_delay,
              */
             OverheadParameters op = new OverheadParameters(interval, engineDelay, queueDelay, postscriptDelay, clusteringDelay, 0);;
-            
+
             /**
              * Balanced Clustering
              */
-            ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.BALANCED;
+            ClusteringParameters.ClusteringMethod method = null;
+            if (code.equalsIgnoreCase("m")) {
+                method = ClusteringParameters.ClusteringMethod.DFJS;
+            } else if (code.equalsIgnoreCase("a")) {
+                method = ClusteringParameters.ClusteringMethod.AFJS;
+            } else if (code.equalsIgnoreCase("n")){
+                method = ClusteringParameters.ClusteringMethod.NONE;
+            }
+            else {
+                method = ClusteringParameters.ClusteringMethod.BALANCED;
+            }
             /**
-             * r: Horizontal Runtime Balancing (HRB)
-             * d: Horizontal Distance Balancing (HDB)
-             * i: Horizontal Impact Factor Balancing (HIFB)
-             * h: Horizontal Random Balancing , the original horizontal clustering
+             * r: Horizontal Runtime Balancing (HRB) d: Horizontal Distance
+             * Balancing (HDB) i: Horizontal Impact Factor Balancing (HIFB) h:
+             * Horizontal Random Balancing , the original horizontal clustering
              */
-            ClusteringParameters cp = new ClusteringParameters(vmNum, 0, method, code);
-            
+            ClusteringParameters cp = new ClusteringParameters(jobNum, 0, method, code);
+            if (communication_graunlarity != 0.0) {
+                cp.setGranularityDataSize(communication_graunlarity);
+            }
+            if (computation_granularity != 0.0) {
+                cp.setGranularityTimeSize(computation_granularity);
+            }
 
             /**
              * Initialize static parameters
@@ -244,8 +264,8 @@ public class BalancedClusteringExample1 {
              */
             WorkflowEngine wfEngine = wfPlanner.getWorkflowEngine();
             /**
-             * Create a list of VMs.The userId of a vm is basically the id of the scheduler
-             * that controls this vm. 
+             * Create a list of VMs.The userId of a vm is basically the id of
+             * the scheduler that controls this vm.
              */
             List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0), Parameters.getVmNum());
 
@@ -267,18 +287,19 @@ public class BalancedClusteringExample1 {
             CloudSim.stopSimulation();
 
             printJobList(outputList0);
-            
+
 
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
     }
 
-    private static DatacenterExtended createDatacenter(String name , double intraBandwidth, int vmNumber) {
+    private static DatacenterExtended createDatacenter(String name, double intraBandwidth , int vmNumber) {
 
         // Here are the steps needed to create a PowerDatacenter:
         // 1. We need to create a list to store one or more
         //    Machines
+        //int vmNumber = 20;
         List<Host> hostList = new ArrayList<Host>();
 
         // 2. A Machine contains one or more PEs or CPUs/Cores. Therefore, should
@@ -293,8 +314,8 @@ public class BalancedClusteringExample1 {
             peList1.add(new Pe(1, new PeProvisionerSimple(mips)));
 
             int hostId = 0;
-            int ram = 2048 * vmNumber /  20; //host memory (MB)
-            long storage = 1000000 * vmNumber / 20; //host storage
+            int ram = 2048; //host memory (MB)
+            long storage = 1000000; //host storage
             int bw = 10000;
             hostList.add(
                     new Host(
@@ -333,14 +354,13 @@ public class BalancedClusteringExample1 {
          * The bandwidth within a data center.
          */
         //double intraBandwidth = 1.5e3;// the number comes from the futuregrid site, you can specify your bw
-        
         try {
             DistributedClusterStorage s1 = new DistributedClusterStorage(name, 1e12, vmNumber, intraBandwidth / 2);
-            
+
             // The bandwidth from one vm to another vm
-            for(int source = 0; source < vmNumber; source ++){
-                for(int destination = 0; destination < vmNumber; destination ++){
-                    if(source == destination){
+            for (int source = 0; source < vmNumber; source++) {
+                for (int destination = 0; destination < vmNumber; destination++) {
+                    if (source == destination) {
                         continue;
                     }
                     s1.setBandwidth(source, destination, intraBandwidth);

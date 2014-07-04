@@ -129,31 +129,33 @@ public class BalancedClustering extends BasicClustering {
             addImpact(set, avg);
         }
 
-        for (Entry entry : map.entrySet()) {
-            int depth = (Integer) entry.getKey();
-            ArrayList<TaskSet> list = (ArrayList) entry.getValue();
-            /**
-             * Horizontal Runtime Variance.
-             */
-            double hrv = new HorizontalRuntimeVariance().getMetric(list);
-            /**
-             * Impact Factor Variance.
-             */
-            double ifv = new ImpactFactorVariance().getMetric(list);
-            /**
-             * Pipeline Runtime Variance.
-             */
-            double prv = new PipelineRuntimeVariance().getMetric(list);
-            /**
-             * Distance Variance.
-             */
-            double dv = new DistanceVariance().getMetric(list);
-            Log.printLine("HRV " + depth + " " + list.size()
-                    + " " + hrv + "\nIFV " + depth + " "
-                    + list.size() + " " + ifv + "\nPRV " + depth
-                    + " " + list.size() + " " + prv + "\nDV " + depth + " " + list.size() + " " + dv);
-
-        }
+        
+//        for (Entry entry : map.entrySet()) {
+//            int depth = (Integer) entry.getKey();
+//            ArrayList<TaskSet> list = (ArrayList) entry.getValue();
+//            /**
+//             * Horizontal Runtime Variance.
+//             */
+//            double hrv = new HorizontalRuntimeVariance().getMetric(list);
+//            /**
+//             * Impact Factor Variance.
+//             */
+//            double ifv = new ImpactFactorVariance().getMetric(list);
+//            /**
+//             * Pipeline Runtime Variance.
+//             */
+//            double prv = new PipelineRuntimeVariance().getMetric(list);
+//            /**
+//             * Distance Variance.
+//             */
+//            double dv = new DistanceVariance().getMetric(list);
+//            Log.printLine("HRV " + depth + " " + list.size()
+//                    + " " + hrv + "\nIFV " + depth + " "
+//                    + list.size() + " " + ifv + "\nPRV " + depth
+//                    + " " + list.size() + " " + prv + "\nDV " + depth + " " + list.size() + " " + dv);
+//
+//        }
+        
     }
 
     /**
@@ -318,10 +320,10 @@ public class BalancedClustering extends BasicClustering {
 
         printMetrics();
         String code = Parameters.getClusteringParameters().getCode();
-        Map<Integer, ArrayList<TaskSet>> map = getCurrentTaskSetAtLevels();
+        Map<Integer, ArrayList<TaskSet>> map = null;
         if (code != null) {
             for (char c : code.toCharArray()) {
-
+                map = getCurrentTaskSetAtLevels();
                 switch (c) {
                     case 'v':
 
@@ -362,10 +364,11 @@ public class BalancedClustering extends BasicClustering {
                         break;
                 }
             }
-            printMetrics();
+            //printMetrics does not work for vetical clustering
+            //printMetrics();
         }
 
-        printOut();
+        //printOut();
 
         Collection sets = mTask2TaskSet.values();
         for (Iterator it = sets.iterator(); it.hasNext();) {

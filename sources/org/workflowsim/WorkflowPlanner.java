@@ -17,6 +17,7 @@ package org.workflowsim;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEntity;
@@ -217,9 +218,16 @@ public class WorkflowPlanner extends SimEntity {
                 exits.add(task);
             }
         }
+        /**
+         * Instead of giving them average IF for different branches, give them random
+         * in case of Genome and SIPHT
+         */
         double avg = 1.0 / exits.size();
+        Random random = new Random(System.currentTimeMillis());
+        double IF = 1.0;
         for (Task task : exits) {
-            addImpact(task, avg);
+            addImpact(task, IF); 
+            IF = random.nextInt();
         }
     }
 

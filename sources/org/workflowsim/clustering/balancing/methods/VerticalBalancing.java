@@ -61,7 +61,7 @@ public class VerticalBalancing extends BalancingMethod {
                 ArrayList pList = child.getParentList();
                 if (pList.size() == 1) {
                     //add parent to child (don't do it reversely)
-                    addTaskSet2TaskSet(set, child);
+                    addTaskSet2TaskSet(set, child, true);
 
                 }
             }
