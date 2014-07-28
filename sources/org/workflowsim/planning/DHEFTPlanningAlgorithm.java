@@ -24,7 +24,7 @@ import org.workflowsim.Task;
 import org.workflowsim.utils.Parameters;
 
 /**
- * The Distributed HEFT planning algorithm. The difference compared to HEFT:
+ * The Distributed DHEFT planning algorithm. The difference compared to HEFT:
  * 
  * 1. We are able to specify the bandwidth between each pair of vms in the
  * bandwidths of Parameters. 
