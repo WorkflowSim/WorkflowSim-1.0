@@ -29,7 +29,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.workflowsim.failure.FailureParameters;
 import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
@@ -39,6 +38,7 @@ import org.workflowsim.utils.ReplicaCatalog;
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Aug 23, 2013
+ * @date Nov 9, 2014
  */
 public class WorkflowParser {
 
@@ -55,6 +55,10 @@ public class WorkflowParser {
      */
     private String daxPath;
     /**
+     * The path to DAX files.
+     */
+    private List<String> daxPaths;
+    /**
      * All tasks.
      */
     private List<Task> taskList;
@@ -62,6 +66,11 @@ public class WorkflowParser {
      * User id. used to create a new task.
      */
     private int userId;
+    
+    /**
+     * current job id. In case multiple workflow submission
+     */
+    private int jobIdStartsFrom;
 
     /**
      * Gets the task list
@@ -85,14 +94,6 @@ public class WorkflowParser {
      * Map from task name to task.
      */
     protected Map<String, Task> mName2Task;
-    /**
-     * Map from task name to task runtime.
-     */
-    protected Map<String, Double> mName2Runtime;
-    /**
-     * Map from file name (data) to its size.
-     */
-    protected Map<String, Double> mName2Size;
 
     /**
      * Initialize a WorkflowParser
@@ -103,15 +104,14 @@ public class WorkflowParser {
     public WorkflowParser(int userId) {
         this.userId = userId;
         this.mName2Task = new HashMap<String, Task>();
-        this.mName2Runtime = new HashMap<String, Double>();
-        this.mName2Size = new HashMap<String, Double>();
 
         this.fileSizePath = Parameters.getDatasizePath();
         this.daxPath = Parameters.getDaxPath();
+        this.daxPaths = Parameters.getDAXPaths();
         this.runtimePath = Parameters.getRuntimePath();
-
+        this.jobIdStartsFrom = 1;
+            
         setTaskList(new ArrayList<Task>());
-
 
     }
 
@@ -127,46 +127,13 @@ public class WorkflowParser {
      * Start to parse a workflow which includes text files and xml files.
      */
     public void parse() {
-        parseTextFile();
-        parseXmlFile();
-    }
-
-    /**
-     * Parse a text file (file size and runtime). Add them to mName2Size and
-     * mName2Runtime
-     */
-    private void parseTextFile() {
-
-        if (fileSizePath == null || (!(new File(fileSizePath).exists()))) {
-            return;
-        }
-        if (runtimePath == null || (!(new File(runtimePath).exists()))) {
-            return;
-        }
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(fileSizePath));
-            String thisline = "";
-            while ((thisline = br.readLine()) != null) {
-                String[] items = thisline.split(" ");
-                if (items.length == 2) {
-                    this.mName2Size.put(items[0], Double.parseDouble(items[1]));
-                }
+        if(this.daxPath != null){
+            parseXmlFile(this.daxPath);
+        } else if(this.daxPaths != null){
+            for(String path: this.daxPaths){
+                parseXmlFile(path);
             }
-            br.close();
-            br = new BufferedReader(new FileReader(runtimePath));
-            while ((thisline = br.readLine()) != null) {
-                String[] items = thisline.split(" ");
-                if (items.length == 2) {
-                    this.mName2Runtime.put(items[0], Double.parseDouble(items[1]));
-                }
-            }
-            br.close();
-
-
-        } catch (Exception e) {
-            Log.printLine("IO exception in reading text files");
         }
-
     }
 
     /**
@@ -183,26 +150,20 @@ public class WorkflowParser {
             Task cTask = (Task) it.next();
             setDepth(cTask, task.getDepth() + 1);
         }
-        /*
-        if (FailureParameters.getAlpha()!=null && ! FailureParameters.getAlpha().containsKey(task.getDepth() )) {
-            FailureParameters.getAlpha().put(task.getDepth(), 0.0);
-        }
-        */ 
     }
 
     /**
      * Parse a DAX file with jdom
      */
-    private void parseXmlFile() {
+    private void parseXmlFile(String path) {
 
         try {
 
             SAXBuilder builder = new SAXBuilder();
             //parse using builder to get DOM representation of the XML file
-            Document dom = builder.build(new File(daxPath));
+            Document dom = builder.build(new File(path));
             Element root = dom.getRootElement();
             List list = root.getChildren();
-            int idIndex = 1;
             for (Iterator it = list.iterator(); it.hasNext();) {
                 Element node = (Element) it.next();
                 if (node.getName().toLowerCase().equals("job")) {
@@ -216,10 +177,7 @@ public class WorkflowParser {
                      * 0
                      */
                     double runtime = 0.0;
-                    if (this.mName2Runtime.containsKey(nodeName)) {
-                        runtime = 1000 * (Double) this.mName2Runtime.get(nodeName);
-                        length = (long) runtime;
-                    } else if (node.getAttributeValue("runtime") != null) {
+                    if (node.getAttributeValue("runtime") != null) {
                         String nodeTime = node.getAttributeValue("runtime");
                         runtime = 1000 * Double.parseDouble(nodeTime);
                         length = (long) runtime;
@@ -249,16 +207,14 @@ public class WorkflowParser {
 
                             String inout = file.getAttributeValue("link");
                             double size = 0.0;
-                            if (this.mName2Size.containsKey(fileName)) {
-                                size = (Double) this.mName2Size.get(fileName) /*/ 1024*/;//now it is KB
+                            
+                            String fileSize = file.getAttributeValue("size");
+                            if (fileSize != null) {
+                                size = Double.parseDouble(fileSize) /*/ 1024*/;
                             } else {
-                                String fileSize = file.getAttributeValue("size");
-                                if (fileSize != null) {
-                                    size = Double.parseDouble(fileSize) /*/ 1024*/;
-                                } else {
-                                    Log.printLine("File Size not found for " + fileName);
-                                }
+                                Log.printLine("File Size not found for " + fileName);
                             }
+                            
                             /**
                              * a bug of cloudsim, size 0 causes a problem. 1 is
                              * ok.
@@ -308,14 +264,15 @@ public class WorkflowParser {
                         }
 
                     }
-
-
-                    Task task = new Task(idIndex, length);
-
+                    Task task;
+                    //In case of multiple workflow submission. Make sure the jobIdStartsFrom is consistent. 
+                    synchronized (this){
+                        task = new Task(this.jobIdStartsFrom, length);
+                        this.jobIdStartsFrom ++ ;
+                    }
                     task.setType(nodeType);
 
                     task.setUserId(userId);
-                    idIndex++;
                     mName2Task.put(nodeName, task);
 
 
@@ -373,8 +330,6 @@ public class WorkflowParser {
             /**
              * Clean them so as to save memory. Parsing workflow may take much memory
              */
-            this.mName2Runtime.clear();
-            this.mName2Size.clear();
             this.mName2Task.clear();//?
 
 

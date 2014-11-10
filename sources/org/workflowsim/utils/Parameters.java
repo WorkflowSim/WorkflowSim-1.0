@@ -15,6 +15,7 @@
  */
 package org.workflowsim.utils;
 
+import java.util.List;
 import org.cloudbus.cloudsim.Log;
 
 /**
@@ -110,6 +111,11 @@ public class Parameters {
      * The physical path to DAX file
      */
     private static String daxPath;
+    
+    /**
+     * The physical path to DAX files
+     */
+    private static List<String> daxPaths;
     /**
      * The physical path to runtime file In the runtime file, please use format
      * as below ID1 1.0 ID2 2.0 ... This is optional, if you have specified task
@@ -196,6 +202,44 @@ public class Parameters {
         cParams = cp;
         vmNum = vm;
         daxPath = dax;
+        runtimePath = runtime;
+        datasizePath = datasize;
+
+        oParams = op;
+        schedulingAlgorithm = scheduler;
+        planningAlgorithm = planner;
+        reduceMethod = rMethod;
+        deadline = dl;
+        maxDepth = 0;
+    }
+    
+    /**
+     * A static function so that you can specify them in any place
+     *
+     * @param fMethod, the fault tolerant clustering method
+     * @param monitor, the fault tolerant clustering monitor
+     * @param failure, the failure generation mode
+     * @param failureList, the task failure list
+     * @param vm, the number of vms
+     * @param dax, the list of DAX paths 
+     * @param runtime, optional, the runtime file path
+     * @param datasize, optional, the datasize file path
+     * @param op, overhead parameters
+     * @param cp, clustering parameters
+     * @param scheduler, scheduling mode
+     * @param planner, planning mode
+     * @param rMethod , reducer mode
+     * @param deadline, deadline of a workflow
+     */
+    public static void init(
+            int vm, List<String> dax, String runtime, String datasize,
+            OverheadParameters op, ClusteringParameters cp,
+            SchedulingAlgorithm scheduler, PlanningAlgorithm planner, String rMethod,
+            long dl) {
+
+        cParams = cp;
+        vmNum = vm;
+        daxPaths = dax;
         runtimePath = runtime;
         datasizePath = datasize;
 
@@ -390,5 +434,13 @@ public class Parameters {
      */
     public static double getRuntimeScale(){
         return runtime_scale;
+    }
+    
+    /**
+     * Gets the dax paths
+     * @return 
+     */
+    public static List<String> getDAXPaths() {
+        return daxPaths;
     }
 }
