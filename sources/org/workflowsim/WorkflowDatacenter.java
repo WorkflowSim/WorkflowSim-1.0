@@ -64,8 +64,6 @@ public class WorkflowDatacenter extends Datacenter {
                 ReplicaCatalog.addStorageList(message.getFileName(), 
                         Integer.toString(message.getDestinationVm()));
                 break;
-
-
             default:
                 break;
         }
@@ -332,6 +330,7 @@ public class WorkflowDatacenter extends Datacenter {
                         break;
 
                     case RANDOM:
+                        time += calculateDataTransferDelay(file, userId, vmId, vm);
                         ReplicaCatalog.addStorageList(file.getName(), Integer.toString(vmId));
                         break;
                 }
@@ -464,7 +463,7 @@ public class WorkflowDatacenter extends Datacenter {
                     case RANDOM:
                         ReplicaCatalog.addStorageList(file.getName(), Integer.toString(vmId));
                         Random random = new Random(System.currentTimeMillis());
-                        double factor = 0.2;
+                        double factor = 0.1;
                         int vm2copy = (int) ((double) Parameters.getVmNum() * factor);
                         for (int i = 0; i < vm2copy; i++) {
                             int destination = (int) (random.nextDouble() * (double) Parameters.getVmNum());
