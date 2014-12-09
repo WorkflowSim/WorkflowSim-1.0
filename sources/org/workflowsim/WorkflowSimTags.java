@@ -44,6 +44,8 @@ public class WorkflowSimTags {
     public static final int JOB_SUBMIT = BASE + 1;
     public static final int CLOUDLET_UPDATE = BASE + 5;
     public static final int CLOUDLET_CHECK = BASE + 6;
+    
+    public static final int FILE_STAGE_OUT = BASE + 7;
 
     /**
      * Private Constructor

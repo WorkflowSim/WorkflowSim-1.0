@@ -17,6 +17,7 @@ package org.workflowsim;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletScheduler;
 import org.cloudbus.cloudsim.Consts;
@@ -57,6 +58,18 @@ public class WorkflowDatacenter extends Datacenter {
 
     @Override
     protected void processOtherEvent(SimEvent ev) {
+        switch (ev.getTag()) {
+            case WorkflowSimTags.FILE_STAGE_OUT:
+                FileStageOutMessage message = (FileStageOutMessage) ev.getData();
+                ReplicaCatalog.addStorageList(message.getFileName(), 
+                        Integer.toString(message.getDestinationVm()));
+                break;
+
+
+            default:
+                break;
+        }
+
     }
 
     /**
@@ -110,12 +123,12 @@ public class WorkflowDatacenter extends Datacenter {
             int userId = cl.getUserId();
             int vmId = cl.getVmId();
             Host host = getVmAllocationPolicy().getHost(vmId, userId);
-            CondorVM vm = (CondorVM)host.getVm(vmId, userId);
+            CondorVM vm = (CondorVM) host.getVm(vmId, userId);
 
             switch (Parameters.getCostModel()) {
                 case DATACENTER:
                     // process this Cloudlet to this CloudResource
-                    cl.setResourceParameter(getId(), getCharacteristics().getCostPerSecond(), 
+                    cl.setResourceParameter(getId(), getCharacteristics().getCostPerSecond(),
                             getCharacteristics().getCostPerBw());
                     break;
                 case VM:
@@ -222,7 +235,7 @@ public class WorkflowDatacenter extends Datacenter {
                  * name)
                  */
                 case LOCAL:
-
+                case RANDOM:
                     ReplicaCatalog.addStorageList(file.getName(), this.getName());
                     /**
                      * Is it not really needed currently but it is left for
@@ -287,11 +300,14 @@ public class WorkflowDatacenter extends Datacenter {
             File file = iter.next();
             //The input file is not an output File 
             if (isRealInputFile(requiredFiles, file)) {
-                double maxBwth = 0.0;
                 List siteList = ReplicaCatalog.getStorageList(file.getName());
                 if (siteList.isEmpty()) {
                     throw new Exception(file.getName() + " does not exist");
                 }
+                int vmId = cl.getVmId();
+                int userId = cl.getUserId();
+                Host host = getVmAllocationPolicy().getHost(vmId, userId);
+                Vm vm = host.getVm(vmId, userId);
                 switch (ReplicaCatalog.getFileSystem()) {
                     case SHARED:
                         //stage-in job
@@ -311,53 +327,11 @@ public class WorkflowDatacenter extends Datacenter {
                         }
                         break;
                     case LOCAL:
+                        time += calculateDataTransferDelay(file, userId, vmId, vm);
+                        ReplicaCatalog.addStorageList(file.getName(), Integer.toString(vmId));
+                        break;
 
-                        int vmId = cl.getVmId();
-                        int userId = cl.getUserId();
-                        Host host = getVmAllocationPolicy().getHost(vmId, userId);
-                        Vm vm = host.getVm(vmId, userId);
-
-                        boolean requiredFileStagein = true;
-
-                        for (Iterator it = siteList.iterator(); it.hasNext();) {
-                            //site is where one replica of this data is located at
-                            String site = (String) it.next();
-                            if (site.equals(this.getName())) {
-                                continue;
-                            }
-                            /**
-                             * This file is already in the local vm and thus it
-                             * is no need to transfer
-                             */
-                            if (site.equals(Integer.toString(vmId))) {
-                                requiredFileStagein = false;
-                                break;
-                            }
-                            double bwth;
-                            if (site.equals(Parameters.SOURCE)) {
-                                //transfers from the source to the VM is limited to the VM bw only
-                                bwth = vm.getBw();
-                                //bwth = dcStorage.getBaseBandwidth();
-                            } else {
-                                //transfers between two VMs is limited to both VMs
-                                bwth = Math.min(vm.getBw(), getVmAllocationPolicy().getHost(Integer.parseInt(site), userId).getVm(Integer.parseInt(site), userId).getBw());
-                                //bwth = dcStorage.getBandwidth(Integer.parseInt(site), vmId);
-                            }
-                            if (bwth > maxBwth) {
-                                maxBwth = bwth;
-                            }
-                        }
-                        if (requiredFileStagein && maxBwth > 0.0) {
-                            time += file.getSize() / Consts.MILLION * 8 / maxBwth;
-                        }
-
-                        /**
-                         * For the case when storage is too small it is not
-                         * handled here
-                         */
-                        //We should add but since CondorVm has a small capability it often fails
-                        //We currently don't use this storage to do anything meaningful. It is left for future. 
-                        //condorVm.addLocalFile(file);
+                    case RANDOM:
                         ReplicaCatalog.addStorageList(file.getName(), Integer.toString(vmId));
                         break;
                 }
@@ -419,6 +393,48 @@ public class WorkflowDatacenter extends Datacenter {
             }
         }
     }
+
+    private double calculateDataTransferDelay(File file, int userId, int vmId, Vm vm) {
+        List siteList = ReplicaCatalog.getStorageList(file.getName());
+        boolean requiredFileStagein = true;
+        double time = 0.0;
+        double maxBwth = 0.0;
+        for (Iterator it = siteList.iterator(); it.hasNext();) {
+            //site is where one replica of this data is located at
+            String site = (String) it.next();
+            if (site.equals(this.getName())) {
+                continue;
+            }
+            /**
+             * This file is already in the local vm and thus it is no need to
+             * transfer
+             */
+            if (site.equals(Integer.toString(vmId))) {
+                requiredFileStagein = false;
+                break;
+            }
+            double bwth;
+            if (site.equals(Parameters.SOURCE)) {
+                //transfers from the source to the VM is limited to the VM bw only
+                bwth = vm.getBw();
+                //bwth = dcStorage.getBaseBandwidth();
+            } else {
+                //transfers between two VMs is limited to both VMs
+                bwth = Math.min(vm.getBw(),
+                        getVmAllocationPolicy().getHost(Integer.parseInt(site), userId)
+                        .getVm(Integer.parseInt(site), userId).getBw());
+                //bwth = dcStorage.getBandwidth(Integer.parseInt(site), vmId);
+            }
+            if (bwth > maxBwth) {
+                maxBwth = bwth;
+            }
+        }
+        if (requiredFileStagein && maxBwth > 0.0) {
+            time = file.getSize() / Consts.MILLION * 8 / maxBwth;
+        }
+        return time;
+    }
+
     /*
      * Register a file to the storage if it is an output file
      * @param requiredFiles, all files to be stage-in
@@ -426,7 +442,6 @@ public class WorkflowDatacenter extends Datacenter {
      * @pre  $none
      * @post $none
      */
-
     private void register(Cloudlet cl) {
         Task tl = (Task) cl;
         List fList = tl.getFileList();
@@ -435,23 +450,57 @@ public class WorkflowDatacenter extends Datacenter {
             if (file.getType() == FileType.OUTPUT.value)//output file
             {
 
+                int vmId = cl.getVmId();
+                int userId = cl.getUserId();
+                Host host = getVmAllocationPolicy().getHost(vmId, userId);
+                CondorVM vm = (CondorVM) host.getVm(vmId, userId);
                 switch (ReplicaCatalog.getFileSystem()) {
                     case SHARED:
                         ReplicaCatalog.addStorageList(file.getName(), this.getName());
                         break;
                     case LOCAL:
-                        int vmId = cl.getVmId();
-                        int userId = cl.getUserId();
-                        Host host = getVmAllocationPolicy().getHost(vmId, userId);
-                        /**
-                         * Left here for future work
-                         */
-                        CondorVM vm = (CondorVM) host.getVm(vmId, userId);
-
                         ReplicaCatalog.addStorageList(file.getName(), Integer.toString(vmId));
+                        break;
+                    case RANDOM:
+                        ReplicaCatalog.addStorageList(file.getName(), Integer.toString(vmId));
+                        Random random = new Random(System.currentTimeMillis());
+                        double factor = 0.2;
+                        int vm2copy = (int) ((double) Parameters.getVmNum() * factor);
+                        for (int i = 0; i < vm2copy; i++) {
+                            int destination = (int) (random.nextDouble() * (double) Parameters.getVmNum());
+                            FileStageOutMessage message = new FileStageOutMessage(destination, vmId, file.getName());
+                            double delay = calculateDataTransferDelay(file, userId, vmId, vm);
+                            send(userId, delay, WorkflowSimTags.FILE_STAGE_OUT, message);
+                        }
                         break;
                 }
             }
+        }
+    }
+
+    private class FileStageOutMessage {
+
+        private int dest;
+        private int src;
+        private String name;
+
+        public FileStageOutMessage(
+                int dest, int src, String name) {
+            this.dest = dest;
+            this.src = src;
+            this.name = name;
+        }
+
+        public int getDestinationVm() {
+            return this.dest;
+        }
+
+        public int getSourceVm() {
+            return this.src;
+        }
+
+        public String getFileName() {
+            return this.name;
         }
     }
 }
