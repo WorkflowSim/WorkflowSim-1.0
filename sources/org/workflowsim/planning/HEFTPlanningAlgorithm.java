@@ -70,11 +70,11 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
     }
 
     public HEFTPlanningAlgorithm() {
-        computationCosts = new HashMap<>();
-        transferCosts = new HashMap<>();
-        rank = new HashMap<>();
-        earliestFinishTimes = new HashMap<>();
-        schedules = new HashMap<>();
+        computationCosts = new HashMap<Task, Map<CondorVM, Double>>();
+        transferCosts = new HashMap<Task, Map<Task, Double>>();
+        rank = new HashMap<Task, Double>();
+        earliestFinishTimes = new HashMap<Task, Double>();
+        schedules = new HashMap<CondorVM, List<Event>>();
     }
 
     /**
@@ -246,7 +246,7 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
      * Allocates all tasks to be scheduled in non-ascending order of schedule.
      */
     private void allocateTasks() {
-        List<TaskRank> taskRank = new ArrayList<>();
+        List<TaskRank> taskRank = new ArrayList<TaskRank>();
         for (Task task : rank.keySet()) {
             taskRank.add(new TaskRank(task, rank.get(task)));
         }

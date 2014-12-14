@@ -65,7 +65,7 @@ public class HEFTPlanningAlgorithmExample1 extends WorkflowSimBasicExample1{
         Random bwRandom = new Random(System.currentTimeMillis());
 
         for (int i = 0; i < vms; i++) {
-            double ratio = bwRandom.nextDouble();
+            double ratio = 1;
             vm[i] = new CondorVM(i, userId, mips * ratio, pesNumber, ram, (long) (bw * ratio), size, vmm, new CloudletSchedulerSpaceShared());
             list.add(vm[i]);
         }

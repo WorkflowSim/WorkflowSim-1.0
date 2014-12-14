@@ -15,6 +15,8 @@
  */
 package org.workflowsim;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -429,7 +431,7 @@ public class WorkflowDatacenter extends Datacenter {
             }
         }
         if (requiredFileStagein && maxBwth > 0.0) {
-            time = file.getSize() / Consts.MILLION * 8 / maxBwth;
+            time = (file.getSize() / (double)(Consts.MILLION * 8)) / maxBwth;
         }
         return time;
     }
@@ -462,20 +464,29 @@ public class WorkflowDatacenter extends Datacenter {
                         break;
                     case RANDOM:
                         ReplicaCatalog.addStorageList(file.getName(), Integer.toString(vmId));
-                        Random random = new Random(System.currentTimeMillis());
-                        double factor = 0.1;
-                        int vm2copy = (int) ((double) Parameters.getVmNum() * factor);
-                        for (int i = 0; i < vm2copy; i++) {
-                            int destination = (int) (random.nextDouble() * (double) Parameters.getVmNum());
+                        
+                        double factor = 1.0;
+                        List <Integer> randoms= new ArrayList<Integer>();
+                        for (int i=0 ; i< Parameters.getVmNum(); i++){
+                        	randoms.add(i);
+                        }
+                        Collections.shuffle(randoms);
+                        
+                        
+                        for (int i = 0; i < (int)(factor* Parameters.getVmNum()); i++) {
+                            int destination = randoms.get(i);
                             FileStageOutMessage message = new FileStageOutMessage(destination, vmId, file.getName());
+                            
                             double delay = calculateDataTransferDelay(file, userId, vmId, vm);
-                            send(userId, delay, WorkflowSimTags.FILE_STAGE_OUT, message);
+                            
+                            send(this.getId(), delay, WorkflowSimTags.FILE_STAGE_OUT, message);
                         }
                         break;
                 }
             }
         }
     }
+    
 
     private class FileStageOutMessage {
 
