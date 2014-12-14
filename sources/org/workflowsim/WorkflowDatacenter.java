@@ -469,7 +469,7 @@ public class WorkflowDatacenter extends Datacenter {
                             int destination = (int) (random.nextDouble() * (double) Parameters.getVmNum());
                             FileStageOutMessage message = new FileStageOutMessage(destination, vmId, file.getName());
                             double delay = calculateDataTransferDelay(file, userId, vmId, vm);
-                            send(userId, delay, WorkflowSimTags.FILE_STAGE_OUT, message);
+                            send(this.getId(), delay, WorkflowSimTags.FILE_STAGE_OUT, message);
                         }
                         break;
                 }
