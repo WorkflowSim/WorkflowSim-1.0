@@ -348,7 +348,7 @@ public class WorkflowDatacenter extends Datacenter {
                             }
                         }
                         if (requiredFileStagein && maxBwth > 0.0) {
-                            time += file.getSize() / Consts.MILLION * 8 / maxBwth;
+                            time += file.getSize() / (double) Consts.MILLION * 8 / maxBwth;
                         }
 
                         /**
