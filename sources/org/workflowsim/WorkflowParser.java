@@ -15,9 +15,7 @@
  */
 package org.workflowsim;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,14 +40,6 @@ import org.workflowsim.utils.ReplicaCatalog;
  */
 public class WorkflowParser {
 
-    /**
-     * The path to data size file.
-     */
-    private String fileSizePath;
-    /**
-     * The path to runtime file.
-     */
-    private String runtimePath;
     /**
      * The path to DAX file.
      */
@@ -104,27 +94,15 @@ public class WorkflowParser {
     public WorkflowParser(int userId) {
         this.userId = userId;
         this.mName2Task = new HashMap<String, Task>();
-
-        this.fileSizePath = Parameters.getDatasizePath();
         this.daxPath = Parameters.getDaxPath();
         this.daxPaths = Parameters.getDAXPaths();
-        this.runtimePath = Parameters.getRuntimePath();
         this.jobIdStartsFrom = 1;
-            
+           
         setTaskList(new ArrayList<Task>());
-
-    }
-
-    public WorkflowParser(int userId, String fileSizePath, String runtimePath, String daxPath) {
-
-        this(userId);
-        this.fileSizePath = fileSizePath;
-        this.runtimePath = runtimePath;
-        this.daxPath = daxPath;
     }
 
     /**
-     * Start to parse a workflow which includes text files and xml files.
+     * Start to parse a workflow which is a xml file(s).
      */
     public void parse() {
         if(this.daxPath != null){
@@ -174,12 +152,16 @@ public class WorkflowParser {
 
                     /**
                      * capture runtime. If not exist, by default the runtime is
-                     * 0
+                     * 0.1. Otherwise CloudSim would ignore this task.
+                     * BUG/#11
                      */
-                    double runtime = 0.0;
+                    double runtime = 0.1;
                     if (node.getAttributeValue("runtime") != null) {
                         String nodeTime = node.getAttributeValue("runtime");
                         runtime = 1000 * Double.parseDouble(nodeTime);
+                        if (runtime < 100) {
+                            runtime = 100;
+                        }
                         length = (long) runtime;
                     } else {
                         Log.printLine("Cannot find runtime for " + nodeName + ",set it to be 0");
@@ -191,9 +173,6 @@ public class WorkflowParser {
 
                     List mFileList = new ArrayList<org.cloudbus.cloudsim.File>();
 
-                    /**
-                     * capture file.
-                     */
                     for (Iterator itf = fileList.iterator(); itf.hasNext();) {
                         Element file = (Element) itf.next();
                         if (file.getName().toLowerCase().equals("uses")) {
@@ -330,8 +309,7 @@ public class WorkflowParser {
             /**
              * Clean them so as to save memory. Parsing workflow may take much memory
              */
-            this.mName2Task.clear();//?
-
+            this.mName2Task.clear();
 
         } catch (JDOMException jde) {
             Log.printLine("JDOM Exception;Please make sure your dax file is valid");
@@ -342,7 +320,6 @@ public class WorkflowParser {
         } catch (Exception e) {
             e.printStackTrace();
             Log.printLine("Parsing Exception");
-
         }
     }
 }

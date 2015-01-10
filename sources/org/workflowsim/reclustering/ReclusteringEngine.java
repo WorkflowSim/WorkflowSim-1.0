@@ -49,19 +49,22 @@ public class ReclusteringEngine {
      * @param taskList, the task list
      * @return a new job
      */
-    private static Job createJob(int id, Job job, long length, List taskList) {
+    private static Job createJob(int id, Job job, long length, List taskList, boolean updateDep) {
         try {
             Job newJob = new Job(id, length);
             newJob.setUserId(job.getUserId());
             newJob.setVmId(-1);
             newJob.setCloudletStatus(Cloudlet.CREATED);
-            newJob.setChildList(job.getChildList());
-            newJob.setParentList(job.getParentList());
+
             newJob.setTaskList(taskList);
             newJob.setDepth(job.getDepth());
-            for (Iterator it = job.getChildList().iterator(); it.hasNext();) {
-                Job cJob = (Job) it.next();
-                cJob.addParent(newJob);
+            if (updateDep) {
+                newJob.setChildList(job.getChildList());
+                newJob.setParentList(job.getParentList());
+                for (Iterator it = job.getChildList().iterator(); it.hasNext();) {
+                    Job cJob = (Job) it.next();
+                    cJob.addParent(newJob);
+                }
             }
 
             return newJob;
@@ -87,7 +90,7 @@ public class ReclusteringEngine {
             switch (FailureParameters.getFTCluteringAlgorithm()) {
                 case FTCLUSTERING_NOOP:
 
-                    jobList.add(createJob(id, job, job.getCloudletLength(), job.getTaskList()));
+                    jobList.add(createJob(id, job, job.getCloudletLength(), job.getTaskList(), true));
                     //job submttted doesn't have to be considered
                     break;
                 /**
@@ -291,13 +294,14 @@ public class ReclusteringEngine {
 
         if (suggestedK == 0) {
             //not really k=0, just too big
-            jobList.add(createJob(id, job, job.getCloudletLength(), allTaskList));
+            jobList.add(createJob(id, job, job.getCloudletLength(), allTaskList, true));
         } else {
 
             int actualK = 0;
             List taskList = new ArrayList();
+            List<Job> retryJobs = new ArrayList();
             long length = 0;
-            Job newJob = createJob(id, job, 0, null);
+            Job newJob = createJob(id, job, 0, null, false);
             for (int i = 0; i < allTaskList.size(); i++) {
                 Task task = (Task) allTaskList.get(i);
                 if (actualK < suggestedK) {
@@ -309,19 +313,20 @@ public class ReclusteringEngine {
                     taskList = new ArrayList();
                     newJob.setCloudletLength(length);
                     length = 0;
-                    jobList.add(newJob);
+                    retryJobs.add(newJob);
                     id++;
-                    newJob = createJob(id, job, 0, null);
+                    newJob = createJob(id, job, 0, null, false);
                     actualK = 0;//really a f*k bug
                 }
             }
-
-
+            
             if (!taskList.isEmpty()) {
                 newJob.setTaskList(taskList);
                 newJob.setCloudletLength(length);
-                jobList.add(newJob);
+                retryJobs.add(newJob);
             }
+            updateDependencies (job, retryJobs);
+            jobList.addAll(retryJobs);
 
         }
         return jobList;
@@ -349,7 +354,7 @@ public class ReclusteringEngine {
             }
         }
         //Log.printLine("WARNING: Doesn't consider the data transfer problem");
-        jobList.add(createJob(id, job, length, newTaskList));
+        jobList.add(createJob(id, job, length, newTaskList, true));
         return jobList;
     }
 
@@ -451,42 +456,62 @@ public class ReclusteringEngine {
         Log.printLine("t=" + taskLength +" d=" + delay + " theta=" + theta + " k=" + suggestedK);
         if (suggestedK == 0) {
             //not really k=0, just too big
-            jobList.add(createJob(id, job, job.getCloudletLength(), allTaskList));
+            jobList.add(createJob(id, job, job.getCloudletLength(), allTaskList, true));
         } else {
 
             int actualK = 0;
             List taskList = new ArrayList();
+            List<Job> retryJobs = new ArrayList();
             long length = 0;
-            Job newJob = createJob(id, job, 0, null);
+            Job newJob = createJob(id, job, 0, null, false);
             for (int i = 0; i < allTaskList.size(); i++) {
                 Task task = (Task) allTaskList.get(i);
                 if (task.getCloudletStatus() == Cloudlet.FAILED) {//This is the difference
                     if (actualK < suggestedK) {
                         actualK++;
                         taskList.add(task);
-
                         length += task.getCloudletLength();
                     } else {
                         newJob.setTaskList(taskList);
                         taskList = new ArrayList();
                         newJob.setCloudletLength(length);
                         length = 0;
-                        jobList.add(newJob);
+                        retryJobs.add(newJob);
                         id++;
-                        newJob = createJob(id, job, 0, null);
+                        newJob = createJob(id, job, 0, null, false);
                         actualK = 0;
                     }
                 }
             }
 
-
             if (!taskList.isEmpty()) {
                 newJob.setTaskList(taskList);
                 newJob.setCloudletLength(length);
-                jobList.add(newJob);
+                retryJobs.add(newJob);
             }
+            updateDependencies (job, retryJobs);
+            jobList.addAll(retryJobs);
 
         }
         return jobList;
+    }
+    
+    private static void updateDependencies (Job job, List<Job> jobList) {
+        // Key idea: avoid setChildList(job.getChildList) within the for loop since
+        // it will override the list
+        List<Job> parents = job.getParentList();
+        List<Task> children = job.getChildList();
+        for (Job rawJob : jobList) { 
+            rawJob.setChildList(children);
+            rawJob.setParentList(parents);
+        }
+        for (Job parent : parents) {
+            parent.getChildList().addAll(jobList);
+        }
+        for (Task childTask : children) {
+            Job childJob = (Job) childTask;
+            childJob.getParentList().addAll(jobList);
+        }
+        
     }
 }
