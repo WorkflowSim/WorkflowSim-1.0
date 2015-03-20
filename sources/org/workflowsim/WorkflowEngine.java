@@ -38,7 +38,7 @@ import org.workflowsim.utils.Parameters;
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public class WorkflowEngine extends SimEntity {
+public final class WorkflowEngine extends SimEntity {
 
     /**
      * The job list.
@@ -74,7 +74,6 @@ public class WorkflowEngine extends SimEntity {
      */
     public WorkflowEngine(String name) throws Exception {
         this(name, 1);
-
     }
 
     public WorkflowEngine(String name, int schedulers) throws Exception {
@@ -86,8 +85,8 @@ public class WorkflowEngine extends SimEntity {
 
         jobsSubmitted = 0;
 
-        setSchedulers(new ArrayList<WorkflowScheduler>());
-        setSchedulerIds(new ArrayList<Integer>());
+        setSchedulers(new ArrayList<>());
+        setSchedulerIds(new ArrayList<>());
 
         for (int i = 0; i < schedulers; i++) {
             WorkflowScheduler wfs = new WorkflowScheduler(name + "_Scheduler_" + i);
@@ -95,8 +94,6 @@ public class WorkflowEngine extends SimEntity {
             getSchedulerIds().add(wfs.getId());
             wfs.setWorkflowEngineId(this.getId());
         }
-
-
     }
 
     /**
@@ -104,16 +101,13 @@ public class WorkflowEngine extends SimEntity {
      * that must be created.
      *
      * @param list the list
-     * @pre list !=null
-     * @post $none
+     * @param schedulerId the scheduler id
      */
     public void submitVmList(List<? extends Vm> list, int schedulerId) {
-
         getScheduler(schedulerId).submitVmList(list);
     }
 
     public void submitVmList(List<? extends Vm> list) {
-
         //bug here, not sure whether we should have different workflow schedulers
         getScheduler(0).submitVmList(list);
         setVmList(list);
@@ -136,20 +130,15 @@ public class WorkflowEngine extends SimEntity {
      * This method is used to send to the broker the list of cloudlets.
      *
      * @param list the list
-     * @pre list !=null
-     * @post $none
      */
     public void submitCloudletList(List<? extends Cloudlet> list) {
         getJobsList().addAll(list);
-
     }
 
     /**
      * Processes events available for this Broker.
      *
      * @param ev a SimEvent object
-     * @pre ev != null
-     * @post $none
      */
     @Override
     public void processEvent(SimEvent ev) {
@@ -162,19 +151,15 @@ public class WorkflowEngine extends SimEntity {
             case CloudSimTags.CLOUDLET_SUBMIT:
                 submitJobs();
                 break;
-
             case CloudSimTags.CLOUDLET_RETURN:
                 processJobReturn(ev);
                 break;
-            // if the simulation finishes
             case CloudSimTags.END_OF_SIMULATION:
                 shutdownEntity();
                 break;
-
             case WorkflowSimTags.JOB_SUBMIT:
                 processJobSubmit(ev);
                 break;
-            // other unknown tags are processed by this method
             default:
                 processOtherEvent(ev);
                 break;
@@ -185,11 +170,8 @@ public class WorkflowEngine extends SimEntity {
      * Process a request for the characteristics of a PowerDatacenter.
      *
      * @param ev a SimEvent object
-     * @pre ev != $null
-     * @post $none
      */
     protected void processResourceCharacteristicsRequest(SimEvent ev) {
-
         for (int i = 0; i < getSchedulerIds().size(); i++) {
             schedule(getSchedulerId(i), 0, CloudSimTags.RESOURCE_CHARACTERISTICS_REQUEST);
         }
@@ -199,11 +181,10 @@ public class WorkflowEngine extends SimEntity {
      * Binds a scheduler with a datacenter.
      *
      * @param datacenterId the data center id
-     * @param id the scheduler id
+     * @param schedulerId the scheduler id
      */
     public void bindSchedulerDatacenter(int datacenterId, int schedulerId) {
         getScheduler(schedulerId).bindSchedulerDatacenter(datacenterId);
-
     }
 
     /**
@@ -213,7 +194,6 @@ public class WorkflowEngine extends SimEntity {
      */
     public void bindSchedulerDatacenter(int datacenterId) {
         bindSchedulerDatacenter(datacenterId, 0);
-
     }
    
     /**
@@ -236,12 +216,10 @@ public class WorkflowEngine extends SimEntity {
     protected void processJobReturn(SimEvent ev) {
 
         Job job = (Job) ev.getData();
-
         if (job.getCloudletStatus() == Cloudlet.FAILED) {
             // Reclusteringengine will add retry job to jobList
             int newId = getJobsList().size() + getJobsSubmittedList().size();
             getJobsList().addAll(ReclusteringEngine.process(job, newId));
-
         }
 
         getJobsReceivedList().add(job);
@@ -254,9 +232,6 @@ public class WorkflowEngine extends SimEntity {
         } else {
             sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
         }
-
-
-
     }
 
     /**
@@ -264,15 +239,12 @@ public class WorkflowEngine extends SimEntity {
      * This method is called by {@link #body()} for incoming unknown tags.
      *
      * @param ev a SimEvent object
-     * @pre ev != null
-     * @post $none
      */
     protected void processOtherEvent(SimEvent ev) {
         if (ev == null) {
             Log.printLine(getName() + ".processOtherEvent(): " + "Error - an event is null.");
             return;
         }
-
         Log.printLine(getName() + ".processOtherEvent(): "
                 + "Error - event unknown by this DatacenterBroker.");
     }

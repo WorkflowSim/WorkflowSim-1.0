@@ -52,11 +52,6 @@ public class WorkflowDatacenter extends Datacenter {
             List<Storage> storageList,
             double schedulingInterval) throws Exception {
         super(name, characteristics, vmAllocationPolicy, storageList, schedulingInterval);
-
-    }
-
-    @Override
-    protected void processOtherEvent(SimEvent ev) {
     }
 
     /**
@@ -70,7 +65,6 @@ public class WorkflowDatacenter extends Datacenter {
      */
     @Override
     protected void processCloudletSubmit(SimEvent ev, boolean ack) {
-
         updateCloudletProcessing();
 
         try {
@@ -110,12 +104,12 @@ public class WorkflowDatacenter extends Datacenter {
             int userId = cl.getUserId();
             int vmId = cl.getVmId();
             Host host = getVmAllocationPolicy().getHost(vmId, userId);
-            CondorVM vm = (CondorVM)host.getVm(vmId, userId);
+            CondorVM vm = (CondorVM) host.getVm(vmId, userId);
 
             switch (Parameters.getCostModel()) {
                 case DATACENTER:
                     // process this Cloudlet to this CloudResource
-                    cl.setResourceParameter(getId(), getCharacteristics().getCostPerSecond(), 
+                    cl.setResourceParameter(getId(), getCharacteristics().getCostPerSecond(),
                             getCharacteristics().getCostPerBw());
                     break;
                 case VM:
@@ -124,9 +118,6 @@ public class WorkflowDatacenter extends Datacenter {
                 default:
                     break;
             }
-
-
-
 
             /**
              * Stage-in file && Shared based on the file.system
@@ -147,7 +138,6 @@ public class WorkflowDatacenter extends Datacenter {
             if (cl.getClassType() == ClassType.COMPUTE.value) {
                 fileTransferTime = processDataStageIn(job.getFileList(), cl);
             }
-
 
             CloudletScheduler scheduler = vm.getCloudletScheduler();
             double estimatedFinishTime = scheduler.cloudletSubmit(cl, fileTransferTime);
@@ -171,13 +161,10 @@ public class WorkflowDatacenter extends Datacenter {
             }
         } catch (ClassCastException c) {
             Log.printLine(getName() + ".processCloudletSubmit(): " + "ClassCastException error.");
-
         } catch (Exception e) {
             Log.printLine(getName() + ".processCloudletSubmit(): " + "Exception error.");
             e.printStackTrace();
-
         }
-
         checkCloudletCompletion();
     }
 
@@ -188,7 +175,6 @@ public class WorkflowDatacenter extends Datacenter {
      * @param vm
      */
     private void updateTaskExecTime(Job job, Vm vm) {
-
         double start_time = job.getExecStartTime();
         for (Task task : job.getTaskList()) {
             task.setExecStartTime(start_time);
@@ -197,7 +183,6 @@ public class WorkflowDatacenter extends Datacenter {
             //Because CloudSim would not let us update end time here
             task.setTaskFinishTime(start_time);
         }
-
     }
 
     /**
@@ -215,14 +200,12 @@ public class WorkflowDatacenter extends Datacenter {
 
         for (Iterator it = fList.iterator(); it.hasNext();) {
             org.cloudbus.cloudsim.File file = (org.cloudbus.cloudsim.File) it.next();
-
             switch (ReplicaCatalog.getFileSystem()) {
                 /**
                  * For local file system, add it to local storage (data center
                  * name)
                  */
                 case LOCAL:
-
                     ReplicaCatalog.addStorageList(file.getName(), this.getName());
                     /**
                      * Is it not really needed currently but it is left for
@@ -240,7 +223,6 @@ public class WorkflowDatacenter extends Datacenter {
                 default:
                     break;
             }
-
         }
     }
 
@@ -303,7 +285,7 @@ public class WorkflowDatacenter extends Datacenter {
                             for (Storage storage : getStorageList()) {
                                 double rate = storage.getMaxTransferRate();
                                 if (rate > maxRate) {
-                                    rate = maxRate;
+                                    maxRate = rate;
                                 }
                             }
                             //Storage storage = getStorageList().get(0);
@@ -311,14 +293,12 @@ public class WorkflowDatacenter extends Datacenter {
                         }
                         break;
                     case LOCAL:
-
                         int vmId = cl.getVmId();
                         int userId = cl.getUserId();
                         Host host = getVmAllocationPolicy().getHost(vmId, userId);
                         Vm vm = host.getVm(vmId, userId);
 
                         boolean requiredFileStagein = true;
-
                         for (Iterator it = siteList.iterator(); it.hasNext();) {
                             //site is where one replica of this data is located at
                             String site = (String) it.next();
@@ -376,8 +356,7 @@ public class WorkflowDatacenter extends Datacenter {
             List<? extends Host> list = getVmAllocationPolicy().getHostList();
             double smallerTime = Double.MAX_VALUE;
             // for each host...
-            for (int i = 0; i < list.size(); i++) {
-                Host host = list.get(i);
+            for (Host host : list) {
                 // inform VMs to update processing
                 double time = host.updateVmsProcessing(CloudSim.clock());
                 // what time do we expect that the next cloudlet will finish?
@@ -406,8 +385,7 @@ public class WorkflowDatacenter extends Datacenter {
     @Override
     protected void checkCloudletCompletion() {
         List<? extends Host> list = getVmAllocationPolicy().getHostList();
-        for (int i = 0; i < list.size(); i++) {
-            Host host = list.get(i);
+        for (Host host : list) {
             for (Vm vm : host.getVmList()) {
                 while (vm.getCloudletScheduler().isFinishedCloudlets()) {
                     Cloudlet cl = vm.getCloudletScheduler().getNextFinishedCloudlet();
@@ -434,7 +412,6 @@ public class WorkflowDatacenter extends Datacenter {
             org.cloudbus.cloudsim.File file = (org.cloudbus.cloudsim.File) it.next();
             if (file.getType() == FileType.OUTPUT.value)//output file
             {
-
                 switch (ReplicaCatalog.getFileSystem()) {
                     case SHARED:
                         ReplicaCatalog.addStorageList(file.getName(), this.getName());
@@ -447,7 +424,6 @@ public class WorkflowDatacenter extends Datacenter {
                          * Left here for future work
                          */
                         CondorVM vm = (CondorVM) host.getVm(vmId, userId);
-
                         ReplicaCatalog.addStorageList(file.getName(), Integer.toString(vmId));
                         break;
                 }

@@ -41,8 +41,7 @@ import org.workflowsim.utils.Parameters.SchedulingAlgorithm;
 /**
  * WorkflowScheduler represents a algorithm acting on behalf of a user. It hides
  * VM management, as vm creation, sumbission of jobs to this VMs and destruction
- * of VMs.
- * It picks up a scheduling algorithm based on the configuration
+ * of VMs. It picks up a scheduling algorithm based on the configuration
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
@@ -70,6 +69,8 @@ public class WorkflowScheduler extends DatacenterBroker {
 
     /**
      * Binds this scheduler to a datacenter
+     *
+     * @param datacenterId data center id
      */
     public void bindSchedulerDatacenter(int datacenterId) {
         if (datacenterId <= 0) {
@@ -78,7 +79,7 @@ public class WorkflowScheduler extends DatacenterBroker {
         }
         this.datacenterIdsList.add(datacenterId);
     }
-    
+
     /**
      * Sets the workflow engine id
      *
@@ -115,18 +116,15 @@ public class WorkflowScheduler extends DatacenterBroker {
             case CloudSimTags.CLOUDLET_RETURN:
                 processCloudletReturn(ev);
                 break;
-            // if the simulation finishes
             case CloudSimTags.END_OF_SIMULATION:
                 shutdownEntity();
                 break;
             case CloudSimTags.CLOUDLET_SUBMIT:
                 processCloudletSubmit(ev);
                 break;
-
             case WorkflowSimTags.CLOUDLET_UPDATE:
                 processCloudletUpdate(ev);
                 break;
-            // other unknown tags are processed by this method
             default:
                 processOtherEvent(ev);
                 break;
@@ -140,7 +138,7 @@ public class WorkflowScheduler extends DatacenterBroker {
      * @return the algorithm that extends BaseSchedulingAlgorithm
      */
     private BaseSchedulingAlgorithm getScheduler(SchedulingAlgorithm name) {
-        BaseSchedulingAlgorithm algorithm = null;
+        BaseSchedulingAlgorithm algorithm;
 
         // choose which algorithm to use. Make sure you have add related enum in
         //Parameters.java
@@ -172,7 +170,6 @@ public class WorkflowScheduler extends DatacenterBroker {
                 break;
 
         }
-
         return algorithm;
     }
 
@@ -259,7 +256,7 @@ public class WorkflowScheduler extends DatacenterBroker {
             Cloudlet cloudlet = (Cloudlet) it.next();
             int vmId = cloudlet.getVmId();
             double delay = 0.0;
-            if(Parameters.getOverheadParams().getQueueDelay()!=null){
+            if (Parameters.getOverheadParams().getQueueDelay() != null) {
                 delay = Parameters.getOverheadParams().getQueueDelay(cloudlet);
             }
             schedule(getVmsToDatacentersMap().get(vmId), delay, CloudSimTags.CLOUDLET_SUBMIT, cloudlet);
@@ -268,7 +265,6 @@ public class WorkflowScheduler extends DatacenterBroker {
         getCloudletList().removeAll(scheduledList);
         getCloudletSubmittedList().addAll(scheduledList);
         cloudletsSubmitted += scheduledList.size();
-
     }
 
     /**
@@ -281,7 +277,6 @@ public class WorkflowScheduler extends DatacenterBroker {
     @Override
     protected void processCloudletReturn(SimEvent ev) {
         Cloudlet cloudlet = (Cloudlet) ev.getData();
-
         Job job = (Job) cloudlet;
 
         /**
@@ -297,27 +292,15 @@ public class WorkflowScheduler extends DatacenterBroker {
         vm.setState(WorkflowSimTags.VM_STATUS_IDLE);
 
         double delay = 0.0;
-        if(Parameters.getOverheadParams().getPostDelay()!=null){
+        if (Parameters.getOverheadParams().getPostDelay() != null) {
             delay = Parameters.getOverheadParams().getPostDelay(job);
         }
         schedule(this.workflowEngineId, delay, CloudSimTags.CLOUDLET_RETURN, cloudlet);
 
         cloudletsSubmitted--;
         //not really update right now, should wait 1 s until many jobs have returned
-
         schedule(this.getId(), 0.0, WorkflowSimTags.CLOUDLET_UPDATE);
 
-    }
-
-    /**
-     * process cloudlet (job) check (not supported yet)
-     *
-     * @param ev a simEvent object
-     */
-    protected void processCloudletCheck(SimEvent ev) {
-        /**
-         * Left for future use.
-         */
     }
 
     /**
@@ -337,9 +320,6 @@ public class WorkflowScheduler extends DatacenterBroker {
 
         // send the registration to GIS
         sendNow(gisID, CloudSimTags.REGISTER_RESOURCE, getId());
-        //the below sentence is executed in workflow engine
-        //schedule(getId(), 0, CloudSimTags.RESOURCE_CHARACTERISTICS_REQUEST);
-
     }
 
     /**
@@ -347,21 +327,15 @@ public class WorkflowScheduler extends DatacenterBroker {
      */
     @Override
     public void shutdownEntity() {
-
         clearDatacenters();
         Log.printLine(getName() + " is shutting down...");
-
     }
 
     /**
      * Submit cloudlets (jobs) to the created VMs. Scheduling is here
-     *
-     * @pre $none
-     * @post $none
      */
     @Override
     protected void submitCloudlets() {
-
         sendNow(this.workflowEngineId, CloudSimTags.CLOUDLET_SUBMIT, null);
     }
     /**
@@ -394,12 +368,9 @@ public class WorkflowScheduler extends DatacenterBroker {
      */
     @Override
     protected void processResourceCharacteristicsRequest(SimEvent ev) {
-
-        setDatacenterCharacteristicsList(new HashMap<Integer, DatacenterCharacteristics>());
-
+        setDatacenterCharacteristicsList(new HashMap<>());
         Log.printLine(CloudSim.clock() + ": " + getName() + ": Cloud Resource List received with "
                 + getDatacenterIdsList().size() + " resource(s)");
-
         for (Integer datacenterId : getDatacenterIdsList()) {
             sendNow(datacenterId, CloudSimTags.RESOURCE_CHARACTERISTICS, getId());
         }

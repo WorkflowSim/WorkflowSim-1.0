@@ -51,8 +51,7 @@ public class Job extends Task {
             final long jobLength) {
 
         super(jobId, jobLength);
-        this.taskList = new ArrayList<Task>();
-
+        this.taskList = new ArrayList<>();
     }
 
     /**
@@ -70,7 +69,6 @@ public class Job extends Task {
      * Sets the list of the tasks
      *
      * @param list, list of the tasks
-     * @return $none
      */
     public void setTaskList(List list) {
         this.taskList = list;
@@ -80,7 +78,6 @@ public class Job extends Task {
      * Adds a task list to the existing task list
      *
      * @param list, task list to be added
-     * @return $none
      */
     public void addTaskList(List list) {
         this.taskList.addAll(list);
@@ -95,7 +92,6 @@ public class Job extends Task {
      */
     @Override
     public List getParentList() {
-
         return super.getParentList();
     }
 }

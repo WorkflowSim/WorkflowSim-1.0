@@ -38,16 +38,16 @@ import org.workflowsim.utils.ReplicaCatalog;
  * @date Aug 23, 2013
  * @date Nov 9, 2014
  */
-public class WorkflowParser {
+public final class WorkflowParser {
 
     /**
      * The path to DAX file.
      */
-    private String daxPath;
+    private final String daxPath;
     /**
      * The path to DAX files.
      */
-    private List<String> daxPaths;
+    private final List<String> daxPaths;
     /**
      * All tasks.
      */
@@ -55,7 +55,7 @@ public class WorkflowParser {
     /**
      * User id. used to create a new task.
      */
-    private int userId;
+    private final int userId;
     
     /**
      * current job id. In case multiple workflow submission
@@ -93,12 +93,12 @@ public class WorkflowParser {
      */
     public WorkflowParser(int userId) {
         this.userId = userId;
-        this.mName2Task = new HashMap<String, Task>();
+        this.mName2Task = new HashMap<>();
         this.daxPath = Parameters.getDaxPath();
         this.daxPaths = Parameters.getDAXPaths();
         this.jobIdStartsFrom = 1;
            
-        setTaskList(new ArrayList<Task>());
+        setTaskList(new ArrayList<>());
     }
 
     /**

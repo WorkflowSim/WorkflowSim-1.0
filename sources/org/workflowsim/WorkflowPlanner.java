@@ -38,7 +38,7 @@ import org.workflowsim.utils.Parameters.PlanningAlgorithm;
  * @date Apr 9, 2013
  *
  */
-public class WorkflowPlanner extends SimEntity {
+public final class WorkflowPlanner extends SimEntity {
 
     /**
      * The task list.
@@ -70,11 +70,9 @@ public class WorkflowPlanner extends SimEntity {
     public WorkflowPlanner(String name, int schedulers) throws Exception {
         super(name);
 
-        setTaskList(new ArrayList<Task>());
-
+        setTaskList(new ArrayList<>());
         this.clusteringEngine = new ClusteringEngine(name + "_Merger_", schedulers);
         this.clusteringEngineId = this.clusteringEngine.getId();
-
         this.parser = new WorkflowParser(getClusteringEngine().getWorkflowEngine().getSchedulerId(0));
 
     }
@@ -137,9 +135,7 @@ public class WorkflowPlanner extends SimEntity {
             case WorkflowSimTags.START_SIMULATION:
                 getWorkflowParser().parse();
                 setTaskList(getWorkflowParser().getTaskList());
-
                 processPlanning();
-
                 processImpactFactors(getTaskList());
                 sendNow(getClusteringEngineId(), WorkflowSimTags.JOB_SUBMIT, getTaskList());
                 break;
@@ -161,7 +157,6 @@ public class WorkflowPlanner extends SimEntity {
         
         planner.setTaskList(getTaskList());
         planner.setVmList(getWorkflowEngine().getAllVmList());
-
         try {
             planner.run();
         } catch (Exception e) {
@@ -177,7 +172,7 @@ public class WorkflowPlanner extends SimEntity {
      * @return the scheduler that extends BaseScheduler
      */
     private BasePlanningAlgorithm getPlanningAlgorithm(PlanningAlgorithm name) {
-        BasePlanningAlgorithm planner = null;
+        BasePlanningAlgorithm planner;
 
         // choose which scheduler to use. Make sure you have add related enum in
         //Parameters.java
@@ -198,9 +193,7 @@ public class WorkflowPlanner extends SimEntity {
             default:
                 planner = null;
                 break;
-
         }
-
         return planner;
     }
 
@@ -292,7 +285,6 @@ public class WorkflowPlanner extends SimEntity {
     /**
      * Gets the task list.
      *
-     * @param <T> the generic type
      * @return the task list
      */
     @SuppressWarnings("unchecked")
@@ -303,8 +295,7 @@ public class WorkflowPlanner extends SimEntity {
     /**
      * Sets the task list.
      *
-     * @param <T> the generic type
-     * @param cloudletList the new task list
+     * @param taskList
      */
     protected void setTaskList(List<Task> taskList) {
         this.taskList = taskList;

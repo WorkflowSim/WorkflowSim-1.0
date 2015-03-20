@@ -55,7 +55,7 @@ public class ClusterStorage extends HarddriveStorage {
     public final void setBandwidth(String name, double bandwidth) {
         if (bandwidth >= 0) {
             if (bandwidthMap == null) {
-                bandwidthMap = new HashMap<String, Double>();
+                bandwidthMap = new HashMap<>();
             }
             bandwidthMap.put(name, bandwidth);
         }

@@ -68,11 +68,11 @@ public class Task extends Cloudlet {
     private String type;
 
     /**
-     * The finish time of a task (Because cloudlet does not allow WorkflowSim to 
+     * The finish time of a task (Because cloudlet does not allow WorkflowSim to
      * update finish_time)
      */
     private double task_finish_time;
-    
+
     /**
      * Allocates a new Task object. The task length should be greater than or
      * equal to 1.
@@ -96,10 +96,9 @@ public class Task extends Cloudlet {
          */
         super(taskId, taskLength, 1, 0, 0, new UtilizationModelFull(), new UtilizationModelFull(), new UtilizationModelFull());
 
-
-        this.childList = new ArrayList<Task>();
-        this.parentList = new ArrayList<Task>();
-        this.fileList = new ArrayList<org.cloudbus.cloudsim.File>();
+        this.childList = new ArrayList<>();
+        this.parentList = new ArrayList<>();
+        this.fileList = new ArrayList<>();
         this.impact = 0.0;
         this.task_finish_time = -1.0;
     }
@@ -108,7 +107,6 @@ public class Task extends Cloudlet {
      * Sets the type of the task
      *
      * @param type the type
-     * @return $none
      */
     public void setType(String type) {
         this.type = type;
@@ -118,8 +116,6 @@ public class Task extends Cloudlet {
      * Gets the type of the task
      *
      * @return the type of the task
-     * @pre $none
-     * @post $none
      */
     public String getType() {
         return type;
@@ -129,7 +125,6 @@ public class Task extends Cloudlet {
      * Sets the priority of the task
      *
      * @param priority the priority
-     * @return $none
      */
     public void setPriority(int priority) {
         this.priority = priority;
@@ -139,7 +134,6 @@ public class Task extends Cloudlet {
      * Sets the depth of the task
      *
      * @param depth the depth
-     * @return $none
      */
     public void setDepth(int depth) {
         this.depth = depth;
@@ -153,7 +147,6 @@ public class Task extends Cloudlet {
      * @post $none
      */
     public int getPriority() {
-
         return this.priority;
     }
 
@@ -161,8 +154,6 @@ public class Task extends Cloudlet {
      * Gets the depth of the task
      *
      * @return the depth of the task
-     * @pre $none
-     * @post $none
      */
     public int getDepth() {
         return this.depth;
@@ -172,8 +163,6 @@ public class Task extends Cloudlet {
      * Gets the child list of the task
      *
      * @return the list of the children
-     * @pre $none
-     * @post $none
      */
     public List<Task> getChildList() {
         return this.childList;
@@ -183,7 +172,6 @@ public class Task extends Cloudlet {
      * Sets the child list of the task
      *
      * @param list, child list of the task
-     * @return $none
      */
     public void setChildList(List list) {
         this.childList = list;
@@ -193,7 +181,6 @@ public class Task extends Cloudlet {
      * Sets the parent list of the task
      *
      * @param list, parent list of the task
-     * @return $none
      */
     public void setParentList(List list) {
         this.parentList = list;
@@ -203,7 +190,6 @@ public class Task extends Cloudlet {
      * Adds the list to existing child list
      *
      * @param list, the child list to be added
-     * @return $none
      */
     public void addChildList(List list) {
         this.childList.addAll(list);
@@ -213,7 +199,6 @@ public class Task extends Cloudlet {
      * Adds the list to existing parent list
      *
      * @param list, the parent list to be added
-     * @return $none
      */
     public void addParentList(List list) {
         this.parentList.addAll(list);
@@ -223,8 +208,6 @@ public class Task extends Cloudlet {
      * Gets the list of the parent tasks
      *
      * @return the list of the parents
-     * @pre $none
-     * @post $none
      */
     public List<Task> getParentList() {
         return this.parentList;
@@ -234,7 +217,6 @@ public class Task extends Cloudlet {
      * Adds a task to existing child list
      *
      * @param task, the child task to be added
-     * @return $none
      */
     public void addChild(Task task) {
         this.childList.add(task);
@@ -244,7 +226,6 @@ public class Task extends Cloudlet {
      * Adds a task to existing parent list
      *
      * @param task, the parent task to be added
-     * @return $none
      */
     public void addParent(Task task) {
         this.parentList.add(task);
@@ -265,7 +246,6 @@ public class Task extends Cloudlet {
      * Adds a file to existing file list
      *
      * @param file, the file to be added
-     * @return $none
      */
     public void addFile(org.cloudbus.cloudsim.File file) {
         this.fileList.add(file);
@@ -275,7 +255,6 @@ public class Task extends Cloudlet {
      * Sets a file list
      *
      * @param list, the file list
-     * @return $none
      */
     public void setFileList(List<org.cloudbus.cloudsim.File> list) {
         this.fileList = list;
@@ -285,7 +264,6 @@ public class Task extends Cloudlet {
      * Sets the impact factor
      *
      * @param impact, the impact factor
-     * @return $none
      */
     public void setImpact(double impact) {
         this.impact = impact;
@@ -301,22 +279,25 @@ public class Task extends Cloudlet {
     public double getImpact() {
         return this.impact;
     }
-    
+
     /**
      * Sets the finish time of the task (different to the one used in Cloudlet)
+     *
      * @param time finish time
      */
-    public void setTaskFinishTime(double time){
+    public void setTaskFinishTime(double time) {
         this.task_finish_time = time;
     }
-    
+
     /**
      * Gets the finish time of a task (different to the one used in Cloudlet)
-     * @return 
+     *
+     * @return
      */
-    public double getTaskFinishTime(){
+    public double getTaskFinishTime() {
         return this.task_finish_time;
     }
+
     /**
      * Gets the total cost of processing or executing this task The original
      * getProcessingCost does not take cpu cost into it also the data file in
@@ -332,10 +313,10 @@ public class Task extends Cloudlet {
         // cloudlet cost: execution cost...
 
         double cost = getCostPerSec() * getActualCPUTime();
-        
+
         // ...plus input data transfer cost...
         long fileSize = 0;
-        for(Iterator it = getFileList().iterator(); it.hasNext();){
+        for (Iterator it = getFileList().iterator(); it.hasNext();) {
             org.cloudbus.cloudsim.File file = (org.cloudbus.cloudsim.File) it.next();
             fileSize += file.getSize() / Consts.MILLION;
         }

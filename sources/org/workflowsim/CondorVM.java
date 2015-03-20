@@ -43,23 +43,23 @@ public class CondorVM extends Vm {
     /**
      * the cost of using memory in this resource
      */
-    private double costPerMem = 0.0;	
-    
+    private double costPerMem = 0.0;
+
     /**
      * the cost of using bandwidth in this resource
      */
-    private double costPerBW = 0.0;	
-    
+    private double costPerBW = 0.0;
+
     /**
      * the cost of using storage in this resource
      */
     private double costPerStorage = 0.0;
-    
+
     /**
      * the cost of using CPU in this resource
      */
-    private double cost = 0.0;	
-    
+    private double cost = 0.0;
+
     /**
      * Creates a new CondorVM object.
      *
@@ -107,7 +107,7 @@ public class CondorVM extends Vm {
             }
         }
     }
-    
+
     /**
      * Creates a new CondorVM object.
      *
@@ -146,7 +146,7 @@ public class CondorVM extends Vm {
             double cost,
             double costPerMem,
             double costPerStorage,
-            double costPerBW,  
+            double costPerBW,
             CloudletScheduler cloudletScheduler) {
         this(id, userId, mips, numberOfPes, ram, bw, size, vmm, cloudletScheduler);
         this.cost = cost;
@@ -157,45 +157,44 @@ public class CondorVM extends Vm {
 
     /**
      * Gets the CPU cost
-     * 
+     *
      * @return the cost
      */
-    public double getCost(){
+    public double getCost() {
         return this.cost;
     }
-    
+
     /**
      * Gets the cost per bw
-     * 
+     *
      * @return the costPerBW
      */
-    public double getCostPerBW(){
+    public double getCostPerBW() {
         return this.costPerBW;
     }
-    
+
     /**
      * Gets the cost per storage
-     * 
+     *
      * @return the costPerStorage
      */
-    public double getCostPerStorage(){
+    public double getCostPerStorage() {
         return this.costPerStorage;
     }
-    
+
     /**
      * Gets the cost per memory
-     * 
+     *
      * @return the costPerMem
-     */ 
-    public double getCostPerMem(){
+     */
+    public double getCostPerMem() {
         return this.costPerMem;
     }
-    
+
     /**
      * Sets the state of the task
      *
-     * @param type the type
-     * @return $none
+     * @param tag
      */
     public final void setState(int tag) {
         this.state = tag;
@@ -242,15 +241,13 @@ public class CondorVM extends Vm {
     /**
      * Tells whether a file is in the local file system
      *
+     * @param file
      * @return whether the file exists in the local file system
-     * @pre $none
-     * @post $none
      */
     public boolean hasLocalFile(org.cloudbus.cloudsim.File file) {
         if (this.storage != null) {
             return this.storage.contains(file);
         }
         return false;
-
     }
 }

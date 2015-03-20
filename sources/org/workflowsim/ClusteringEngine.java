@@ -71,11 +71,11 @@ public final class ClusteringEngine extends SimEntity {
     /**
      * The WorkflowEngineId of the WorkflowEngine
      */
-    private int workflowEngineId;
+    private final int workflowEngineId;
     /**
      * The WorkflowEngine used in this ClusteringEngine
      */
-    private WorkflowEngine workflowEngine;
+    private final WorkflowEngine workflowEngine;
 
     /**
      * Created a new ClusteringEngine object.
@@ -89,19 +89,20 @@ public final class ClusteringEngine extends SimEntity {
      */
     public ClusteringEngine(String name, int schedulers) throws Exception {
         super(name);
-        setJobList(new ArrayList<Job>());
-        setTaskList(new ArrayList<Task>());
-        setTaskSubmittedList(new ArrayList<Task>());
-        setTaskReceivedList(new ArrayList<Task>());
+        setJobList(new ArrayList<>());
+        setTaskList(new ArrayList<>());
+        setTaskSubmittedList(new ArrayList<>());
+        setTaskReceivedList(new ArrayList<>());
 
         cloudletsSubmitted = 0;
         this.workflowEngine = new WorkflowEngine(name + "_Engine_0", schedulers);
         this.workflowEngineId = this.workflowEngine.getId();
-
     }
 
     /**
      * returns the WorkflowEngineId
+     *
+     * @return workflow engine id
      */
     public int getWorkflowEngineId() {
         return this.workflowEngineId;
@@ -109,6 +110,8 @@ public final class ClusteringEngine extends SimEntity {
 
     /**
      * returns the WorkflowEngine
+     *
+     * @return workflow engine
      */
     public WorkflowEngine getWorkflowEngine() {
         return this.workflowEngine;
@@ -128,7 +131,6 @@ public final class ClusteringEngine extends SimEntity {
     /**
      * Processes events available for this ClusteringEngine.
      *
-     * @param ev a SimEvent object
      * @pre ev != null
      * @post $none
      */
@@ -138,27 +140,17 @@ public final class ClusteringEngine extends SimEntity {
          * The parameters from configuration file
          */
         ClusteringParameters params = Parameters.getClusteringParameters();
-
-
         switch (params.getClusteringMethod()) {
             /**
              * Perform Horizontal Clustering
              */
             case HORIZONTAL:
-                /**
-                 * if clusters.num is set in configuration file
-                 */
+                // if clusters.num is set in configuration file
                 if (params.getClustersNum() != 0) {
                     this.engine = new HorizontalClustering(params.getClustersNum(), 0);
-                } /**
-                 * else if clusters.size is set in configuration file
-                 */
+                } // if clusters.size is set in configuration file
                 else if (params.getClustersSize() != 0) {
                     this.engine = new HorizontalClustering(0, params.getClustersSize());
-                }/**
-                 * else does no clustering
-                 */
-                else {
                 }
                 break;
             /**
@@ -190,8 +182,6 @@ public final class ClusteringEngine extends SimEntity {
         engine.setTaskList(getTaskList());
         engine.run();
         setJobList(engine.getJobList());
-
-
     }
 
     /**
@@ -206,7 +196,6 @@ public final class ClusteringEngine extends SimEntity {
          * if the type is input file)
          */
         if (file.getType() == FileType.INPUT.value) {
-
             for (org.cloudbus.cloudsim.File another : list) {
                 /**
                  * if there is another file that has the same name and it is
@@ -227,9 +216,6 @@ public final class ClusteringEngine extends SimEntity {
 
     /**
      * Adds data stage-in jobs to the job list
-     *
-     * @param $none
-     * @return $none
      */
     protected void processDatastaging() {
 
@@ -250,7 +236,7 @@ public final class ClusteringEngine extends SimEntity {
          * all the files to be the input of this stage-in job so that
          * WorkflowSim will transfers them when this job is executed
          */
-        List fileList = new ArrayList<org.cloudbus.cloudsim.File>();
+        List fileList = new ArrayList<>();
         for (Iterator it = list.iterator(); it.hasNext();) {
             org.cloudbus.cloudsim.File file = (org.cloudbus.cloudsim.File) it.next();
             /**
@@ -276,12 +262,10 @@ public final class ClusteringEngine extends SimEntity {
          */
         job.setUserId(getWorkflowEngine().getSchedulerId(0));
 
-
         /**
          * add stage-in job
          */
-        for (Iterator it = getJobList().iterator(); it.hasNext();) {
-            Job cJob = (Job) it.next();
+        for (Job cJob : getJobList()) {
             /**
              * first level jobs
              */
@@ -289,13 +273,8 @@ public final class ClusteringEngine extends SimEntity {
                 cJob.addParent(job);
                 job.addChild(cJob);
             }
-
         }
         getJobList().add(job);
-
-        /**
-         * In the future, we will add stage-out job
-         */
     }
 
     /**
@@ -387,7 +366,6 @@ public final class ClusteringEngine extends SimEntity {
     /**
      * Gets the task list.
      *
-     * @param <T> the generic type
      * @return the task list
      */
     @SuppressWarnings("unchecked")
@@ -398,7 +376,6 @@ public final class ClusteringEngine extends SimEntity {
     /**
      * Gets the job list.
      *
-     * @param <T> the generic type
      * @return the job list
      */
     public List<Job> getJobList() {
@@ -408,7 +385,6 @@ public final class ClusteringEngine extends SimEntity {
     /**
      * Sets the task list.
      *
-     * @param <T> the generic type
      * @param taskList the new task list
      */
     protected void setTaskList(List<Task> taskList) {
@@ -418,7 +394,6 @@ public final class ClusteringEngine extends SimEntity {
     /**
      * Sets the job list.
      *
-     * @param <T> the generic type
      * @param jobList the new job list
      */
     protected void setJobList(List<Job> jobList) {
@@ -428,7 +403,6 @@ public final class ClusteringEngine extends SimEntity {
     /**
      * Gets the tasks submitted list.
      *
-     * @param <T> the generic type
      * @return the task submitted list
      */
     @SuppressWarnings("unchecked")
@@ -439,7 +413,6 @@ public final class ClusteringEngine extends SimEntity {
     /**
      * Sets the tasks submitted list.
      *
-     * @param <T> the generic type
      * @param taskSubmittedList the new task submitted list
      */
     protected void setTaskSubmittedList(List<Task> taskSubmittedList) {
@@ -449,7 +422,6 @@ public final class ClusteringEngine extends SimEntity {
     /**
      * Gets the task received list.
      *
-     * @param <T> the generic type
      * @return the task received list
      */
     @SuppressWarnings("unchecked")
@@ -460,7 +432,6 @@ public final class ClusteringEngine extends SimEntity {
     /**
      * Sets the task received list.
      *
-     * @param <T> the generic type
      * @param taskReceivedList the new cloudlet received list
      */
     protected void setTaskReceivedList(List<Task> taskReceivedList) {
