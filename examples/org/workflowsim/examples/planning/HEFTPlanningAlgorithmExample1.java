@@ -43,13 +43,13 @@ import org.workflowsim.utils.ReplicaCatalog;
  * @since WorkflowSim Toolkit 1.1
  * @date Nov 9, 2013
  */
-public class HEFTPlanningAlgorithmExample1 extends WorkflowSimBasicExample1{
+public class HEFTPlanningAlgorithmExample1 extends WorkflowSimBasicExample1 {
 
     ////////////////////////// STATIC METHODS ///////////////////////
     protected static List<CondorVM> createVM(int userId, int vms) {
 
         //Creates a container to store VMs. This list is passed to the broker later
-        LinkedList<CondorVM> list = new LinkedList<CondorVM>();
+        LinkedList<CondorVM> list = new LinkedList<>();
 
         //VM Parameters
         long size = 10000; //image size (MB)
@@ -61,15 +61,12 @@ public class HEFTPlanningAlgorithmExample1 extends WorkflowSimBasicExample1{
 
         //create VMs
         CondorVM[] vm = new CondorVM[vms];
-
         Random bwRandom = new Random(System.currentTimeMillis());
-
         for (int i = 0; i < vms; i++) {
             double ratio = bwRandom.nextDouble();
             vm[i] = new CondorVM(i, userId, mips * ratio, pesNumber, ram, (long) (bw * ratio), size, vmm, new CloudletSchedulerSpaceShared());
             list.add(vm[i]);
         }
-
         return list;
     }
 
@@ -79,7 +76,6 @@ public class HEFTPlanningAlgorithmExample1 extends WorkflowSimBasicExample1{
      */
     public static void main(String[] args) {
 
-        
         try {
             // First step: Initialize the WorkflowSim package. 
 
@@ -93,26 +89,27 @@ public class HEFTPlanningAlgorithmExample1 extends WorkflowSimBasicExample1{
              * Should change this based on real physical path
              */
             String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
-            
+
             File daxFile = new File(daxPath);
-            if(!daxFile.exists()){
+            if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return;
             }
 
             /**
-             * Since we are using HEFT planning algorithm, the scheduling algorithm should be static 
-             * such that the scheduler would not override the result of the planner
+             * Since we are using HEFT planning algorithm, the scheduling
+             * algorithm should be static such that the scheduler would not
+             * override the result of the planner
              */
             Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.STATIC;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.HEFT;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.LOCAL;
 
             /**
-             * No overheads 
+             * No overheads
              */
-            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);;
-            
+            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);
+
             /**
              * No Clustering
              */
@@ -162,15 +159,9 @@ public class HEFTPlanningAlgorithmExample1 extends WorkflowSimBasicExample1{
             wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
 
             CloudSim.startSimulation();
-
-
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
-
             CloudSim.stopSimulation();
-
             printJobList(outputList0);
-
-
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }

@@ -17,10 +17,7 @@ package org.workflowsim.examples.planning;
 
 import java.io.File;
 import java.util.Calendar;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
-import org.cloudbus.cloudsim.CloudletSchedulerSpaceShared;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.workflowsim.CondorVM;
@@ -28,7 +25,6 @@ import org.workflowsim.WorkflowDatacenter;
 import org.workflowsim.Job;
 import org.workflowsim.WorkflowEngine;
 import org.workflowsim.WorkflowPlanner;
-import org.workflowsim.examples.WorkflowSimBasicExample1;
 import org.workflowsim.utils.ClusteringParameters;
 import org.workflowsim.utils.OverheadParameters;
 import org.workflowsim.utils.Parameters;
@@ -46,13 +42,11 @@ import org.workflowsim.utils.ReplicaCatalog;
 public class DHEFTPlanningAlgorithmExample1 extends HEFTPlanningAlgorithmExample1 {
 
     ////////////////////////// STATIC METHODS ///////////////////////
-    
     /**
      * Creates main() to run this example This example has only one datacenter
      * and one storage
      */
     public static void main(String[] args) {
-
 
         try {
             // First step: Initialize the WorkflowSim package. 
@@ -86,7 +80,7 @@ public class DHEFTPlanningAlgorithmExample1 extends HEFTPlanningAlgorithmExample
             /**
              * No overheads
              */
-            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);;
+            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);
 
             /**
              * No Clustering
@@ -137,15 +131,9 @@ public class DHEFTPlanningAlgorithmExample1 extends HEFTPlanningAlgorithmExample
             wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
 
             CloudSim.startSimulation();
-
-
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
-
             CloudSim.stopSimulation();
-
             printJobList(outputList0);
-
-
         } catch (Exception e) {
             e.printStackTrace();
             Log.printLine("The simulation has been terminated due to an unexpected error");

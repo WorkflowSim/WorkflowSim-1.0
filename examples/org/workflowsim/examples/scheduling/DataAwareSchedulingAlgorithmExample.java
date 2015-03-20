@@ -47,7 +47,6 @@ public class DataAwareSchedulingAlgorithmExample extends DHEFTPlanningAlgorithmE
      */
     public static void main(String[] args) {
 
-
         try {
             // First step: Initialize the WorkflowSim package. 
 
@@ -80,7 +79,7 @@ public class DataAwareSchedulingAlgorithmExample extends DHEFTPlanningAlgorithmE
             /**
              * No overheads
              */
-            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);;
+            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);
 
             /**
              * No Clustering
@@ -131,13 +130,9 @@ public class DataAwareSchedulingAlgorithmExample extends DHEFTPlanningAlgorithmE
             wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
 
             CloudSim.startSimulation();
-
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
-
             CloudSim.stopSimulation();
-
             printJobList(outputList0);
-
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }

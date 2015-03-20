@@ -31,13 +31,13 @@ import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * This MCT Scheduling Algorithm 
+ * This MCT Scheduling Algorithm
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.1
  * @date Nov 9, 2013
  */
-public class MCTSchedulingAlgorithmExample extends DataAwareSchedulingAlgorithmExample{
+public class MCTSchedulingAlgorithmExample extends DataAwareSchedulingAlgorithmExample {
 
     ////////////////////////// STATIC METHODS ///////////////////////
     /**
@@ -46,10 +46,8 @@ public class MCTSchedulingAlgorithmExample extends DataAwareSchedulingAlgorithmE
      */
     public static void main(String[] args) {
 
-
         try {
             // First step: Initialize the WorkflowSim package. 
-
             /**
              * However, the exact number of vms may not necessarily be vmNum If
              * the data center or the host doesn't have sufficient resources the
@@ -60,26 +58,27 @@ public class MCTSchedulingAlgorithmExample extends DataAwareSchedulingAlgorithmE
              * Should change this based on real physical path
              */
             String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
-            
+
             File daxFile = new File(daxPath);
-            if(!daxFile.exists()){
+            if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return;
             }
 
             /**
-             * Since we are using HEFT planning algorithm, the scheduling algorithm should be static 
-             * such that the scheduler would not override the result of the planner
+             * Since we are using HEFT planning algorithm, the scheduling
+             * algorithm should be static such that the scheduler would not
+             * override the result of the planner
              */
             Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.MCT;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.LOCAL;
 
             /**
-             * No overheads 
+             * No overheads
              */
-            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);;
-            
+            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);
+
             /**
              * No Clustering
              */
@@ -129,15 +128,9 @@ public class MCTSchedulingAlgorithmExample extends DataAwareSchedulingAlgorithmE
             wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
 
             CloudSim.startSimulation();
-
-
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
-
             CloudSim.stopSimulation();
-
             printJobList(outputList0);
-
-
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
