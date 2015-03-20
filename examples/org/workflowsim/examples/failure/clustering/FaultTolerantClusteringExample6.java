@@ -39,26 +39,25 @@ import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * This FaultTolerantClusteringExample3 uses Dynamic Reclustering to address the fault 
- * tolerance problem in task clustering
+ * This FaultTolerantClusteringExample3 uses Dynamic Reclustering to address the
+ * fault tolerance problem in task clustering
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Dec 31, 2013
  */
-public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExample1{
+public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExample1 {
 
     ////////////////////////// STATIC METHODS ///////////////////////
     /**
-     * Creates main() to run this example
-     * This example has only one datacenter and one storage
+     * Creates main() to run this example This example has only one datacenter
+     * and one storage
      */
     public static void main(String[] args) {
 
-
-       try {
+        try {
             // First step: Initialize the WorkflowSim package. 
-           
+
             /**
              * However, the exact number of vms may not necessarily be vmNum If
              * the data center or the host doesn't have sufficient resources the
@@ -73,55 +72,49 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
             //String daxPath = "/Users/chenweiwei/Research/balanced_clustering/data/scan-1/LIGO.n.800.8.dax";
             //String daxPath ="/Users/chenweiwei/Research/balanced_clustering/data/scan-1/GENOME.d.702049732.5.dax";
             String daxPath = "/Users/chenweiwei/Research/balanced_clustering/data/scan-1/CYBERSHAKE.n.700.10.dax";
-           //String daxPath = "/Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Montage_300.xml";
+            //String daxPath = "/Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Montage_300.xml";
             //This controls k if q_shape is large it is good
-           double q_scale = 50, q_weight = 3, q_shape = 3;
-           double t_scale = 10;//default is 1.0
-           String clustering = "DR";
-           double theta = 100, theta_weight = 30 * 100;
+            double q_scale = 50, q_weight = 3, q_shape = 3;
+            double t_scale = 10;//default is 1.0
+            String clustering = "DR";
+            double theta = 100, theta_weight = 30 * 100;
 
-           
-           for(int i = 0; i < args.length; i ++){
-               char key = args[i].charAt(1);
-               switch(key){
-                   case 'c':
-                       clustering = args[++i];
-                       break;
-                   case 'd':
-                       daxPath = args[++i];
-                       break;
-                   case 'b':
-                       t_scale = Double.parseDouble(args[++i]);
-                       break;
-                   case 'w':
-                       q_weight = Double.parseDouble(args[++i]);
-                       break;
-                   case 'q':
-                       q_scale = Double.parseDouble(args[++i]);
-                       break;
-                   case 's':
-                       q_shape = Double.parseDouble(args[++i]);
-                       break;
-                   case 'p':
-                       theta = Double.parseDouble(args[++i]);
-                       break;
-                   case 't':
-                       theta_weight = Double.parseDouble(args[++i]);
-                       break;
-                  
-               }
-           }
+            for (int i = 0; i < args.length; i++) {
+                char key = args[i].charAt(1);
+                switch (key) {
+                    case 'c':
+                        clustering = args[++i];
+                        break;
+                    case 'd':
+                        daxPath = args[++i];
+                        break;
+                    case 'b':
+                        t_scale = Double.parseDouble(args[++i]);
+                        break;
+                    case 'w':
+                        q_weight = Double.parseDouble(args[++i]);
+                        break;
+                    case 'q':
+                        q_scale = Double.parseDouble(args[++i]);
+                        break;
+                    case 's':
+                        q_shape = Double.parseDouble(args[++i]);
+                        break;
+                    case 'p':
+                        theta = Double.parseDouble(args[++i]);
+                        break;
+                    case 't':
+                        theta_weight = Double.parseDouble(args[++i]);
+                        break;
+                }
+            }
             t_scale /= 10;
-            if(daxPath == null){
-                Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
-                return ;
-            }
             File daxFile = new File(daxPath);
-            if(!daxFile.exists()){
+            if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
-                return ;
+                return;
             }
-            
+
             /**
              * Runtime Parameters
              */
@@ -131,51 +124,59 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
              *  Fault Tolerant Parameters
              */
             /**
-             * MONITOR_JOB classifies failures based on the level of jobs; MONITOR_VM classifies failures
-             * based on the vm id; MOINTOR_ALL does not do any classification; MONITOR_NONE does not record
-             * any failiure. 
+             * MONITOR_JOB classifies failures based on the level of jobs;
+             * MONITOR_VM classifies failures based on the vm id; MOINTOR_ALL
+             * does not do any classification; MONITOR_NONE does not record any
+             * failiure.
              */
             FailureParameters.FTCMonitor ftc_monitor = FailureParameters.FTCMonitor.MONITOR_VM_JOB;
             /**
-             *  Similar to FTCMonitor, FTCFailure controls the way how we generate failures. 
+             * Similar to FTCMonitor, FTCFailure controls the way how we
+             * generate failures.
              */
             FailureParameters.FTCFailure ftc_failure = FailureParameters.FTCFailure.FAILURE_VM_JOB;
             /**
-             *  In this example, we have horizontal clustering and we use Dynamic Reclustering. 
+             * In this example, we have horizontal clustering and we use Dynamic
+             * Reclustering.
              */
-            
-             /**
+
+            /**
              * No Clustering
              */
             ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.HORIZONTAL;
-            
-            
-            
+
             FailureParameters.FTCluteringAlgorithm ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_NOOP;
-            if(clustering.equalsIgnoreCase("SR")){
-                ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_SR;
-            }else if(clustering.equalsIgnoreCase("DR")){
-                ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_DR;
-            }else if(clustering.equalsIgnoreCase("NOOP")){
-                ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_NOOP;
-            }else if(clustering.equalsIgnoreCase("DC")){
-                ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_DC;
-            }else if(clustering.equalsIgnoreCase("VR")){
-                ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_VERTICAL;
-                method = ClusteringParameters.ClusteringMethod.VERTICAL;
+
+            switch (clustering) {
+                case "SR":
+                    ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_SR;
+                    break;
+                case "DR":
+                    ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_DR;
+                    break;
+                case "NOOP":
+                    ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_NOOP;
+                    break;
+                case "DC":
+                    ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_DC;
+                    break;
+                case "VR":
+                    ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_VERTICAL;
+                    method = ClusteringParameters.ClusteringMethod.VERTICAL;
+                    break;
             }
             ClusteringParameters cp = new ClusteringParameters(vmNum, 0, method, null);
-            
+
             /**
-             * Task failure rate for each level 
-             * 
+             * Task failure rate for each level
+             *
              */
             int maxLevel = 11; //most workflows we use has a maximum of 11 levels
 
             DistributionGenerator[][] failureGenerators = new DistributionGenerator[vmNum][maxLevel];
             //Don't make it smaller than 10 seconds, it has too many failures
             DistributionGenerator generator = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL,
-                        theta, 0.78, theta_weight, theta_weight * theta, 0.78);
+                    theta, 0.78, theta_weight, theta_weight * theta, 0.78);
 
             for (int level = 0; level < maxLevel; level++) {
                 /*
@@ -184,66 +185,37 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
                  * of submitted tasks will fail. It doesn't have to be the same task 
                  * failure rate at each level. 
                  */
-                for(int vmId = 0; vmId < vmNum; vmId++ ){
+                for (int vmId = 0; vmId < vmNum; vmId++) {
                     failureGenerators[vmId][level] = generator;
                 }
             }
-            
-            
-
             /**
-             * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
-             * such that the planner would not override the result of the scheduler
+             * Since we are using MINMIN scheduling algorithm, the planning
+             * algorithm should be INVALID such that the planner would not
+             * override the result of the scheduler
              */
             Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.MINMIN;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
 
             /**
-             * overheads 
+             * overheads
              */
             Map<Integer, DistributionGenerator> clusteringDelay = new HashMap();
             Map<Integer, DistributionGenerator> queueDelay = new HashMap();
             Map<Integer, DistributionGenerator> postscriptDelay = new HashMap();
             Map<Integer, DistributionGenerator> engineDelay = new HashMap();
             /**
-             * application has at most 11 horizontal levels 
+             * application has at most 11 horizontal levels
              */
-            
+
             DistributionGenerator queue_delay = new DistributionGenerator(
-                    DistributionGenerator.DistributionFamily.GAMMA, q_scale, q_shape, 
+                    DistributionGenerator.DistributionFamily.GAMMA, q_scale, q_shape,
                     q_weight, q_weight * q_scale, q_shape);
-            for (int level = 0; level < maxLevel; level++ ){
-//                if(c_delay == 0.0){
-//                    
-//                }else{
-//                    DistributionGenerator cluster_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, c_delay, 1.0);
-//                    clusteringDelay.put(level, cluster_delay);
-//                }
-                /**
-                 * a = 3, b=30 the weight is about 50%
-                 */
-                
+            for (int level = 0; level < maxLevel; level++) {
                 queueDelay.put(level, queue_delay);
-                
-//                if(p_delay == 0.0){
-//                    
-//                }else{
-//                    DistributionGenerator postscript_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, p_delay, 1.0);
-//                    postscriptDelay.put(level, postscript_delay);
-//                }
-//                if(e_delay == 0.0){
-//                    
-//                }else{
-//                    DistributionGenerator engine_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, e_delay, 1.0);
-//                    engineDelay.put(level, engine_delay);
-//                }
             }
-
             OverheadParameters op = new OverheadParameters(0, engineDelay, queueDelay, postscriptDelay, clusteringDelay, 0);
-            
-
-
             /**
              * Initialize static parameters
              */
@@ -252,7 +224,6 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
                     null, op, cp, sch_method, pln_method,
                     null, 0);
             ReplicaCatalog.init(file_system);
-
             FailureMonitor.init();
             FailureGenerator.init();
 
@@ -263,7 +234,6 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
 
             // Initialize the CloudSim library
             CloudSim.init(num_user, calendar, trace_flag);
-
             WorkflowDatacenter datacenter0 = createDatacenter("Datacenter_0");
 
             /**
@@ -275,8 +245,8 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
              */
             WorkflowEngine wfEngine = wfPlanner.getWorkflowEngine();
             /**
-             * Create a list of VMs.The userId of a vm is basically the id of the scheduler
-             * that controls this vm. 
+             * Create a list of VMs.The userId of a vm is basically the id of
+             * the scheduler that controls this vm.
              */
             List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0), Parameters.getVmNum());
 
@@ -291,21 +261,15 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
             wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
 
             CloudSim.startSimulation();
-
-
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
-
             CloudSim.stopSimulation();
-
             printJobList2(outputList0);
-            
-
         } catch (Exception e) {
             e.printStackTrace();
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
     }
-    
+
     /**
      * Prints the job objects
      *
@@ -315,7 +279,6 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
         int size = list.size();
         double makespan = 0;
         Job job;
-
         String indent = "    ";
         Log.printLine();
         Log.printLine("========== OUTPUT ==========");
@@ -326,21 +289,18 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
         for (int i = 0; i < size; i++) {
             job = list.get(i);
             Log.print(indent + job.getCloudletId() + indent + indent);
-            
-            if(job.getFinishTime()  > makespan){
+
+            if (job.getFinishTime() > makespan) {
                 makespan = job.getFinishTime();
             }
-
             if (job.getCloudletStatus() == Cloudlet.SUCCESS) {
                 Log.print("SUCCESS");
-
                 Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
                         + indent + indent + indent + dft.format(job.getActualCPUTime())
                         + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
                         + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
             } else if (job.getCloudletStatus() == Cloudlet.FAILED) {
                 Log.print("FAILED");
-
                 Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
                         + indent + indent + indent + dft.format(job.getActualCPUTime())
                         + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
@@ -348,8 +308,5 @@ public class FaultTolerantClusteringExample6 extends FaultTolerantClusteringExam
             }
         }
         return makespan;
-
-
     }
-
 }

@@ -33,18 +33,19 @@ import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * This DynamicWorkloadExample1 uses specifically CloudletSchedulerDynamicWorkload as the local scheduler;
+ * This DynamicWorkloadExample1 uses specifically
+ * CloudletSchedulerDynamicWorkload as the local scheduler;
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Oct 13, 2013
  */
-public class DynamicWorkloadExample1 extends WorkflowSimBasicExample1{
+public class DynamicWorkloadExample1 extends WorkflowSimBasicExample1 {
 
     protected static List<CondorVM> createVM(int userId, int vms) {
 
         //Creates a container to store VMs. This list is passed to the broker later
-        LinkedList<CondorVM> list = new LinkedList<CondorVM>();
+        LinkedList<CondorVM> list = new LinkedList<>();
 
         //VM Parameters
         long size = 10000; //image size (MB)
@@ -68,8 +69,8 @@ public class DynamicWorkloadExample1 extends WorkflowSimBasicExample1{
 
     ////////////////////////// STATIC METHODS ///////////////////////
     /**
-     * Creates main() to run this example
-     * This example has only one datacenter and one storage
+     * Creates main() to run this example This example has only one datacenter
+     * and one storage
      */
     public static void main(String[] args) {
 
@@ -86,29 +87,26 @@ public class DynamicWorkloadExample1 extends WorkflowSimBasicExample1{
              * Should change this based on real physical path
              */
             String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
-            if(daxPath == null){
-                Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
-                return;
-            }
             File daxFile = new File(daxPath);
-            if(!daxFile.exists()){
+            if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return;
             }
 
             /**
-             * Since we are using HEFT planning algorithm, the scheduling algorithm should be static 
-             * such that the scheduler would not override the result of the planner
+             * Since we are using HEFT planning algorithm, the scheduling
+             * algorithm should be static such that the scheduler would not
+             * override the result of the planner
              */
             Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.STATIC;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.HEFT;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.LOCAL;
 
             /**
-             * No overheads 
+             * No overheads
              */
-            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);;
-            
+            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);
+
             /**
              * No Clustering
              */
@@ -118,7 +116,6 @@ public class DynamicWorkloadExample1 extends WorkflowSimBasicExample1{
             /**
              * Initialize static parameters
              */
-           
             Parameters.init(vmNum, daxPath, null,
                     null, op, cp, sch_method, pln_method,
                     null, 0);
@@ -143,8 +140,8 @@ public class DynamicWorkloadExample1 extends WorkflowSimBasicExample1{
              */
             WorkflowEngine wfEngine = wfPlanner.getWorkflowEngine();
             /**
-             * Create a list of VMs.The userId of a vm is basically the id of the scheduler
-             * that controls this vm. 
+             * Create a list of VMs.The userId of a vm is basically the id of
+             * the scheduler that controls this vm.
              */
             List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0), Parameters.getVmNum());
 
@@ -159,18 +156,11 @@ public class DynamicWorkloadExample1 extends WorkflowSimBasicExample1{
             wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
 
             CloudSim.startSimulation();
-
-
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
-
             CloudSim.stopSimulation();
-
             printJobList(outputList0);
-            
-
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
     }
-
 }

@@ -35,7 +35,6 @@ import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
-import org.workflowsim.ClusterStorage;
 import org.workflowsim.CondorVM;
 import org.workflowsim.WorkflowDatacenter;
 import org.workflowsim.Job;
@@ -48,8 +47,8 @@ import org.workflowsim.utils.ReplicaCatalog;
 
 /**
  * This WorkflowSimExample creates a workflow planner, a workflow engine, and
- * one schedulers, one data centers and 20 vms. You should change daxPath at least. 
- * You may change other parameters as well.
+ * one schedulers, one data centers and 20 vms. You should change daxPath at
+ * least. You may change other parameters as well.
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
@@ -58,9 +57,8 @@ import org.workflowsim.utils.ReplicaCatalog;
 public class WorkflowSimBasicExample1 {
 
     protected static List<CondorVM> createVM(int userId, int vms) {
-
         //Creates a container to store VMs. This list is passed to the broker later
-        LinkedList<CondorVM> list = new LinkedList<CondorVM>();
+        LinkedList<CondorVM> list = new LinkedList<>();
 
         //VM Parameters
         long size = 10000; //image size (MB)
@@ -72,27 +70,22 @@ public class WorkflowSimBasicExample1 {
 
         //create VMs
         CondorVM[] vm = new CondorVM[vms];
-
         for (int i = 0; i < vms; i++) {
             double ratio = 1.0;
             vm[i] = new CondorVM(i, userId, mips * ratio, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared());
             list.add(vm[i]);
         }
-
         return list;
     }
 
     ////////////////////////// STATIC METHODS ///////////////////////
     /**
-     * Creates main() to run this example
-     * This example has only one datacenter and one storage
+     * Creates main() to run this example This example has only one datacenter
+     * and one storage
      */
     public static void main(String[] args) {
-
-
-       try {
+        try {
             // First step: Initialize the WorkflowSim package. 
-
             /**
              * However, the exact number of vms may not necessarily be vmNum If
              * the data center or the host doesn't have sufficient resources the
@@ -103,29 +96,26 @@ public class WorkflowSimBasicExample1 {
              * Should change this based on real physical path
              */
             String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
-            if(daxPath == null){
-                Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
-                return;
-            }
             File daxFile = new File(daxPath);
-            if(!daxFile.exists()){
+            if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return;
             }
 
             /**
-             * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
-             * such that the planner would not override the result of the scheduler
+             * Since we are using MINMIN scheduling algorithm, the planning
+             * algorithm should be INVALID such that the planner would not
+             * override the result of the scheduler
              */
             Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.MINMIN;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
 
             /**
-             * No overheads 
+             * No overheads
              */
-            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);;
-            
+            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);
+
             /**
              * No Clustering
              */
@@ -159,8 +149,8 @@ public class WorkflowSimBasicExample1 {
              */
             WorkflowEngine wfEngine = wfPlanner.getWorkflowEngine();
             /**
-             * Create a list of VMs.The userId of a vm is basically the id of the scheduler
-             * that controls this vm. 
+             * Create a list of VMs.The userId of a vm is basically the id of
+             * the scheduler that controls this vm.
              */
             List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0), Parameters.getVmNum());
 
@@ -173,17 +163,10 @@ public class WorkflowSimBasicExample1 {
              * Binds the data centers with the scheduler.
              */
             wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
-
             CloudSim.startSimulation();
-
-
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
-
             CloudSim.stopSimulation();
-
             printJobList(outputList0);
-            
-
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
@@ -194,13 +177,13 @@ public class WorkflowSimBasicExample1 {
         // Here are the steps needed to create a PowerDatacenter:
         // 1. We need to create a list to store one or more
         //    Machines
-        List<Host> hostList = new ArrayList<Host>();
+        List<Host> hostList = new ArrayList<>();
 
         // 2. A Machine contains one or more PEs or CPUs/Cores. Therefore, should
         //    create a list to store these PEs before creating
         //    a Machine.
         for (int i = 1; i <= 20; i++) {
-            List<Pe> peList1 = new ArrayList<Pe>();
+            List<Pe> peList1 = new ArrayList<>();
             int mips = 2000;
             // 3. Create PEs and add these into the list.
             //for a quad-core machine, a list of 4 PEs is required:
@@ -213,14 +196,13 @@ public class WorkflowSimBasicExample1 {
             int bw = 10000;
             hostList.add(
                     new Host(
-                    hostId,
-                    new RamProvisionerSimple(ram),
-                    new BwProvisionerSimple(bw),
-                    storage,
-                    peList1,
-                    new VmSchedulerTimeShared(peList1))); // This is our first machine
+                            hostId,
+                            new RamProvisionerSimple(ram),
+                            new BwProvisionerSimple(bw),
+                            storage,
+                            peList1,
+                            new VmSchedulerTimeShared(peList1))); // This is our first machine
             hostId++;
-
         }
 
         // 5. Create a DatacenterCharacteristics object that stores the
@@ -235,20 +217,18 @@ public class WorkflowSimBasicExample1 {
         double costPerMem = 0.05;		// the cost of using memory in this resource
         double costPerStorage = 0.1;	// the cost of using storage in this resource
         double costPerBw = 0.1;			// the cost of using bw in this resource
-        LinkedList<Storage> storageList = new LinkedList<Storage>();	//we are not adding SAN devices by now
+        LinkedList<Storage> storageList = new LinkedList<>();	//we are not adding SAN devices by now
         WorkflowDatacenter datacenter = null;
-
 
         DatacenterCharacteristics characteristics = new DatacenterCharacteristics(
                 arch, os, vmm, hostList, time_zone, cost, costPerMem, costPerStorage, costPerBw);
-
 
         // 6. Finally, we need to create a storage object.
         /**
          * The bandwidth within a data center in MB/s.
          */
         int maxTransferRate = 15;// the number comes from the futuregrid site, you can specify your bw
-        
+
         try {
             HarddriveStorage s1 = new HarddriveStorage(name, 1e12);
             s1.setMaxTransferRate(maxTransferRate);
@@ -257,7 +237,6 @@ public class WorkflowSimBasicExample1 {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return datacenter;
     }
 
@@ -274,29 +253,25 @@ public class WorkflowSimBasicExample1 {
         Log.printLine();
         Log.printLine("========== OUTPUT ==========");
         Log.printLine("Cloudlet ID" + indent + "STATUS" + indent
-                + "Data center ID" + indent + "VM ID" + indent + indent + "Time" + indent + "Start Time" + indent + "Finish Time" + indent + "Depth");
-
+                + "Data center ID" + indent + "VM ID" + indent + indent
+                + "Time" + indent + "Start Time" + indent + "Finish Time" + indent + "Depth");
         DecimalFormat dft = new DecimalFormat("###.##");
         for (int i = 0; i < size; i++) {
             job = list.get(i);
             Log.print(indent + job.getCloudletId() + indent + indent);
-
             if (job.getCloudletStatus() == Cloudlet.SUCCESS) {
                 Log.print("SUCCESS");
-
                 Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
                         + indent + indent + indent + dft.format(job.getActualCPUTime())
                         + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
                         + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
             } else if (job.getCloudletStatus() == Cloudlet.FAILED) {
                 Log.print("FAILED");
-
                 Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
                         + indent + indent + indent + dft.format(job.getActualCPUTime())
                         + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
                         + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
             }
         }
-
     }
 }

@@ -26,29 +26,30 @@ import org.workflowsim.examples.planning.*;
 import org.workflowsim.examples.scheduling.*;
 import org.workflowsim.examples.cost.*;
 
-
 /**
  * Test all the workflow examples
+ *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Mar 3, 2014
  */
 public class WorkflowSimAllExamplesTester {
+
     /**
-     * 
+     *
      * Test all the workflow examples and check their results
-     */ 
-    public static void main(String[] args){
-        try{
+     */
+    public static void main(String[] args) {
+        try {
             /**
-             * Basic Examples 
+             * Basic Examples
              */
             WorkflowSimBasicExample1.main(args);
             WorkflowSimBasicExample2.main(args);
             WorkflowSimBasicExample3.main(args);
             DynamicWorkloadExample1.main(args);
             WorkflowSimMultipleClusterExample1.main(args);
-            
+
             /*
              * Horizontal Clustering Examples
              */
@@ -56,17 +57,17 @@ public class WorkflowSimAllExamplesTester {
             HorizontalClusteringExample2.main(args);
             HorizontalClusteringExample3.main(args);
             VerticalClusteringExample1.main(args);
-            
+
             /**
-             * Balanced Clustering Examples 
+             * Balanced Clustering Examples
              */
             BalancedClusteringExample1.main(args);
-            
+
             /**
              * Fault Tolerant Scheduling Examples
              */
             FaultTolerantSchedulingExample1.main(args);
-            
+
             /**
              * Fault Tolerant Clustering Examples
              */
@@ -76,13 +77,13 @@ public class WorkflowSimAllExamplesTester {
             FaultTolerantClusteringExample4.main(args);
             FaultTolerantClusteringExample5.main(args);
             FaultTolerantClusteringExample6.main(args);
-            
+
             /**
              * Planning Algorithms
              */
             DHEFTPlanningAlgorithmExample1.main(args);
             HEFTPlanningAlgorithmExample1.main(args);
-            
+
             /**
              * Scheduling Algorithms
              */
@@ -91,11 +92,9 @@ public class WorkflowSimAllExamplesTester {
             MAXMINSchedulingAlgorithmExample.main(args);
             MCTSchedulingAlgorithmExample.main(args);
             MINMINSchedulingAlgorithmExample.main(args);
-            
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.printLine("ERROR: please check your workflow examples");
             e.printStackTrace();
         }
-        
     }
 }

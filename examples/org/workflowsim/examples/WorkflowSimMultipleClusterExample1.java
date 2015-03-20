@@ -55,12 +55,12 @@ import org.workflowsim.utils.ReplicaCatalog;
  * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
  */
-public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1{
+public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1 {
 
     protected static List<CondorVM> createVM(int userId, int vms, int vmIdBase) {
 
         //Creates a container to store VMs. This list is passed to the broker later
-        LinkedList<CondorVM> list = new LinkedList<CondorVM>();
+        LinkedList<CondorVM> list = new LinkedList<>();
 
         //VM Parameters
         long size = 10000; //image size (MB)
@@ -72,13 +72,11 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
 
         //create VMs
         CondorVM[] vm = new CondorVM[vms];
-
         for (int i = 0; i < vms; i++) {
             double ratio = 1.0;
             vm[i] = new CondorVM(vmIdBase + i, userId, mips * ratio, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared());
             list.add(vm[i]);
         }
-
         return list;
     }
 
@@ -87,7 +85,6 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
      * Creates main() to run this example
      */
     public static void main(String[] args) {
-
 
         try {
             // First step: Initialize the WorkflowSim package. 
@@ -102,29 +99,26 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
              * Should change this based on real physical path
              */
             String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
-            if(daxPath == null){
-                Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
-                return;
-            }
             File daxFile = new File(daxPath);
-            if(!daxFile.exists()){
+            if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return;
             }
 
             /**
-             * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
-             * such that the planner would not override the result of the scheduler
+             * Since we are using MINMIN scheduling algorithm, the planning
+             * algorithm should be INVALID such that the planner would not
+             * override the result of the scheduler
              */
             Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.MINMIN;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
 
             /**
-             * No overheads 
+             * No overheads
              */
-            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);;
-            
+            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);
+
             /**
              * No Clustering
              */
@@ -138,7 +132,7 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
                     null, op, cp, sch_method, pln_method,
                     null, 0);
             ReplicaCatalog.init(file_system);
-            
+
             // before creating any entities.
             int num_user = 1;   // number of grid users
             Calendar calendar = Calendar.getInstance();
@@ -159,11 +153,12 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
              */
             WorkflowEngine wfEngine = wfPlanner.getWorkflowEngine();
             /**
-             * Create two list of VMs. The trick is that make sure all vmId is unique so we need to 
-             * index vm from a base (in this case Parameters.getVmNum/2 for the second vmlist1). 
+             * Create two list of VMs. The trick is that make sure all vmId is
+             * unique so we need to index vm from a base (in this case
+             * Parameters.getVmNum/2 for the second vmlist1).
              */
-            List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0), Parameters.getVmNum() / 2 , 0);
-            List<CondorVM> vmlist1 = createVM(wfEngine.getSchedulerId(0), Parameters.getVmNum() / 2 , Parameters.getVmNum() / 2);
+            List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0), Parameters.getVmNum() / 2, 0);
+            List<CondorVM> vmlist1 = createVM(wfEngine.getSchedulerId(0), Parameters.getVmNum() / 2, Parameters.getVmNum() / 2);
 
             /**
              * Submits these lists of vms to this WorkflowEngine.
@@ -172,23 +167,19 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
             wfEngine.submitVmList(vmlist1, 0);
 
             /**
-             * Binds the data centers with the scheduler id.
-             * This scheduler controls two data centers. Make sure your data center is not very big otherwise
-             * all the vms will be allocated to the first available data center
-             * In the future, the vm allocation algorithm should be improved. 
+             * Binds the data centers with the scheduler id. This scheduler
+             * controls two data centers. Make sure your data center is not very
+             * big otherwise all the vms will be allocated to the first
+             * available data center In the future, the vm allocation algorithm
+             * should be improved.
              */
             wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
             wfEngine.bindSchedulerDatacenter(datacenter1.getId(), 0);
 
             CloudSim.startSimulation();
-
-
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
-
             CloudSim.stopSimulation();
-
             printJobList(outputList0);
-
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
@@ -199,7 +190,7 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
         // Here are the steps needed to create a PowerDatacenter:
         // 1. We need to create a list to store one or more
         //    Machines
-        List<Host> hostList = new ArrayList<Host>();
+        List<Host> hostList = new ArrayList<>();
 
         // 2. A Machine contains one or more PEs or CPUs/Cores. Therefore, should
         //    create a list to store these PEs before creating
@@ -210,10 +201,9 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
         // the failed vms to the next available datacenter. The trick is make sure your datacenter is not 
         // very big so that the broker will distribute them. 
         // In a future work, vm scheduling algorithms should be done
-        
         //
         for (int i = 1; i <= 3; i++) {
-            List<Pe> peList1 = new ArrayList<Pe>();
+            List<Pe> peList1 = new ArrayList<>();
             int mips = 2000;
             // 3. Create PEs and add these into the list.
             //for a quad-core machine, a list of 4 PEs is required:
@@ -226,14 +216,13 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
             int bw = 10000;
             hostList.add(
                     new Host(
-                    hostId,
-                    new RamProvisionerSimple(ram),
-                    new BwProvisionerSimple(bw),
-                    storage,
-                    peList1,
-                    new VmSchedulerTimeShared(peList1))); // This is our first machine
+                            hostId,
+                            new RamProvisionerSimple(ram),
+                            new BwProvisionerSimple(bw),
+                            storage,
+                            peList1,
+                            new VmSchedulerTimeShared(peList1))); // This is our first machine
             hostId++;
-
         }
 
         // 5. Create a DatacenterCharacteristics object that stores the
@@ -248,13 +237,10 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
         double costPerMem = 0.05;		// the cost of using memory in this resource
         double costPerStorage = 0.1;	// the cost of using storage in this resource
         double costPerBw = 0.1;			// the cost of using bw in this resource
-        LinkedList<Storage> storageList = new LinkedList<Storage>();	//we are not adding SAN devices by now
+        LinkedList<Storage> storageList = new LinkedList<>();	//we are not adding SAN devices by now
         WorkflowDatacenter datacenter = null;
-
-
         DatacenterCharacteristics characteristics = new DatacenterCharacteristics(
                 arch, os, vmm, hostList, time_zone, cost, costPerMem, costPerStorage, costPerBw);
-
 
         // 6. Finally, we need to create a cluster storage object.
         /**
@@ -267,18 +253,19 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
         double intraBandwidth = interBandwidth * 2;
         try {
             ClusterStorage s1 = new ClusterStorage(name, 1e12);
-            if (name.equals("Datacenter_0")) {
-                /**
-                 * The bandwidth from Datacenter_0 to Datacenter_1.
-                 */
-                s1.setBandwidth("Datacenter_1", interBandwidth);
-
-            } else if (name.equals("Datacenter_1")) {
-                /**
-                 * The bandwidth from Datacenter_1 to Datacenter_0.
-                 */
-                s1.setBandwidth("Datacenter_0", interBandwidth);
-
+            switch (name) {
+                case "Datacenter_0":
+                    /**
+                     * The bandwidth from Datacenter_0 to Datacenter_1.
+                     */
+                    s1.setBandwidth("Datacenter_1", interBandwidth);
+                    break;
+                case "Datacenter_1":
+                    /**
+                     * The bandwidth from Datacenter_1 to Datacenter_0.
+                     */
+                    s1.setBandwidth("Datacenter_0", interBandwidth);
+                    break;
             }
             // The bandwidth within a data center
             s1.setBandwidth("local", intraBandwidth);
@@ -287,8 +274,8 @@ public class WorkflowSimMultipleClusterExample1 extends WorkflowSimBasicExample1
             storageList.add(s1);
             datacenter = new WorkflowDatacenter(name, characteristics, new VmAllocationPolicySimple(hostList), storageList, 0);
         } catch (Exception e) {
+            e.printStackTrace();
         }
-
         return datacenter;
     }
 }
