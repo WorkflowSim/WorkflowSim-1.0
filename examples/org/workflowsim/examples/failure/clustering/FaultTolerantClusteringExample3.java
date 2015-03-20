@@ -51,10 +51,8 @@ public class FaultTolerantClusteringExample3 extends FaultTolerantClusteringExam
      */
     public static void main(String[] args) {
 
-
         try {
             // First step: Initialize the WorkflowSim package. 
-
             /**
              * However, the exact number of vms may not necessarily be vmNum If
              * the data center or the host doesn't have sufficient resources the
@@ -65,10 +63,6 @@ public class FaultTolerantClusteringExample3 extends FaultTolerantClusteringExam
              * Should change this based on real physical path
              */
             String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
-            if (daxPath == null) {
-                Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
-                return;
-            }
             File daxFile = new File(daxPath);
             if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
@@ -110,13 +104,10 @@ public class FaultTolerantClusteringExample3 extends FaultTolerantClusteringExam
                  */
                 DistributionGenerator generator = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL,
                         100, 1.0, 30, 300, 0.78);
-                for(int vmId = 0; vmId < vmNum; vmId++){
+                for (int vmId = 0; vmId < vmNum; vmId++) {
                     failureGenerators[vmId][level] = generator;
                 }
             }
-
-
-
             /**
              * Since we are using MINMIN scheduling algorithm, the planning
              * algorithm should be INVALID such that the planner would not
@@ -129,7 +120,7 @@ public class FaultTolerantClusteringExample3 extends FaultTolerantClusteringExam
             /**
              * No overheads
              */
-            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);;
+            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);
 
             /**
              * No Clustering
@@ -184,15 +175,9 @@ public class FaultTolerantClusteringExample3 extends FaultTolerantClusteringExam
             wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
 
             CloudSim.startSimulation();
-
-
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
-
             CloudSim.stopSimulation();
-
             printJobList(outputList0);
-
-
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }

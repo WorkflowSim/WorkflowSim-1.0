@@ -35,28 +35,24 @@ import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * Compared to FaultTolerantClusteringExample1, FaultTolerantClusteringExample4 models task
- * as a function of vm index
+ * Compared to FaultTolerantClusteringExample1, FaultTolerantClusteringExample4
+ * models task as a function of vm index
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Mar 2, 2014
  */
-public class FaultTolerantClusteringExample4 extends FaultTolerantClusteringExample1{
-
-   
+public class FaultTolerantClusteringExample4 extends FaultTolerantClusteringExample1 {
 
     ////////////////////////// STATIC METHODS ///////////////////////
     /**
-     * Creates main() to run this example
-     * This example has only one datacenter and one storage
+     * Creates main() to run this example This example has only one datacenter
+     * and one storage
      */
     public static void main(String[] args) {
 
-
-       try {
+        try {
             // First step: Initialize the WorkflowSim package. 
-
             /**
              * However, the exact number of vms may not necessarily be vmNum If
              * the data center or the host doesn't have sufficient resources the
@@ -67,12 +63,8 @@ public class FaultTolerantClusteringExample4 extends FaultTolerantClusteringExam
              * Should change this based on real physical path
              */
             String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
-            if(daxPath == null){
-                Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
-                return;
-            }
             File daxFile = new File(daxPath);
-            if(!daxFile.exists()){
+            if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return;
             }
@@ -80,48 +72,53 @@ public class FaultTolerantClusteringExample4 extends FaultTolerantClusteringExam
              *  Fault Tolerant Parameters
              */
             /**
-             * MONITOR_JOB classifies failures based on the level of jobs; MONITOR_VM classifies failures
-             * based on the vm id; MOINTOR_ALL does not do any classification; MONITOR_NONE does not record
-             * any failiure. 
+             * MONITOR_JOB classifies failures based on the level of jobs;
+             * MONITOR_VM classifies failures based on the vm id; MOINTOR_ALL
+             * does not do any classification; MONITOR_NONE does not record any
+             * failiure.
              */
             FailureParameters.FTCMonitor ftc_monitor = FailureParameters.FTCMonitor.MONITOR_VM;
             /**
-             *  Similar to FTCMonitor, FTCFailure controls the way how we generate failures. 
+             * Similar to FTCMonitor, FTCFailure controls the way how we
+             * generate failures.
              */
             FailureParameters.FTCFailure ftc_failure = FailureParameters.FTCFailure.FAILURE_VM;
             /**
-             *  In this example, we have horizontal clustering and we use Dynamic Clustering. 
+             * In this example, we have horizontal clustering and we use Dynamic
+             * Clustering.
              */
             FailureParameters.FTCluteringAlgorithm ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_DR;
             /**
-             * Task failure rate for each level 
-             * 
+             * Task failure rate for each level
+             *
              */
             int maxLevel = 11;
             DistributionGenerator[][] failureGenerators = new DistributionGenerator[vmNum][maxLevel];
             /**
-             * Model failures as a function of VM (each VM has its own independent distribution
+             * Model failures as a function of VM (each VM has its own
+             * independent distribution
              */
             for (int vmId = 0; vmId < vmNum; vmId++) {
                 DistributionGenerator generator = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL,
                         100, 1.0, 30, 300, 0.78);
-                for( int level = 0; level < maxLevel; level++){
+                for (int level = 0; level < maxLevel; level++) {
                     failureGenerators[vmId][level] = generator;
                 }
             }
             /**
-             * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
-             * such that the planner would not override the result of the scheduler
+             * Since we are using MINMIN scheduling algorithm, the planning
+             * algorithm should be INVALID such that the planner would not
+             * override the result of the scheduler
              */
             Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.MINMIN;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
 
             /**
-             * No overheads 
+             * No overheads
              */
-            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);;
-            
+            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);
+
             /**
              * No Clustering
              */
@@ -159,8 +156,8 @@ public class FaultTolerantClusteringExample4 extends FaultTolerantClusteringExam
              */
             WorkflowEngine wfEngine = wfPlanner.getWorkflowEngine();
             /**
-             * Create a list of VMs.The userId of a vm is basically the id of the scheduler
-             * that controls this vm. 
+             * Create a list of VMs.The userId of a vm is basically the id of
+             * the scheduler that controls this vm.
              */
             List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0), Parameters.getVmNum());
 
@@ -175,18 +172,11 @@ public class FaultTolerantClusteringExample4 extends FaultTolerantClusteringExam
             wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
 
             CloudSim.startSimulation();
-
-
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
-
             CloudSim.stopSimulation();
-
             printJobList(outputList0);
-            
-
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
     }
-    
 }

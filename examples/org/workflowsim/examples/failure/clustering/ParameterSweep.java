@@ -25,18 +25,17 @@ public class ParameterSweep {
 
     public static void main(String[] args) {
         String p = "10";
-        if (args.length == 0) {
-        } else {
+        if (args.length != 0) {
             p = args[0];
         }
 
         String clustering = "DR";
         //Search for best
         String result = "";
-        for(double q_scale = 10; q_scale <= 100; q_scale += 10){
-            for(double q_weight = 10; q_weight <= 10e4; q_weight *=10 ){
-                for(double q_shape = 2; q_shape <= 10; q_shape +=2){
-                    for(double theta_weight = 10; theta_weight <= 10e4; theta_weight *=10){
+        for (double q_scale = 10; q_scale <= 100; q_scale += 10) {
+            for (double q_weight = 10; q_weight <= 10e4; q_weight *= 10) {
+                for (double q_shape = 2; q_shape <= 10; q_shape += 2) {
+                    for (double theta_weight = 10; theta_weight <= 10e4; theta_weight *= 10) {
                         double makespan = execute100(p, q_scale, q_weight, q_shape, theta_weight, clustering);
                         result += q_scale + " " + q_weight + " " + q_shape + " " + theta_weight + " " + makespan;
                         result += "\n";
@@ -45,7 +44,6 @@ public class ParameterSweep {
             }
         }
         System.out.println(result);
-
     }
 
     public static double execute(String p, double q_scale, double q_weight, double q_shape,
@@ -60,17 +58,16 @@ public class ParameterSweep {
             "-t", Double.toString(theta_weight),
             "-c", clustering};
         return FaultTolerantClusteringExample5.main2(args);
-
     }
+
     public static double execute100(String p, double q_scale, double q_weight, double q_shape,
             double theta_weight, String clustering) {
         double sum = 0.0;
         int n = 100;
-        for(int i = 0; i < n; i ++){
+        for (int i = 0; i < n; i++) {
             sum += execute(p, q_scale, q_weight, q_shape, theta_weight, clustering);
         }
-        sum /=  n;
+        sum /= n;
         return sum;
     }
-    
 }

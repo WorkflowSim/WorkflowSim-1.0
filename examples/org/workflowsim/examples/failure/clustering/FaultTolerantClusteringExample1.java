@@ -52,10 +52,8 @@ public class FaultTolerantClusteringExample1 extends FaultTolerantSchedulingExam
      */
     public static void main(String[] args) {
 
-
         try {
             // First step: Initialize the WorkflowSim package. 
-
             /**
              * However, the exact number of vms may not necessarily be vmNum If
              * the data center or the host doesn't have sufficient resources the
@@ -66,10 +64,6 @@ public class FaultTolerantClusteringExample1 extends FaultTolerantSchedulingExam
              * Should change this based on real physical path
              */
             String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
-            if (daxPath == null) {
-                Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
-                return;
-            }
             File daxFile = new File(daxPath);
             if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
@@ -100,9 +94,7 @@ public class FaultTolerantClusteringExample1 extends FaultTolerantSchedulingExam
              *
              */
             int maxLevel = 11; //most workflows we use has a maximum of 11 levels
-
             DistributionGenerator[][] failureGenerators = new DistributionGenerator[vmNum][maxLevel];
-
             for (int level = 0; level < maxLevel; level++) {
                 /*
                  * For simplicity, set the task failure rate of each level to be 0.1. Which means 10%
@@ -111,7 +103,7 @@ public class FaultTolerantClusteringExample1 extends FaultTolerantSchedulingExam
                  */
                 DistributionGenerator generator = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL,
                         100, 1.0, 30, 300, 0.78);
-                for(int vmId = 0; vmId < vmNum; vmId++){
+                for (int vmId = 0; vmId < vmNum; vmId++) {
                     failureGenerators[vmId][level] = generator;
                 }
             }
@@ -128,7 +120,7 @@ public class FaultTolerantClusteringExample1 extends FaultTolerantSchedulingExam
             /**
              * No overheads
              */
-            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);;
+            OverheadParameters op = new OverheadParameters(0, null, null, null, null, 0);
 
             /**
              * No Clustering
@@ -183,15 +175,9 @@ public class FaultTolerantClusteringExample1 extends FaultTolerantSchedulingExam
             wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
 
             CloudSim.startSimulation();
-
-
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
-
             CloudSim.stopSimulation();
-
             printJobList(outputList0);
-
-
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }

@@ -57,7 +57,6 @@ public class FaultTolerantClusteringExample7 extends FaultTolerantClusteringExam
      */
     public static void main(String[] args) {
 
-
         try {
             // First step: Initialize the WorkflowSim package. 
 
@@ -119,7 +118,6 @@ public class FaultTolerantClusteringExample7 extends FaultTolerantClusteringExam
                     case 'n':
                         portion = Double.parseDouble(args[++i]);
                         break;
-
                 }
             }
             t_scale /= 10;
@@ -132,7 +130,6 @@ public class FaultTolerantClusteringExample7 extends FaultTolerantClusteringExam
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return;
             }
-
             /**
              * Runtime Parameters
              */
@@ -165,17 +162,23 @@ public class FaultTolerantClusteringExample7 extends FaultTolerantClusteringExam
             ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.HORIZONTAL;
 
             FailureParameters.FTCluteringAlgorithm ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_NOOP;
-            if (clustering.equalsIgnoreCase("SR")) {
-                ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_SR;
-            } else if (clustering.equalsIgnoreCase("DR")) {
-                ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_DR;
-            } else if (clustering.equalsIgnoreCase("NOOP")) {
-                ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_NOOP;
-            } else if (clustering.equalsIgnoreCase("DC")) {
-                ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_DC;
-            } else if (clustering.equalsIgnoreCase("VR")) {
-                ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_VERTICAL;
-                method = ClusteringParameters.ClusteringMethod.VERTICAL;
+            switch (clustering) {
+                case "SR":
+                    ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_SR;
+                    break;
+                case "DR":
+                    ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_DR;
+                    break;
+                case "NOOP":
+                    ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_NOOP;
+                    break;
+                case "DC":
+                    ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_DC;
+                    break;
+                case "VR":
+                    ftc_method = FailureParameters.FTCluteringAlgorithm.FTCLUSTERING_VERTICAL;
+                    method = ClusteringParameters.ClusteringMethod.VERTICAL;
+                    break;
             }
             ClusteringParameters cp = new ClusteringParameters(vmNum, 0, method, null);
 
@@ -227,10 +230,7 @@ public class FaultTolerantClusteringExample7 extends FaultTolerantClusteringExam
             for (int level = 0; level < maxLevel; level++) {
                 queueDelay.put(level, queue_delay);
             }
-
             OverheadParameters op = new OverheadParameters(0, engineDelay, queueDelay, postscriptDelay, clusteringDelay, 0);
-
-
 
             /**
              * Initialize static parameters
@@ -279,15 +279,9 @@ public class FaultTolerantClusteringExample7 extends FaultTolerantClusteringExam
             wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
 
             CloudSim.startSimulation();
-
-
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
-
             CloudSim.stopSimulation();
-
             printJobList2(outputList0);
-
-
         } catch (Exception e) {
             e.printStackTrace();
             Log.printLine("The simulation has been terminated due to an unexpected error");
@@ -321,14 +315,12 @@ public class FaultTolerantClusteringExample7 extends FaultTolerantClusteringExam
 
             if (job.getCloudletStatus() == Cloudlet.SUCCESS) {
                 Log.print("SUCCESS");
-
                 Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
                         + indent + indent + indent + dft.format(job.getActualCPUTime())
                         + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
                         + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
             } else if (job.getCloudletStatus() == Cloudlet.FAILED) {
                 Log.print("FAILED");
-
                 Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
                         + indent + indent + indent + dft.format(job.getActualCPUTime())
                         + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
