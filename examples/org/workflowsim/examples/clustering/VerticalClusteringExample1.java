@@ -34,8 +34,8 @@ import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * This VerticalClusteringExample1 is using vertical clustering. In contrast to 
- * HorizontalClustering, VerticalClustering merges task at the same branch 
+ * This VerticalClusteringExample1 is using vertical clustering. In contrast to
+ * HorizontalClustering, VerticalClustering merges task at the same branch
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
@@ -45,15 +45,13 @@ public class VerticalClusteringExample1 extends HorizontalClusteringExample1 {
 
     ////////////////////////// STATIC METHODS ///////////////////////
     /**
-     * Creates main() to run this example
-     * This example has only one datacenter and one storage
+     * Creates main() to run this example This example has only one datacenter
+     * and one storage
      */
     public static void main(String[] args) {
 
-
-       try {
+        try {
             // First step: Initialize the WorkflowSim package. 
-
             /**
              * However, the exact number of vms may not necessarily be vmNum If
              * the data center or the host doesn't have sufficient resources the
@@ -64,51 +62,48 @@ public class VerticalClusteringExample1 extends HorizontalClusteringExample1 {
              * Should change this based on real physical path
              */
             String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
-            if(daxPath == null){
-                Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
-                return;
-            }
             File daxFile = new File(daxPath);
-            if(!daxFile.exists()){
+            if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return;
             }
 
             /**
-             * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
-             * such that the planner would not override the result of the scheduler
+             * Since we are using MINMIN scheduling algorithm, the planning
+             * algorithm should be INVALID such that the planner would not
+             * override the result of the scheduler
              */
             Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.MINMIN;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
 
             /**
-             * clustering delay must be added, if you don't need it, you can set all the clustering
-             * delay to be zero, but not null
+             * clustering delay must be added, if you don't need it, you can set
+             * all the clustering delay to be zero, but not null
              */
             Map<Integer, DistributionGenerator> clusteringDelay = new HashMap();
             /**
-             * Montage has at most 11 horizontal levels 
+             * Montage has at most 11 horizontal levels
              */
             int maxLevel = 11;
-            for (int level = 0; level < maxLevel; level++ ){
+            for (int level = 0; level < maxLevel; level++) {
                 DistributionGenerator cluster_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, 1.0, 1.0);
                 clusteringDelay.put(level, cluster_delay);//the clustering delay specified to each level is 1.0 seconds
             }
             // Add clustering delay to the overhead parameters
-            OverheadParameters op = new OverheadParameters(0, null, null, null, clusteringDelay, 0);;
-            
+            OverheadParameters op = new OverheadParameters(0, null, null, null, clusteringDelay, 0);
+
             /**
              * Vertical Clustering
              */
             ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.VERTICAL;
             ClusteringParameters cp = new ClusteringParameters(0, 0, method, null);
-            
 
             /**
-             * Initialize static parameters
-             * The reducer method is set to be "montage" in this case to remove duplicate dependencies
-             * within montage workflow. However, it is just for performance and it is not required. 
+             * Initialize static parameters The reducer method is set to be
+             * "montage" in this case to remove duplicate dependencies within
+             * montage workflow. However, it is just for performance and it is
+             * not required.
              */
             Parameters.init(vmNum, daxPath, null,
                     null, op, cp, sch_method, pln_method,
@@ -134,8 +129,8 @@ public class VerticalClusteringExample1 extends HorizontalClusteringExample1 {
              */
             WorkflowEngine wfEngine = wfPlanner.getWorkflowEngine();
             /**
-             * Create a list of VMs.The userId of a vm is basically the id of the scheduler
-             * that controls this vm. 
+             * Create a list of VMs.The userId of a vm is basically the id of
+             * the scheduler that controls this vm.
              */
             List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0), Parameters.getVmNum());
 
@@ -150,19 +145,11 @@ public class VerticalClusteringExample1 extends HorizontalClusteringExample1 {
             wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
 
             CloudSim.startSimulation();
-
-
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
-
             CloudSim.stopSimulation();
-
             printJobList(outputList0);
-            
-
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
     }
-
-    
 }

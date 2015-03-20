@@ -45,8 +45,8 @@ public class WorkflowSimAllExamplesTester {
              * Basic Examples
              */
             WorkflowSimBasicExample1.main(args);
-            WorkflowSimBasicExample2.main(args);
-            WorkflowSimBasicExample3.main(args);
+            WorkflowSimCostExample1.main(args);
+            WorkflowSimCostExample2.main(args);
             DynamicWorkloadExample1.main(args);
             WorkflowSimMultipleClusterExample1.main(args);
 

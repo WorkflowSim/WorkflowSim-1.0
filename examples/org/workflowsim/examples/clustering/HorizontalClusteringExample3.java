@@ -34,28 +34,26 @@ import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
- * This HorizontalClusteringExample3 is similar to HorizontalClusteringExample2 except
- * we have scheduling overheads set in this case. We can see how clustering improves 
- * the runtime if we have scheduling overheads (workflow engine delay, queue delay, 
- * postscript delay)
+ * This HorizontalClusteringExample3 is similar to HorizontalClusteringExample2
+ * except we have scheduling overheads set in this case. We can see how
+ * clustering improves the runtime if we have scheduling overheads (workflow
+ * engine delay, queue delay, postscript delay)
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
  * @date Dec 29, 2013
  */
-public class HorizontalClusteringExample3 extends HorizontalClusteringExample1{
+public class HorizontalClusteringExample3 extends HorizontalClusteringExample1 {
 
     ////////////////////////// STATIC METHODS ///////////////////////
     /**
-     * Creates main() to run this example
-     * This example has only one datacenter and one storage
+     * Creates main() to run this example This example has only one datacenter
+     * and one storage
      */
     public static void main(String[] args) {
 
-
-       try {
+        try {
             // First step: Initialize the WorkflowSim package. 
-
             /**
              * However, the exact number of vms may not necessarily be vmNum If
              * the data center or the host doesn't have sufficient resources the
@@ -66,42 +64,40 @@ public class HorizontalClusteringExample3 extends HorizontalClusteringExample1{
              * Should change this based on real physical path
              */
             String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
-            if(daxPath == null){
-                Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
-                return;
-            }
             File daxFile = new File(daxPath);
-            if(!daxFile.exists()){
+            if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
                 return;
             }
 
             /**
-             * Since we are using MINMIN scheduling algorithm, the planning algorithm should be INVALID 
-             * such that the planner would not override the result of the scheduler
+             * Since we are using MINMIN scheduling algorithm, the planning
+             * algorithm should be INVALID such that the planner would not
+             * override the result of the scheduler
              */
             Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.MINMIN;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
             /**
-             * Montage has at most 11 horizontal levels 
+             * Montage has at most 11 horizontal levels
              */
             int maxLevel = 11;
             /**
-             * clustering delay must be added, if you don't need it, you can set all the clustering
-             * delay to be zero, but not null
+             * clustering delay must be added, if you don't need it, you can set
+             * all the clustering delay to be zero, but not null
              */
             Map<Integer, DistributionGenerator> clusteringDelay = new HashMap();
             Map<Integer, DistributionGenerator> queueDelay = new HashMap();
             Map<Integer, DistributionGenerator> postscriptDelay = new HashMap();
             Map<Integer, DistributionGenerator> engineDelay = new HashMap();
             /**
-             * Interval is the period of workflow engine. For simplicity we set it to be 5, 
-             * which is the default value in Condor, which also means we release every 5 
-             * jobs at a time and each period takes a workflow engine delay. 
+             * Interval is the period of workflow engine. For simplicity we set
+             * it to be 5, which is the default value in Condor, which also
+             * means we release every 5 jobs at a time and each period takes a
+             * workflow engine delay.
              */
-            int interval = 5; 
-            for (int level = 0; level < maxLevel; level++ ){
+            int interval = 5;
+            for (int level = 0; level < maxLevel; level++) {
                 DistributionGenerator cluster_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, 1.0, 1.0);
                 clusteringDelay.put(level, cluster_delay);
                 DistributionGenerator queue_delay = new DistributionGenerator(DistributionGenerator.DistributionFamily.WEIBULL, 10.0, 1.0);
@@ -112,21 +108,21 @@ public class HorizontalClusteringExample3 extends HorizontalClusteringExample1{
                 engineDelay.put(level, engine_delay);
             }
             // Add clustering delay to the overhead parameters
-            OverheadParameters op = new OverheadParameters(interval, engineDelay, queueDelay, postscriptDelay, clusteringDelay, 0);;
-            
+            OverheadParameters op = new OverheadParameters(interval, engineDelay, queueDelay, postscriptDelay, clusteringDelay, 0);
+
             /**
              * Horizontal Clustering
              */
             ClusteringParameters.ClusteringMethod method = ClusteringParameters.ClusteringMethod.HORIZONTAL;
             /**
-             * You can only specify clusters.num or clusters.size
-             * clusters.num is the number of clustered jobs per horizontal level
+             * You can only specify clusters.num or clusters.size clusters.num
+             * is the number of clustered jobs per horizontal level
              * clusters.size is the number of tasks per clustered job
-             * clusters.num * clusters.size = the number of tasks per horizontal level
-             * In this case, we specify the clusters.num = 20, which means we have 20 jobs per level
+             * clusters.num * clusters.size = the number of tasks per horizontal
+             * level In this case, we specify the clusters.num = 20, which means
+             * we have 20 jobs per level
              */
             ClusteringParameters cp = new ClusteringParameters(20, 0, method, null);
-            
 
             /**
              * Initialize static parameters
@@ -155,8 +151,8 @@ public class HorizontalClusteringExample3 extends HorizontalClusteringExample1{
              */
             WorkflowEngine wfEngine = wfPlanner.getWorkflowEngine();
             /**
-             * Create a list of VMs.The userId of a vm is basically the id of the scheduler
-             * that controls this vm. 
+             * Create a list of VMs.The userId of a vm is basically the id of
+             * the scheduler that controls this vm.
              */
             List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0), Parameters.getVmNum());
 
@@ -171,18 +167,11 @@ public class HorizontalClusteringExample3 extends HorizontalClusteringExample1{
             wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
 
             CloudSim.startSimulation();
-
-
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
-
             CloudSim.stopSimulation();
-
             printJobList(outputList0);
-            
-
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
     }
-
 }

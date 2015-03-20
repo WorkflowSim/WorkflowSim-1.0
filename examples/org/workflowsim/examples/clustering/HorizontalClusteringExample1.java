@@ -52,10 +52,8 @@ public class HorizontalClusteringExample1 extends WorkflowSimBasicExample1 {
      */
     public static void main(String[] args) {
 
-
        try {
             // First step: Initialize the WorkflowSim package. 
-
             /**
              * However, the exact number of vms may not necessarily be vmNum If
              * the data center or the host doesn't have sufficient resources the
@@ -66,10 +64,6 @@ public class HorizontalClusteringExample1 extends WorkflowSimBasicExample1 {
              * Should change this based on real physical path
              */
             String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
-            if(daxPath == null){
-                Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
-                return;
-            }
             File daxFile = new File(daxPath);
             if(!daxFile.exists()){
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
@@ -98,7 +92,7 @@ public class HorizontalClusteringExample1 extends WorkflowSimBasicExample1 {
                 clusteringDelay.put(level, cluster_delay);//the clustering delay specified to each level is 1.0 seconds
             }
             // Add clustering delay to the overhead parameters
-            OverheadParameters op = new OverheadParameters(0, null, null, null, clusteringDelay, 0);;
+            OverheadParameters op = new OverheadParameters(0, null, null, null, clusteringDelay, 0);
             
             /**
              * Horizontal Clustering
@@ -113,7 +107,6 @@ public class HorizontalClusteringExample1 extends WorkflowSimBasicExample1 {
              */
             ClusteringParameters cp = new ClusteringParameters(0, 2, method, null);
             
-
             /**
              * Initialize static parameters
              */
@@ -157,15 +150,9 @@ public class HorizontalClusteringExample1 extends WorkflowSimBasicExample1 {
             wfEngine.bindSchedulerDatacenter(datacenter0.getId(), 0);
 
             CloudSim.startSimulation();
-
-
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
-
             CloudSim.stopSimulation();
-
             printJobList(outputList0);
-            
-
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
