@@ -280,7 +280,7 @@ public class WorkflowDatacenter extends Datacenter {
                         /**
                          * Picks up the site that is closest
                          */
-                        if (cl.getClassType() == ClassType.STAGE_IN.value) {
+                        //if (cl.getClassType() == ClassType.STAGE_IN.value) {
                             double maxRate = Double.MIN_VALUE;
                             for (Storage storage : getStorageList()) {
                                 double rate = storage.getMaxTransferRate();
@@ -290,7 +290,7 @@ public class WorkflowDatacenter extends Datacenter {
                             }
                             //Storage storage = getStorageList().get(0);
                             time += file.getSize() / maxRate;
-                        }
+                        //}
                         break;
                     case LOCAL:
                         int vmId = cl.getVmId();
