@@ -100,9 +100,9 @@ public class WorkflowSimMultipleWorkflowsExample1 {
              * Should change this based on real physical path
              */
             List<String> daxPaths = new ArrayList<>();
-            daxPaths.add("/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml");
-            daxPaths.add("/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_25.xml");
-            daxPaths.add("/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_1000.xml");
+            daxPaths.add("/Users/weiweich/NetBeansProjects/WorkflowSim-1.0/config/dax/Montage_100.xml");
+            daxPaths.add("/Users/weiweich/NetBeansProjects/WorkflowSim-1.0/config/dax/Montage_25.xml");
+            daxPaths.add("/Users/weiweich/NetBeansProjects/WorkflowSim-1.0/config/dax/Montage_1000.xml");
             /**
              * Check every file must exist
              */
