@@ -58,8 +58,6 @@ public class TaskSet {
         this.childList = new ArrayList<>();
         this.hasChecked = false;
         this.impactFactor = 0.0;
-
-
     }
 
     /**

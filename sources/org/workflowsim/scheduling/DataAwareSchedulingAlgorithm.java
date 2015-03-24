@@ -21,7 +21,6 @@ import org.workflowsim.CondorVM;
 import org.workflowsim.FileItem;
 import org.workflowsim.Job;
 import org.workflowsim.WorkflowSimTags;
-import org.workflowsim.utils.Parameters.FileType;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
@@ -71,35 +70,7 @@ public class DataAwareSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             }
         }
     }
-    
-       /**
-     * If a input file has an output file it does not need stage-in For
-     * workflows, we have a rule that a file is written once and read many
-     * times, thus if a file is an output file it means it is generated within
-     * this job and then used by another task within the same job (or other jobs
-     * maybe) This is useful when we perform horizontal clustering
-     *
-     * @param list, the list of all files
-     * @param file, the file to be examined
-     * @pre $none
-     * @post $none
-     */
-    private boolean isRealInputFile(List<FileItem> list, FileItem file) {
-        if (file.getType() == FileType.INPUT)//input file
-        {
-            for (FileItem another : list) {
-                if (another.getName().equals(file.getName())
-                        /**
-                         * if another file is output file
-                         */
-                        && another.getType() == FileType.OUTPUT) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
+
     /*
      * Stage in for a single job (both stage-in job and compute job)
      * @param requiredFiles, all files to be stage-in
@@ -113,7 +84,7 @@ public class DataAwareSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
         for (FileItem file : requiredFiles) {
             //The input file is not an output File 
-            if (isRealInputFile(requiredFiles, file)) {
+            if (file.isRealInputFile(requiredFiles)) {
                 List<String> siteList = ReplicaCatalog.getStorageList(file.getName());
 
                 boolean hasFile = false;

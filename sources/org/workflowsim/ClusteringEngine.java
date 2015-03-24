@@ -29,7 +29,6 @@ import org.workflowsim.clustering.balancing.BalancedClustering;
 import org.workflowsim.utils.ClusteringParameters;
 import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.Parameters.ClassType;
-import org.workflowsim.utils.Parameters.FileType;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
@@ -184,36 +183,6 @@ public final class ClusteringEngine extends SimEntity {
     }
 
     /**
-     * Checks whether a file is an input file alone (not a output file)
-     *
-     * @param list, the list of all files
-     * @param file, the file to be checked
-     * @return
-     */
-    private boolean isRealInputFile(List<FileItem> list, FileItem file) {
-        /**
-         * if the type is input file)
-         */
-        if (file.getType() == FileType.INPUT) {
-            for (FileItem another : list) {
-                /**
-                 * if there is another file that has the same name and it is
-                 * output file
-                 */
-                if (another.getName().equals(file.getName())
-                        /**
-                         * It is output file
-                         */
-                        && another.getType() == FileType.OUTPUT) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Adds data stage-in jobs to the job list
      */
     protected void processDatastaging() {
@@ -240,7 +209,7 @@ public final class ClusteringEngine extends SimEntity {
             /**
              * To avoid duplicate files
              */
-            if (isRealInputFile(list, file)) {
+            if (file.isRealInputFile(list)) {
                 ReplicaCatalog.addFileToStorage(file.getName(), Parameters.SOURCE);
                 fileList.add(file);
             }
