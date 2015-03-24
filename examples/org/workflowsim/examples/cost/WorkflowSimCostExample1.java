@@ -62,7 +62,7 @@ public class WorkflowSimCostExample1 extends WorkflowSimBasicExample1 {
             /**
              * Should change this based on real physical path
              */
-            String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
+            String daxPath = "/Users/weiweich/NetBeansProjects/WorkflowSim-1.0/config/dax/Montage_100.xml";
             File daxFile = new File(daxPath);
             if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
@@ -137,6 +137,7 @@ public class WorkflowSimCostExample1 extends WorkflowSimBasicExample1 {
             CloudSim.stopSimulation();
             printJobList(outputList0);
         } catch (Exception e) {
+            e.printStackTrace();
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
     }

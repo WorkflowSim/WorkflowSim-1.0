@@ -67,7 +67,7 @@ public class FaultTolerantClusteringExample5 extends FaultTolerantClusteringExam
             /**
              * Should change this based on real physical path
              */
-            //String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_1000.xml";
+            //String daxPath = "/Users/weiweich/NetBeansProjects/WorkflowSim-1.0/config/dax/Montage_1000.xml";
             String daxPath = "/Users/chenweiwei/Research/balanced_clustering/generator/BharathiPaper/Montage_300.xml";
             double q_scale = 50.0, q_weight = 10, q_shape = 2;
             String clustering = "DR";

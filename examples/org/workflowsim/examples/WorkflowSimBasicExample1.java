@@ -95,7 +95,7 @@ public class WorkflowSimBasicExample1 {
             /**
              * Should change this based on real physical path
              */
-            String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
+            String daxPath = "/Users/weiweich/NetBeansProjects/WorkflowSim-1.0/config/dax/Montage_100.xml";
             File daxFile = new File(daxPath);
             if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
@@ -230,6 +230,7 @@ public class WorkflowSimBasicExample1 {
         int maxTransferRate = 15;// the number comes from the futuregrid site, you can specify your bw
 
         try {
+            // Here we set the bandwidth to be 15MB/s
             HarddriveStorage s1 = new HarddriveStorage(name, 1e12);
             s1.setMaxTransferRate(maxTransferRate);
             storageList.add(s1);
