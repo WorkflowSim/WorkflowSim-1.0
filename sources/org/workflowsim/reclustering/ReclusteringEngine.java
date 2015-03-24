@@ -491,13 +491,13 @@ public class ReclusteringEngine {
     private static void updateDependencies (Job job, List<Job> jobList) {
         // Key idea: avoid setChildList(job.getChildList) within the for loop since
         // it will override the list
-        List<Job> parents = job.getParentList();
+        List<Task> parents = job.getParentList();
         List<Task> children = job.getChildList();
         for (Job rawJob : jobList) { 
             rawJob.setChildList(children);
             rawJob.setParentList(parents);
         }
-        for (Job parent : parents) {
+        for (Task parent : parents) {
             parent.getChildList().addAll(jobList);
         }
         for (Task childTask : children) {

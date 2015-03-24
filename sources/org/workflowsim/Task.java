@@ -16,7 +16,6 @@
 package org.workflowsim;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Consts;
@@ -173,7 +172,7 @@ public class Task extends Cloudlet {
      *
      * @param list, child list of the task
      */
-    public void setChildList(List list) {
+    public void setChildList(List<Task> list) {
         this.childList = list;
     }
 
@@ -182,7 +181,7 @@ public class Task extends Cloudlet {
      *
      * @param list, parent list of the task
      */
-    public void setParentList(List list) {
+    public void setParentList(List<Task> list) {
         this.parentList = list;
     }
 
@@ -191,7 +190,7 @@ public class Task extends Cloudlet {
      *
      * @param list, the child list to be added
      */
-    public void addChildList(List list) {
+    public void addChildList(List<Task> list) {
         this.childList.addAll(list);
     }
 
@@ -200,7 +199,7 @@ public class Task extends Cloudlet {
      *
      * @param list, the parent list to be added
      */
-    public void addParentList(List list) {
+    public void addParentList(List<Task> list) {
         this.parentList.addAll(list);
     }
 
@@ -316,8 +315,7 @@ public class Task extends Cloudlet {
 
         // ...plus input data transfer cost...
         long fileSize = 0;
-        for (Iterator it = getFileList().iterator(); it.hasNext();) {
-            org.cloudbus.cloudsim.File file = (org.cloudbus.cloudsim.File) it.next();
+        for (FileItem file : getFileList()) {
             fileSize += file.getSize() / Consts.MILLION;
         }
         cost += costPerBw * fileSize;

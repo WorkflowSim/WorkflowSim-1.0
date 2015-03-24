@@ -16,7 +16,6 @@
 package org.workflowsim;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.DatacenterBroker;
@@ -350,7 +349,6 @@ public class WorkflowScheduler extends DatacenterBroker {
 
         sendNow(this.getId(), WorkflowSimTags.CLOUDLET_UPDATE);
         if (!processCloudletSubmitHasShown) {
-            //Log.printLine("Pay Attention that the actual vm size is " + getVmsCreatedList().size());
             processCloudletSubmitHasShown = true;
         }
     }

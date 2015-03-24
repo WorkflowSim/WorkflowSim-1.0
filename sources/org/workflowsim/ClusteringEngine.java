@@ -16,7 +16,6 @@
 package org.workflowsim;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSimTags;
@@ -191,12 +190,12 @@ public final class ClusteringEngine extends SimEntity {
      * @param file, the file to be checked
      * @return
      */
-    private boolean isRealInputFile(List<org.cloudbus.cloudsim.File> list, org.cloudbus.cloudsim.File file) {
+    private boolean isRealInputFile(List<FileItem> list, FileItem file) {
         /**
          * if the type is input file)
          */
-        if (file.getType() == FileType.INPUT.value) {
-            for (org.cloudbus.cloudsim.File another : list) {
+        if (file.getType() == FileType.INPUT) {
+            for (FileItem another : list) {
                 /**
                  * if there is another file that has the same name and it is
                  * output file
@@ -205,7 +204,7 @@ public final class ClusteringEngine extends SimEntity {
                         /**
                          * It is output file
                          */
-                        && another.getType() == FileType.OUTPUT.value) {
+                        && another.getType() == FileType.OUTPUT) {
                     return false;
                 }
             }
@@ -222,7 +221,7 @@ public final class ClusteringEngine extends SimEntity {
         /**
          * All the files of this workflow, it is saved in the workflow engine
          */
-        List list = this.engine.getTaskFiles();
+        List<FileItem> list = this.engine.getTaskFiles();
         /**
          * A bug of cloudsim, you cannot set the length of a cloudlet to be
          * smaller than 110 otherwise it will fail The reason why we set the id
@@ -236,14 +235,13 @@ public final class ClusteringEngine extends SimEntity {
          * all the files to be the input of this stage-in job so that
          * WorkflowSim will transfers them when this job is executed
          */
-        List fileList = new ArrayList<>();
-        for (Iterator it = list.iterator(); it.hasNext();) {
-            org.cloudbus.cloudsim.File file = (org.cloudbus.cloudsim.File) it.next();
+        List<FileItem> fileList = new ArrayList<>();
+        for (FileItem file : list) {
             /**
              * To avoid duplicate files
              */
             if (isRealInputFile(list, file)) {
-                ReplicaCatalog.addStorageList(file.getName(), Parameters.SOURCE);
+                ReplicaCatalog.addFileToStorage(file.getName(), Parameters.SOURCE);
                 fileList.add(file);
             }
         }

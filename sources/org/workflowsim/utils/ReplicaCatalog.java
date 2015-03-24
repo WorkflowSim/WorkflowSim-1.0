@@ -49,7 +49,7 @@ public class ReplicaCatalog {
     /**
      * Map from file to a list of data storage
      */
-    private static Map<String, List> dataReplicaCatalog;
+    private static Map<String, List<String>> dataReplicaCatalog;
 
     /**
      * Initialize a ReplicaCatalog
@@ -107,7 +107,7 @@ public class ReplicaCatalog {
      * @param file the file object
      * @return list of storages
      */
-    public static List getStorageList(String file) {
+    public static List<String> getStorageList(String file) {
         return dataReplicaCatalog.get(file);
     }
 
@@ -117,11 +117,11 @@ public class ReplicaCatalog {
      * @param file, a file object
      * @param storage , the storage associated with this file
      */
-    public static void addStorageList(String file, String storage) {
+    public static void addFileToStorage(String file, String storage) {
         if (!dataReplicaCatalog.containsKey(file)) {
-            dataReplicaCatalog.put(file, new ArrayList());
+            dataReplicaCatalog.put(file, new ArrayList<>());
         }
-        List list = getStorageList(file);
+        List<String> list = getStorageList(file);
         if (!list.contains(storage)) {
             list.add(storage);
         }
