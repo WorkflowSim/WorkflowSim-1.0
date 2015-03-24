@@ -171,7 +171,7 @@ public final class WorkflowParser {
                     
                     List fileList = node.getChildren();
 
-                    List mFileList = new ArrayList<org.cloudbus.cloudsim.File>();
+                    List<org.cloudbus.cloudsim.File> mFileList = new ArrayList<>();
 
                     for (Iterator itf = fileList.iterator(); itf.hasNext();) {
                         Element file = (Element) itf.next();
@@ -223,6 +223,9 @@ public final class WorkflowParser {
                                 size = 0 - size;
                                 Log.printLine("Size is negative, I assume it is a parser error");
                             }
+                            /*
+                             * Note that CloudSim use size as MB, in this case we use it as Byte
+                             */
                             if (type == Parameters.FileType.OUTPUT.value) {
                                 /**
                                  * It is good that CloudSim does tell whether a

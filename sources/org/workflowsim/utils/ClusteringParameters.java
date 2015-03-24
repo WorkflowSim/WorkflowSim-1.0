@@ -28,11 +28,11 @@ public class ClusteringParameters {
      * The number of clustered jobs per level. You just need to set one of
      * clusters.num or clusteres.size
      */
-    private int clusters_num;
+    private final int clusters_num;
     /**
      * The size of clustered jobs (=The number of tasks in a clustered job)
      */
-    private int clusters_size;
+    private final int clusters_size;
 
     /**
      * Supported Clustering Method, by default it is none

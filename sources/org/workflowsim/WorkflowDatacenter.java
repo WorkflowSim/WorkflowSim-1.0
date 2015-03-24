@@ -135,7 +135,7 @@ public class WorkflowDatacenter extends Datacenter {
             Job job = (Job) cl;
 
             double fileTransferTime = 0.0;
-            if (cl.getClassType() == ClassType.COMPUTE.value) {
+            if (cl.getClassType() == ClassType.STAGE_IN.value) {
                 fileTransferTime = processDataStageIn(job.getFileList(), cl);
             }
 
@@ -280,17 +280,16 @@ public class WorkflowDatacenter extends Datacenter {
                         /**
                          * Picks up the site that is closest
                          */
-                        if (cl.getClassType() == ClassType.STAGE_IN.value) {
-                            double maxRate = Double.MIN_VALUE;
-                            for (Storage storage : getStorageList()) {
-                                double rate = storage.getMaxTransferRate();
-                                if (rate > maxRate) {
-                                    maxRate = rate;
-                                }
+                        double maxRate = Double.MIN_VALUE;
+                        for (Storage storage : getStorageList()) {
+                            double rate = storage.getMaxTransferRate();
+                            if (rate > maxRate) {
+                                maxRate = rate;
                             }
-                            //Storage storage = getStorageList().get(0);
-                            time += file.getSize() / maxRate;
                         }
+                        //Storage storage = getStorageList().get(0);
+                        time += file.getSize() / (double) Consts.MILLION / maxRate;
+                        
                         break;
                     case LOCAL:
                         int vmId = cl.getVmId();
@@ -328,7 +327,7 @@ public class WorkflowDatacenter extends Datacenter {
                             }
                         }
                         if (requiredFileStagein && maxBwth > 0.0) {
-                            time += file.getSize() / (double) Consts.MILLION * 8 / maxBwth;
+                            time += file.getSize() / (double) Consts.MILLION / maxBwth;
                         }
 
                         /**
