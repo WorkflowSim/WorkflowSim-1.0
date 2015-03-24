@@ -79,9 +79,9 @@ public final class WorkflowEngine extends SimEntity {
     public WorkflowEngine(String name, int schedulers) throws Exception {
         super(name);
 
-        setJobsList(new ArrayList<Job>());
-        setJobsSubmittedList(new ArrayList<Job>());
-        setJobsReceivedList(new ArrayList<Job>());
+        setJobsList(new ArrayList<>());
+        setJobsSubmittedList(new ArrayList<>());
+        setJobsReceivedList(new ArrayList<>());
 
         jobsSubmitted = 0;
 
@@ -275,9 +275,9 @@ public final class WorkflowEngine extends SimEntity {
     protected void submitJobs() {
 
         List<Job> list = getJobsList();
-        Map allocationList = new HashMap<Integer, List>();
+        Map<Integer, List> allocationList = new HashMap<>();
         for (int i = 0; i < getSchedulers().size(); i++) {
-            List<Job> submittedList = new ArrayList<Job>();
+            List<Job> submittedList = new ArrayList<>();
             allocationList.put(getSchedulerId(i), submittedList);
         }
         int num = list.size();
@@ -293,15 +293,13 @@ public final class WorkflowEngine extends SimEntity {
                         flag = false;
                         break;
                     }
-
                 }
                 /**
                  * This job's parents have all completed successfully. Should
                  * submit.
                  */
                 if (flag) {
-
-                    List submittedList = (List) allocationList.get(job.getUserId());
+                    List submittedList = allocationList.get(job.getUserId());
                     submittedList.add(job);
                     jobsSubmitted++;
                     getJobsSubmittedList().add(job);
@@ -317,7 +315,7 @@ public final class WorkflowEngine extends SimEntity {
          */
         for (int i = 0; i < getSchedulers().size(); i++) {
 
-            List submittedList = (List) allocationList.get(getSchedulerId(i));
+            List submittedList = allocationList.get(getSchedulerId(i));
             //divid it into sublist
 
             int interval = Parameters.getOverheadParams().getWEDInterval();
@@ -326,11 +324,9 @@ public final class WorkflowEngine extends SimEntity {
                 delay = Parameters.getOverheadParams().getWEDDelay(submittedList);
             }
 
-
             double delaybase = delay;
             int size = submittedList.size();
             if (interval > 0 && interval <= size) {
-
                 int index = 0;
                 List subList = new ArrayList();
                 while (index < size) {
@@ -341,22 +337,16 @@ public final class WorkflowEngine extends SimEntity {
                         schedule(getSchedulerId(i), delay, CloudSimTags.CLOUDLET_SUBMIT, subList);
                         delay += delaybase;
                         subList = new ArrayList();
-
                     }
-
                 }
                 if (!subList.isEmpty()) {
                     schedule(getSchedulerId(i), delay, CloudSimTags.CLOUDLET_SUBMIT, subList);
                 }
-
-
             } else if (!submittedList.isEmpty()) {
                 sendNow(this.getSchedulerId(i), CloudSimTags.CLOUDLET_SUBMIT, submittedList);
             }
         }
-
     }
-
 
     /*
      * (non-Javadoc)
@@ -465,7 +455,6 @@ public final class WorkflowEngine extends SimEntity {
     /**
      * Gets the schedulers.
      *
-     * @param <T> the generic type
      * @return the schedulers
      */
     public List<WorkflowScheduler> getSchedulers() {
@@ -485,7 +474,6 @@ public final class WorkflowEngine extends SimEntity {
     /**
      * Gets the scheduler id.
      *
-     * @param <T> the generic type
      * @return the scheduler id
      */
     public List<Integer> getSchedulerIds() {
@@ -505,7 +493,7 @@ public final class WorkflowEngine extends SimEntity {
     /**
      * Gets the scheduler id list.
      *
-     * @param <T> the generic type
+     * @param index
      * @return the scheduler id list
      */
     public int getSchedulerId(int index) {
@@ -518,11 +506,10 @@ public final class WorkflowEngine extends SimEntity {
     /**
      * Gets the scheduler .
      *
-     * @param index the scheduler id
+     * @param schedulerId
      * @return the scheduler
      */
     public WorkflowScheduler getScheduler(int schedulerId) {
-
         if (this.scheduler != null) {
             return this.scheduler.get(schedulerId);
         }

@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.DatacenterBroker;
-import org.cloudbus.cloudsim.DatacenterCharacteristics;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
@@ -195,7 +194,6 @@ public class WorkflowScheduler extends DatacenterBroker {
              */
             if (VmList.getById(getVmList(), vmId) != null) {
                 getVmsCreatedList().add(VmList.getById(getVmList(), vmId));
-
                 Log.printLine(CloudSim.clock() + ": " + getName() + ": VM #" + vmId
                         + " has been created in Datacenter #" + datacenterId + ", Host #"
                         + VmList.getById(getVmsCreatedList(), vmId).getHost().getId());
@@ -251,16 +249,14 @@ public class WorkflowScheduler extends DatacenterBroker {
             e.printStackTrace();
         }
 
-        List scheduledList = scheduler.getScheduledList();
-        for (Iterator it = scheduledList.iterator(); it.hasNext();) {
-            Cloudlet cloudlet = (Cloudlet) it.next();
+        List<Cloudlet> scheduledList = scheduler.getScheduledList();
+        for (Cloudlet cloudlet : scheduledList) {
             int vmId = cloudlet.getVmId();
             double delay = 0.0;
             if (Parameters.getOverheadParams().getQueueDelay() != null) {
                 delay = Parameters.getOverheadParams().getQueueDelay(cloudlet);
             }
             schedule(getVmsToDatacentersMap().get(vmId), delay, CloudSimTags.CLOUDLET_SUBMIT, cloudlet);
-
         }
         getCloudletList().removeAll(scheduledList);
         getCloudletSubmittedList().addAll(scheduledList);

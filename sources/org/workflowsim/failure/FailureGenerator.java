@@ -15,7 +15,6 @@
  */
 package org.workflowsim.failure;
 
-import java.util.Iterator;
 import org.apache.commons.math3.distribution.GammaDistribution;
 import org.apache.commons.math3.distribution.LogNormalDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -25,7 +24,6 @@ import org.workflowsim.Job;
 import org.workflowsim.Task;
 import org.apache.commons.math3.distribution.WeibullDistribution;
 import org.workflowsim.utils.DistributionGenerator;
-import org.workflowsim.utils.Parameters;
 
 /**
  * FailureGenerator creates a failure when a job returns
@@ -43,9 +41,12 @@ public class FailureGenerator {
      */
     private static final int maxFailureSizeExtension = 50;
     private static int failureSizeExtension = 0;
-    private static boolean hasChangeTime = false;
+    private static final boolean hasChangeTime = false;
     /**
      *
+     * @param alpha
+     * @param beta
+     * @return 
      */
     protected static RealDistribution getDistribution(double alpha, double beta) {
         RealDistribution distribution = null;
@@ -83,7 +84,7 @@ public class FailureGenerator {
     protected static boolean checkFailureStatus(Task task, int vmId) throws Exception {
 
 
-        DistributionGenerator generator = null;
+        DistributionGenerator generator;
         switch (FailureParameters.getFailureGeneratorMode()) {
             /**
              * Every task follows the same distribution.
@@ -160,8 +161,7 @@ public class FailureGenerator {
         }
         try {
 
-            for (Iterator it = job.getTaskList().iterator(); it.hasNext();) {
-                Task task = (Task) it.next();
+            for (Task task : job.getTaskList()) {
                 int failedTaskSum = 0;
                 if (checkFailureStatus(task, job.getVmId())) {
                     //this task fail
@@ -181,8 +181,6 @@ public class FailureGenerator {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return jobFailed;
-
     }
 }

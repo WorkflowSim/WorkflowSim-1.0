@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.cloudbus.cloudsim.Log;
-import org.workflowsim.utils.Parameters;
 
 /**
  * FailureMonitor collects failure information
@@ -34,11 +33,11 @@ public class FailureMonitor {
     /**
      * VM ID to a Failure Record. *
      */
-    protected static Map<Integer, ArrayList<FailureRecord>> vm2record;
+    protected static Map<Integer, List<FailureRecord>> vm2record;
     /**
      * Type to a Failure Record. *
      */
-    protected static Map<Integer, ArrayList<FailureRecord>> type2record;
+    protected static Map<Integer, List<FailureRecord>> type2record;
     /**
      * JobID to a Failure Record. *
      */
@@ -56,11 +55,10 @@ public class FailureMonitor {
      * Initialize a FailureMonitor object.
      */
     public static void init() {
-        vm2record = new HashMap<Integer, ArrayList<FailureRecord>>();
-        type2record = new HashMap<Integer, ArrayList<FailureRecord>>();
-        jobid2record = new HashMap<Integer, FailureRecord>();
-        recordList = new ArrayList<FailureRecord>();
-
+        vm2record = new HashMap<>();
+        type2record = new HashMap<>();
+        jobid2record = new HashMap<>();
+        recordList = new ArrayList<>();
     }
 
     /**
@@ -72,7 +70,6 @@ public class FailureMonitor {
      * @return optimal clustering factor
      */
     protected static double getK(double d, double a, double t) {
-
         double k = (-d + Math.sqrt(d * d - 4 * d / Math.log(1 - a))) / (2 * t);
         return k;
     }
@@ -131,7 +128,7 @@ public class FailureMonitor {
             case MONITOR_VM:
 
                 if (!vm2record.containsKey(record.vmId)) {
-                    vm2record.put(record.vmId, new ArrayList<FailureRecord>());
+                    vm2record.put(record.vmId, new ArrayList<>());
                 }
                 vm2record.get(record.vmId).add(record);
 
@@ -139,7 +136,7 @@ public class FailureMonitor {
             case MONITOR_JOB:
 
                 if (!type2record.containsKey(record.depth)) {
-                    type2record.put(record.depth, new ArrayList<FailureRecord>());
+                    type2record.put(record.depth, new ArrayList<>());
                 }
                 type2record.get(record.depth).add(record);
 
@@ -205,6 +202,5 @@ public class FailureMonitor {
         }
         double alpha = (double) ((double) sumFailures / (double) sumJobs);
         return alpha;
-
     }
 }

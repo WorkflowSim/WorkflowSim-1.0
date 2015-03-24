@@ -18,7 +18,7 @@ package org.workflowsim.clustering.balancing;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.cloudbus.cloudsim.Log;
@@ -50,15 +50,15 @@ public class BalancedClustering extends BasicClustering {
     /**
      * Number of clustered jobs per level.
      */
-    private int clusterNum;
+    private final int clusterNum;
     /**
      * Map from task to taskSet.
      */
-    private Map<Task, TaskSet> mTask2TaskSet;
+    private final Map<Task, TaskSet> mTask2TaskSet;
     /**
      * Map from taskSet to its depth.
      */
-    private Map mTaskSet2Depth;
+    private final Map<TaskSet, Integer> mTaskSet2Depth;
 
     /**
      * Initialize a BalancedClustering method
@@ -68,20 +68,17 @@ public class BalancedClustering extends BasicClustering {
     public BalancedClustering(int clusterNum) {
         super();
         this.clusterNum = clusterNum;
-        this.mTask2TaskSet = new HashMap<Task, TaskSet>();
-        mTaskSet2Depth = new HashMap<TaskSet, Integer>();
-
+        this.mTask2TaskSet = new HashMap<>();
+        mTaskSet2Depth = new HashMap<>();
     }
 
     /**
      * Clean the checked flag of a taskset
      *
-     * @return $none
      */
     public void cleanTaskSetChecked() {
-        Collection sets = mTask2TaskSet.values();
-        for (Iterator it = sets.iterator(); it.hasNext();) {
-            TaskSet set = (TaskSet) it.next();
+        Collection<TaskSet> sets = mTask2TaskSet.values();
+        for (TaskSet set : sets) {
             set.hasChecked = false;
         }
     }
@@ -110,28 +107,28 @@ public class BalancedClustering extends BasicClustering {
      * Print out all the balancing metrics
      */
     public void printMetrics() {
-        Map<Integer, ArrayList<TaskSet>> map = getCurrentTaskSetAtLevels();
+        Map<Integer, List<TaskSet>> map = getCurrentTaskSetAtLevels();
         for (TaskSet set : mTask2TaskSet.values()) {
             set.setImpactFafctor(0.0);
         }
 
         int maxDepth = 0;
-        for (Entry entry : map.entrySet()) {
-            int depth = (Integer) entry.getKey();
+        for (Entry<Integer, List<TaskSet>> entry : map.entrySet()) {
+            int depth = entry.getKey();
             if (depth > maxDepth) {
                 maxDepth = depth;
             }
         }
-        ArrayList<TaskSet> exits = map.get(maxDepth);
+        List<TaskSet> exits = map.get(maxDepth);
         double avg = 1.0 / exits.size();
         for (TaskSet set : exits) {
             //set.setImpactFafctor(avg);
             addImpact(set, avg);
         }
 
-        for (Entry entry : map.entrySet()) {
-            int depth = (Integer) entry.getKey();
-            ArrayList<TaskSet> list = (ArrayList) entry.getValue();
+        for (Entry<Integer, List<TaskSet>> entry : map.entrySet()) {
+            int depth = entry.getKey();
+            List<TaskSet> list = entry.getValue();
             /**
              * Horizontal Runtime Variance.
              */
@@ -161,25 +158,23 @@ public class BalancedClustering extends BasicClustering {
      *
      * @return tasks list per level
      */
-    public Map<Integer, ArrayList<TaskSet>> getCurrentTaskSetAtLevels() {
+    public Map<Integer, List<TaskSet>> getCurrentTaskSetAtLevels() {
         //makesure it is updated 
 
         //makesure Taskset.hasChecked is false
-        Map map = new HashMap<Integer, ArrayList<TaskSet>>();
-        Collection sets = mTask2TaskSet.values();
-        for (Iterator it = sets.iterator(); it.hasNext();) {
-            TaskSet set = (TaskSet) it.next();
+        Map<Integer, List<TaskSet>> map = new HashMap<>();
+        Collection<TaskSet> sets = mTask2TaskSet.values();
+        for (TaskSet set : sets) {
             if (!set.hasChecked) {
                 set.hasChecked = true;
                 int depth = getDepth(set);
                 if (!map.containsKey(depth)) {
-                    map.put(depth, new ArrayList<TaskSet>());
+                    map.put(depth, new ArrayList<>());
                 }
-                ArrayList list = (ArrayList) map.get(depth);
+                List list = map.get(depth);
                 list.add(set);
 
             }
-
         }
         mTaskSet2Depth.clear();
         //must do
@@ -195,11 +190,10 @@ public class BalancedClustering extends BasicClustering {
      */
     private int getDepth(TaskSet set) {
         if (mTaskSet2Depth.containsKey(set)) {
-            return (Integer) mTaskSet2Depth.get(set);
+            return mTaskSet2Depth.get(set);
         } else {
             int depth = 0;
-            for (Iterator it = set.getParentList().iterator(); it.hasNext();) {
-                TaskSet parent = (TaskSet) it.next();
+            for (TaskSet parent : set.getParentList()) {
                 int curDepth = getDepth(parent);
                 if (curDepth > depth) {
                     depth = curDepth;
@@ -227,8 +221,7 @@ public class BalancedClustering extends BasicClustering {
         if (ancestor == set) {
             return true;
         }
-        for (Iterator it = set.getParentList().iterator(); it.hasNext();) {
-            Task parent = (Task) it.next();
+        for (Task parent : set.getParentList()) {
             if (check(ancestor, parent)) {
                 return true;
             } else {
@@ -240,7 +233,7 @@ public class BalancedClustering extends BasicClustering {
     /**
      * used for recover.
      */
-    private Map<Task, Task> mRecover = new HashMap<Task, Task>();
+    private final Map<Task, Task> mRecover = new HashMap<>();
 
     /**
      * Add pairs that needs to remove to mRecover.
@@ -291,10 +284,9 @@ public class BalancedClustering extends BasicClustering {
      * Add the pair from the mRecover.
      */
     private void recover() {
-        for (Iterator it = mRecover.entrySet().iterator(); it.hasNext();) {
-            Entry entry = (Entry) it.next();
-            Task set = (Task) entry.getKey();
-            Task children = (Task) entry.getValue();
+        for (Entry<Task, Task> entry : mRecover.entrySet()) {
+            Task set = entry.getKey();
+            Task children = entry.getValue();
             set.getChildList().add(children);
             children.getParentList().add(set);
         }
@@ -304,12 +296,10 @@ public class BalancedClustering extends BasicClustering {
     public void run() {
 
         if (clusterNum > 0) {
-            for (Iterator it = getTaskList().iterator(); it.hasNext();) {
-                Task task = (Task) it.next();
+            for (Task task : getTaskList()) {
                 TaskSet set = new TaskSet();
                 set.addTask(task);
                 mTask2TaskSet.put(task, set);
-
             }
         }
 
@@ -318,26 +308,22 @@ public class BalancedClustering extends BasicClustering {
 
         printMetrics();
         String code = Parameters.getClusteringParameters().getCode();
-        Map<Integer, ArrayList<TaskSet>> map = getCurrentTaskSetAtLevels();
+        Map<Integer, List<TaskSet>> map = getCurrentTaskSetAtLevels();
         if (code != null) {
             for (char c : code.toCharArray()) {
 
                 switch (c) {
                     case 'v':
-
-                        //verticalClustering();
                         VerticalBalancing v = new VerticalBalancing(map, this.mTask2TaskSet, this.clusterNum);
                         v.run();
                         break;
                     case 'c':
-                        //childAwareHorizontalClustering();
                         ChildAwareHorizontalClustering ch =
                                 new ChildAwareHorizontalClustering(map, this.mTask2TaskSet, this.clusterNum);
                         ch.run();
                         updateTaskSetDependencies();
                         break;
                     case 'r':
-                        //horizontalRuntimeBalancing();
                         HorizontalRuntimeBalancing r =
                                 new HorizontalRuntimeBalancing(map, this.mTask2TaskSet, this.clusterNum);
                         r.run();
@@ -367,9 +353,8 @@ public class BalancedClustering extends BasicClustering {
 
         printOut();
 
-        Collection sets = mTask2TaskSet.values();
-        for (Iterator it = sets.iterator(); it.hasNext();) {
-            TaskSet set = (TaskSet) it.next();
+        Collection<TaskSet> sets = mTask2TaskSet.values();
+        for (TaskSet set : sets) {
             if (!set.hasChecked) {
                 set.hasChecked = true;
                 addTasks2Job(set.getTaskList());
@@ -389,9 +374,8 @@ public class BalancedClustering extends BasicClustering {
      * Print out the clustering information.
      */
     private void printOut() {
-        Collection sets = mTask2TaskSet.values();
-        for (Iterator it = sets.iterator(); it.hasNext();) {
-            TaskSet set = (TaskSet) it.next();
+        Collection<TaskSet> sets = mTask2TaskSet.values();
+        for (TaskSet set : sets) {
             if (!set.hasChecked) {
                 set.hasChecked = true;
 
@@ -400,7 +384,6 @@ public class BalancedClustering extends BasicClustering {
                     Log.printLine("Task " + task.getCloudletId() + " " + task.getImpact() + " " + task.getCloudletLength());
                 }
             }
-
         }
         //within each method
         cleanTaskSetChecked();
@@ -411,29 +394,24 @@ public class BalancedClustering extends BasicClustering {
      */
     private void updateTaskSetDependencies() {
 
-        Collection sets = mTask2TaskSet.values();
-        for (Iterator it = sets.iterator(); it.hasNext();) {
-            TaskSet set = (TaskSet) it.next();
+        Collection<TaskSet> sets = mTask2TaskSet.values();
+        for (TaskSet set : sets) {
             if (!set.hasChecked) {
                 set.hasChecked = true;
                 set.getChildList().clear();
                 set.getParentList().clear();
                 for (Task task : set.getTaskList()) {
-                    for (Iterator tIt = task.getParentList().iterator(); tIt.hasNext();) {
-                        Task parent = (Task) tIt.next();
-                        TaskSet parentSet = (TaskSet) mTask2TaskSet.get(parent);
+                    for (Task parent : task.getParentList()) {
+                        TaskSet parentSet = mTask2TaskSet.get(parent);
                         if (!set.getParentList().contains(parentSet) && set != parentSet) {
                             set.getParentList().add(parentSet);
                         }
-
                     }
-                    for (Iterator tIt = task.getChildList().iterator(); tIt.hasNext();) {
-                        Task child = (Task) tIt.next();
-                        TaskSet childSet = (TaskSet) mTask2TaskSet.get(child);
+                    for (Task child : task.getChildList()) {
+                        TaskSet childSet = mTask2TaskSet.get(child);
                         if (!set.getChildList().contains(childSet) && set != childSet) {
                             set.getChildList().add(childSet);
                         }
-
                     }
                 }
             }

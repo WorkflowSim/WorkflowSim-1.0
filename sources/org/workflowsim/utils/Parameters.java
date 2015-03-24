@@ -51,7 +51,7 @@ public class Parameters {
      * File Type
      */
     public enum FileType{
-        INPUT(1), OUTPUT(2);
+        NONE(0), INPUT(1), OUTPUT(2);
         public final int value;
         private FileType(int fType){
             this.value = fType;
@@ -163,7 +163,7 @@ public class Parameters {
     /**
      * Invalid String
      */
-    private static String INVALID = "Invalid";
+    private static final String INVALID = "Invalid";
     
     /**
      * The scale of runtime. Multiple runtime by this
@@ -178,10 +178,6 @@ public class Parameters {
     /**
      * A static function so that you can specify them in any place
      *
-     * @param fMethod, the fault tolerant clustering method
-     * @param monitor, the fault tolerant clustering monitor
-     * @param failure, the failure generation mode
-     * @param failureList, the task failure list
      * @param vm, the number of vms
      * @param dax, the DAX path
      * @param runtime, optional, the runtime file path
@@ -191,7 +187,7 @@ public class Parameters {
      * @param scheduler, scheduling mode
      * @param planner, planning mode
      * @param rMethod , reducer mode
-     * @param deadline, deadline of a workflow
+     * @param dl, deadline
      */
     public static void init(
             int vm, String dax, String runtime, String datasize,
@@ -216,10 +212,6 @@ public class Parameters {
     /**
      * A static function so that you can specify them in any place
      *
-     * @param fMethod, the fault tolerant clustering method
-     * @param monitor, the fault tolerant clustering monitor
-     * @param failure, the failure generation mode
-     * @param failureList, the task failure list
      * @param vm, the number of vms
      * @param dax, the list of DAX paths 
      * @param runtime, optional, the runtime file path
@@ -229,7 +221,7 @@ public class Parameters {
      * @param scheduler, scheduling mode
      * @param planner, planning mode
      * @param rMethod , reducer mode
-     * @param deadline, deadline of a workflow
+     * @param dl, deadline of a workflow
      */
     public static void init(
             int vm, List<String> dax, String runtime, String datasize,
@@ -339,9 +331,7 @@ public class Parameters {
     /**
      * Sets the vm number
      *
-     * @param vmNum
-     * @pre $none
-     * @post $none
+     * @param num
      */
     public static void setVmNum(int num) {
         vmNum = num;
@@ -351,8 +341,6 @@ public class Parameters {
      * Gets the clustering parameters
      *
      * @return the clustering parameters
-     * @pre $none
-     * @post $none
      */
     public static ClusteringParameters getClusteringParameters() {
         return cParams;
@@ -362,8 +350,6 @@ public class Parameters {
      * Gets the scheduling method
      *
      * @return the scheduling method
-     * @pre $none
-     * @post $none
      */
     public static SchedulingAlgorithm getSchedulingAlgorithm() {
         return schedulingAlgorithm;

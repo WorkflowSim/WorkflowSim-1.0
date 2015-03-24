@@ -33,7 +33,7 @@ public class ClusterStorage extends HarddriveStorage {
     /**
      * The map stores the bandwidth from this cluster-storage to others
      */
-    Map bandwidthMap;
+    Map<String, Double> bandwidthMap;
 
     /**
      * Initialize a ClusterStorage
@@ -67,12 +67,12 @@ public class ClusterStorage extends HarddriveStorage {
      * @param destination
      * @return bandwidth
      */
-    public double getMaxTransferRate(String destination) {
+    public double getMaxBandwidth(String destination) {
         if (bandwidthMap.containsKey(destination)) {
-            return (Double) bandwidthMap.get(destination);
+            return bandwidthMap.get(destination);
         } else {
             //local bandwidth between vms
-            return (Double) bandwidthMap.get("local");
+            return bandwidthMap.get("local");
         }
     }
 }

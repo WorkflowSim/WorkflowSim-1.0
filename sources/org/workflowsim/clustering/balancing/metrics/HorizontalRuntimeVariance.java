@@ -17,7 +17,7 @@
  */
 package org.workflowsim.clustering.balancing.metrics;
 
-import java.util.ArrayList;
+import java.util.List;
 import org.workflowsim.clustering.TaskSet;
 
 /**
@@ -34,7 +34,7 @@ public class HorizontalRuntimeVariance implements BalancingMetric {
      * @return the standard deviation
      */
     @Override
-    public double getMetric(ArrayList<TaskSet> list) {
+    public double getMetric(List<TaskSet> list) {
         if (list == null || list.size() <= 1) {
             return 0.0;
         }

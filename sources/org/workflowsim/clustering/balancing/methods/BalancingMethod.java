@@ -17,9 +17,9 @@
  */
 package org.workflowsim.clustering.balancing.methods;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import org.workflowsim.Task;
 import org.workflowsim.clustering.TaskSet;
@@ -34,14 +34,14 @@ import org.workflowsim.clustering.TaskSet;
 public class BalancingMethod {
 
     /** Task Map */
-    private Map<Task, TaskSet> taskMap;
+    private final Map<Task, TaskSet> taskMap;
     
     /**
      * TaskSet per level.
      */
-    private Map<Integer, ArrayList<TaskSet>> levelMap;
+    private final Map<Integer, List<TaskSet>> levelMap;
     /** Number of clustered jobs per level. */
-    private int clusterNum;
+    private final int clusterNum;
 
     /**
      * Initialize a BalancingMethod
@@ -59,7 +59,7 @@ public class BalancingMethod {
      * Gets the task map
      * @return task map
      */
-    public Map getTaskMap() {
+    public Map<Task, TaskSet> getTaskMap() {
         return this.taskMap;
     }
 
@@ -67,7 +67,7 @@ public class BalancingMethod {
      * Gets the level map
      * @return level map
      */
-    public Map getLevelMap() {
+    public Map<Integer, List<TaskSet>> getLevelMap() {
         return this.levelMap;
     }
 

@@ -41,7 +41,7 @@ public class StaticSchedulingAlgorithm extends BaseSchedulingAlgorithm {
     @Override
     public void run() throws Exception {
 
-        Map mId2Vm = new HashMap<Integer, CondorVM>();
+        Map<Integer, CondorVM> mId2Vm = new HashMap<>();
 
         for (int i = 0; i < getVmList().size(); i++) {
             CondorVM vm = (CondorVM) getVmList().get(i);
@@ -65,7 +65,7 @@ public class StaticSchedulingAlgorithm extends BaseSchedulingAlgorithm {
                 cloudlet.setVmId(0);
 
             }
-            CondorVM vm = (CondorVM) mId2Vm.get(cloudlet.getVmId());
+            CondorVM vm = mId2Vm.get(cloudlet.getVmId());
             if (vm.getState() == WorkflowSimTags.VM_STATUS_IDLE) {
                 vm.setState(WorkflowSimTags.VM_STATUS_BUSY);
                 getScheduledList().add(cloudlet);

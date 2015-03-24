@@ -204,7 +204,7 @@ public final class WorkflowPlanner extends SimEntity {
      * @param taskList all the tasks
      */
     private void processImpactFactors(List<Task> taskList) {
-        ArrayList<Task> exits = new ArrayList();
+        List<Task> exits = new ArrayList<>();
         for (Task task : taskList) {
             if (task.getChildList().isEmpty()) {
                 exits.add(task);

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.workflowsim.clustering.AbstractArrayList;
 import org.workflowsim.clustering.TaskSet;
@@ -49,15 +50,15 @@ public class ChildAwareHorizontalClustering extends BalancingMethod {
      */
     @Override
     public void run() {
-        Map<Integer, ArrayList<TaskSet>> map = getLevelMap();
-        Map<ArrayList<TaskSet>, AbstractArrayList> tmpMap = new HashMap();
+        Map<Integer, List<TaskSet>> map = getLevelMap();
+        Map<List<TaskSet>, AbstractArrayList> tmpMap = new HashMap();
         for (Map.Entry entry : map.entrySet()) {
             int depth = (Integer) entry.getKey();
             ArrayList<TaskSet> list = (ArrayList) entry.getValue();
             AbstractArrayList abList = new AbstractArrayList(list, depth);
             tmpMap.put(list, abList);
         }
-        ArrayList<AbstractArrayList> abList = new ArrayList(tmpMap.values());
+        List<AbstractArrayList> abList = new ArrayList(tmpMap.values());
         sortMap(abList);
         for (AbstractArrayList list : abList) {
             if (!list.hasChecked) {
@@ -70,9 +71,9 @@ public class ChildAwareHorizontalClustering extends BalancingMethod {
 
                     int i = depth + 1;
                     while (map.containsKey(i)) {
-                        ArrayList<TaskSet> tsList = (ArrayList) map.get(i);
+                        List<TaskSet> tsList = map.get(i);
                         CHBcheckLevel(tsList);
-                        AbstractArrayList tsAbList = (AbstractArrayList) tmpMap.get(tsList);
+                        AbstractArrayList tsAbList = tmpMap.get(tsList);
                         tsAbList.hasChecked = true;
                         i++;
                     }
@@ -87,8 +88,9 @@ public class ChildAwareHorizontalClustering extends BalancingMethod {
      * Sort taskSets based on their size
      * @param list taskSets to be sorted
      */
-    private void sortMap(ArrayList<AbstractArrayList> list) {
+    private void sortMap(List<AbstractArrayList> list) {
         Collections.sort(list, new Comparator<AbstractArrayList>() {
+            @Override
             public int compare(AbstractArrayList l1, AbstractArrayList l2) {
 
                 return (int) (l2.getArrayList().size() - l1.getArrayList().size());
@@ -102,18 +104,16 @@ public class ChildAwareHorizontalClustering extends BalancingMethod {
      * @param taskList to be processed
      * @return 
      */
-    private boolean CHBcheckLevel(ArrayList taskList) {
+    private boolean CHBcheckLevel(List<TaskSet> taskList) {
         boolean hasClustered = false;
-        for (int i = 0; i < taskList.size(); i++) {
-            TaskSet setA = (TaskSet) taskList.get(i);
+        for (TaskSet setA : taskList) {
             setA.hasChecked = false;//for safety
         }
         for (int i = 0; i < taskList.size(); i++) {
-            TaskSet setA = (TaskSet) taskList.get(i);
+            TaskSet setA =  taskList.get(i);
             if (!setA.hasChecked) {
-
                 for (int j = i + 1; j < taskList.size(); j++) {
-                    TaskSet setB = (TaskSet) taskList.get(j);
+                    TaskSet setB = taskList.get(j);
                     if (!setB.hasChecked) {
 
                         TaskSet kid = CHBhasOneParent(setA, setB);

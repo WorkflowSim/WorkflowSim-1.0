@@ -54,9 +54,6 @@ public class FCFSSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             if (!stillHasVm) {
                 break;
             }
-
         }
     }
-
-
 }

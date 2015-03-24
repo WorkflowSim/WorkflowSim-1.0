@@ -89,7 +89,7 @@ public class PeriodicalDistributionGenerator extends DistributionGenerator{
     private double[] generatePeriodicalSamples(double currentTime){
         RealDistribution distribution_upper = getDistribution(signal.getUpperBound(), shape);
         RealDistribution distribution_lower = getDistribution(signal.getLowerBound(), shape);
-        RealDistribution distribution = null;
+        RealDistribution distribution;
         double[] periodicalSamples = new double[SAMPLE_SIZE];
         boolean direction = signal.getDirection();
         for(int i = 0; i < SAMPLE_SIZE; i ++){

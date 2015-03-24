@@ -17,9 +17,9 @@ package org.workflowsim.planning;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Datacenter;
 import org.cloudbus.cloudsim.Vm;
+import org.workflowsim.Task;
 
 /**
  * The base planner has implemented the basic features. Every other planning method
@@ -34,7 +34,7 @@ public abstract class BasePlanningAlgorithm implements PlanningAlgorithmInterfac
     /**
      * the task list.
      */
-    private List<? extends Cloudlet> tasktList;
+    private List<Task> tasktList;
     /**
      * the vm list.
      */
@@ -76,7 +76,7 @@ public abstract class BasePlanningAlgorithm implements PlanningAlgorithmInterfac
      * @return the task list
      */
     @Override
-    public List getTaskList() {
+    public List<Task> getTaskList() {
         return this.tasktList;
     }
 

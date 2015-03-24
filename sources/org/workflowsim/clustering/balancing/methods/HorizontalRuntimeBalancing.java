@@ -20,7 +20,7 @@ package org.workflowsim.clustering.balancing.methods;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import org.workflowsim.Task;
@@ -49,9 +49,8 @@ public class HorizontalRuntimeBalancing extends BalancingMethod {
      */
     @Override
     public void run() {
-        Map<Integer, ArrayList<TaskSet>> map = getLevelMap();
-        for (Iterator it = map.values().iterator(); it.hasNext();) {
-            ArrayList<TaskSet> taskList = (ArrayList) it.next();
+        Map<Integer, List<TaskSet>> map = getLevelMap();
+        for (List<TaskSet> taskList : map.values()) {
             /**The reason why we don shuffle is very complicated. */
             long seed = System.nanoTime();
             Collections.shuffle(taskList, new Random(seed));
@@ -59,7 +58,7 @@ public class HorizontalRuntimeBalancing extends BalancingMethod {
             Collections.shuffle(taskList, new Random(seed));
 
             if (taskList.size() > getClusterNum()) {
-                ArrayList<TaskSet> jobList = new ArrayList<TaskSet>();
+                List<TaskSet> jobList = new ArrayList<>();
                 for (int i = 0; i < getClusterNum(); i++) {
                     jobList.add(new TaskSet());
                 }
@@ -87,8 +86,9 @@ public class HorizontalRuntimeBalancing extends BalancingMethod {
      * Sort taskSets based on their runtime
      * @param taskList taskSets to be sorted
      */
-    private void sortListIncreasing(ArrayList taskList) {
+    private void sortListIncreasing(List<TaskSet> taskList) {
         Collections.sort(taskList, new Comparator<TaskSet>() {
+            @Override
             public int compare(TaskSet t1, TaskSet t2) {
                 //Decreasing order
                 return (int) (t1.getJobRuntime() - t2.getJobRuntime());
@@ -101,8 +101,9 @@ public class HorizontalRuntimeBalancing extends BalancingMethod {
      * Sort taskSets based on their runtime
      * @param taskList taskSets to be sorted
      */
-    private void sortListDecreasing(ArrayList taskList) {
+    private void sortListDecreasing(List<TaskSet> taskList) {
         Collections.sort(taskList, new Comparator<TaskSet>() {
+            @Override
             public int compare(TaskSet t1, TaskSet t2) {
                 //Decreasing order
                 return (int) (t2.getJobRuntime() - t1.getJobRuntime());

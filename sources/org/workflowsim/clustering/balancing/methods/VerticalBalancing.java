@@ -17,9 +17,8 @@
  */
 package org.workflowsim.clustering.balancing.methods;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import org.workflowsim.clustering.TaskSet;
 
@@ -47,25 +46,22 @@ public class VerticalBalancing extends BalancingMethod {
      */
     @Override
     public void run() {
-        Collection sets = getTaskMap().values();
-        for (Iterator it = sets.iterator(); it.hasNext();) {
-            TaskSet set = (TaskSet) it.next();
+        Collection<TaskSet> sets = getTaskMap().values();
+        for (TaskSet set : sets) {
             if (!set.hasChecked) {
                 set.hasChecked = true;
             }
             //check if you can merge it with its child
-            ArrayList list = set.getChildList();
+            List<TaskSet> list = set.getChildList();
             if (list.size() == 1) {
                 //
-                TaskSet child = (TaskSet) list.get(0);
-                ArrayList pList = child.getParentList();
+                TaskSet child = list.get(0);
+                List pList = child.getParentList();
                 if (pList.size() == 1) {
                     //add parent to child (don't do it reversely)
                     addTaskSet2TaskSet(set, child);
-
                 }
             }
-
         }
         //within each method
         cleanTaskSetChecked();

@@ -17,8 +17,8 @@
  */
 package org.workflowsim.clustering.balancing.metrics;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import org.workflowsim.clustering.TaskSet;
 
 /**
@@ -36,7 +36,7 @@ public class DistanceVariance implements BalancingMetric {
      * @return the distance variance
      */
     @Override
-    public double getMetric(ArrayList<TaskSet> list) {
+    public double getMetric(List<TaskSet> list) {
         if (list == null || list.size() <= 1) {
             return 0.0;
         }
@@ -77,8 +77,8 @@ public class DistanceVariance implements BalancingMetric {
         if (taskA == null || taskB == null || taskA == taskB) {
             return 0;
         }
-        LinkedList<TaskSet> listA = new LinkedList<TaskSet>();
-        LinkedList<TaskSet> listB = new LinkedList<TaskSet>();
+        LinkedList<TaskSet> listA = new LinkedList<>();
+        LinkedList<TaskSet> listB = new LinkedList<>();
         int distance = 0;
         listA.add(taskA);
         listB.add(taskB);
@@ -114,9 +114,7 @@ public class DistanceVariance implements BalancingMetric {
             }
 
             distance++;
-
         } while (!listA.isEmpty() && !listB.isEmpty());
-
         return distance * 2;
     }
 }

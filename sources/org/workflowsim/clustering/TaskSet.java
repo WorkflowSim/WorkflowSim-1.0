@@ -16,6 +16,7 @@
 package org.workflowsim.clustering;
 
 import java.util.ArrayList;
+import java.util.List;
 import org.workflowsim.Task;
 
 /**
@@ -30,15 +31,15 @@ public class TaskSet {
     /**
      * the task list.
      */
-    private ArrayList<Task> taskList;
+    private final List<Task> taskList;
     /**
      * the parent list of this taskset.
      */
-    private ArrayList<TaskSet> parentList;
+    private final List<TaskSet> parentList;
     /**
      * the child list of this taskset.
      */
-    private ArrayList<TaskSet> childList;
+    private final List<TaskSet> childList;
     /**
      * the check point.
      */
@@ -52,9 +53,9 @@ public class TaskSet {
      * Initialize a TaskSet object
      */
     public TaskSet() {
-        this.taskList = new ArrayList<Task>();
-        this.parentList = new ArrayList<TaskSet>();
-        this.childList = new ArrayList<TaskSet>();
+        this.taskList = new ArrayList<>();
+        this.parentList = new ArrayList<>();
+        this.childList = new ArrayList<>();
         this.hasChecked = false;
         this.impactFactor = 0.0;
 
@@ -84,7 +85,7 @@ public class TaskSet {
      *
      * @return parent list
      */
-    public ArrayList<TaskSet> getParentList() {
+    public List<TaskSet> getParentList() {
         return this.parentList;
     }
 
@@ -93,7 +94,7 @@ public class TaskSet {
      *
      * @return the child list
      */
-    public ArrayList<TaskSet> getChildList() {
+    public List<TaskSet> getChildList() {
         return this.childList;
     }
 
@@ -102,7 +103,7 @@ public class TaskSet {
      *
      * @return task list
      */
-    public ArrayList<Task> getTaskList() {
+    public List<Task> getTaskList() {
         return this.taskList;
     }
 
@@ -120,7 +121,7 @@ public class TaskSet {
      *
      * @param list to be added
      */
-    public void addTask(ArrayList<Task> list) {
+    public void addTask(List<Task> list) {
         this.taskList.addAll(list);
     }
 

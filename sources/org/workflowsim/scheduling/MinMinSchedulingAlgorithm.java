@@ -33,7 +33,7 @@ public class MinMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
     public MinMinSchedulingAlgorithm() {
         super();
     }
-    private List hasChecked = new ArrayList<Boolean>();
+    private final List<Boolean> hasChecked = new ArrayList<>();
 
     @Override
     public void run() {
@@ -48,8 +48,7 @@ public class MinMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             Cloudlet minCloudlet = null;
             for (int j = 0; j < size; j++) {
                 Cloudlet cloudlet = (Cloudlet) getCloudletList().get(j);
-                boolean chk = (Boolean) (hasChecked.get(j));
-                if (!chk) {
+                if (!hasChecked.get(j)) {
                     minCloudlet = cloudlet;
                     minIndex = j;
                     break;
@@ -62,14 +61,10 @@ public class MinMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
             for (int j = 0; j < size; j++) {
                 Cloudlet cloudlet = (Cloudlet) getCloudletList().get(j);
-                boolean chk = (Boolean) (hasChecked.get(j));
-
-                if (chk) {
+                if (hasChecked.get(j)) {
                     continue;
                 }
-
                 long length = cloudlet.getCloudletLength();
-
                 if (length < minCloudlet.getCloudletLength()) {
                     minCloudlet = cloudlet;
                     minIndex = j;
@@ -94,13 +89,11 @@ public class MinMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
                 if ((vm.getState() == WorkflowSimTags.VM_STATUS_IDLE)
                         && vm.getCurrentRequestedTotalMips() > firstIdleVm.getCurrentRequestedTotalMips()) {
                     firstIdleVm = vm;
-
                 }
             }
             firstIdleVm.setState(WorkflowSimTags.VM_STATUS_BUSY);
             minCloudlet.setVmId(firstIdleVm.getId());
             getScheduledList().add(minCloudlet);
-
         }
     }
 }

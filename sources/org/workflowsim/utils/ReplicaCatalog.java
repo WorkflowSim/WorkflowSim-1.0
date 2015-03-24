@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.workflowsim.FileItem;
 
 /**
  * ReplicaCatalog stores all the data information and where (site) there are
@@ -35,13 +36,12 @@ public class ReplicaCatalog {
      * File System
      */
     public enum FileSystem {
-
         SHARED, LOCAL
     }
     /**
      * Map from file name to a file object
      */
-    private static Map FileName2File;
+    private static Map<String, FileItem> fileName2File;
     /**
      * The selection of file.system
      */
@@ -49,7 +49,7 @@ public class ReplicaCatalog {
     /**
      * Map from file to a list of data storage
      */
-    private static Map dataReplicaCatalog;
+    private static Map<String, List> dataReplicaCatalog;
 
     /**
      * Initialize a ReplicaCatalog
@@ -58,8 +58,8 @@ public class ReplicaCatalog {
      */
     public static void init(FileSystem fs) {
         fileSystem = fs;
-        dataReplicaCatalog = new HashMap< String, List>();
-        FileName2File = new HashMap<String, org.cloudbus.cloudsim.File>();
+        dataReplicaCatalog = new HashMap<>();
+        fileName2File = new HashMap<>();
     }
 
     /**
@@ -77,8 +77,8 @@ public class ReplicaCatalog {
      * @param fileName, file name
      * @return file object
      */
-    public static org.cloudbus.cloudsim.File getFile(String fileName) {
-        return (org.cloudbus.cloudsim.File) FileName2File.get(fileName);
+    public static FileItem getFile(String fileName) {
+        return fileName2File.get(fileName);
     }
 
     /**
@@ -87,8 +87,8 @@ public class ReplicaCatalog {
      * @param fileName, the file name
      * @param file , the file object
      */
-    public static void setFile(String fileName, org.cloudbus.cloudsim.File file) {
-        FileName2File.put(fileName, file);
+    public static void setFile(String fileName, FileItem file) {
+        fileName2File.put(fileName, file);
     }
 
     /**
@@ -98,7 +98,7 @@ public class ReplicaCatalog {
      * @return boolean, whether the file exist
      */
     public static boolean containsFile(String fileName) {
-        return FileName2File.containsKey(fileName);
+        return fileName2File.containsKey(fileName);
     }
 
     /**
@@ -108,7 +108,7 @@ public class ReplicaCatalog {
      * @return list of storages
      */
     public static List getStorageList(String file) {
-        return (List) dataReplicaCatalog.get(file);
+        return dataReplicaCatalog.get(file);
     }
 
     /**

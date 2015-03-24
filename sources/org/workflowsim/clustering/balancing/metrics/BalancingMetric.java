@@ -17,7 +17,7 @@
  */
 package org.workflowsim.clustering.balancing.metrics;
 
-import java.util.ArrayList;
+import java.util.List;
 import org.workflowsim.clustering.TaskSet;
 
 /**
@@ -27,6 +27,8 @@ import org.workflowsim.clustering.TaskSet;
  * @date Apr 9, 2013
  */
 public interface BalancingMetric {
-    /** Gets the metric value. */
-    public double getMetric(ArrayList<TaskSet> list);
+    /** Gets the metric value.
+     * @param list
+     * @return  */
+    public double getMetric(List<TaskSet> list);
 }

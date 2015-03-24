@@ -19,8 +19,7 @@ package org.workflowsim.clustering.balancing.methods;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import org.workflowsim.Task;
@@ -49,9 +48,8 @@ public class HorizontalRandomClustering extends BalancingMethod {
      */
     @Override
     public void run() {
-        Map<Integer, ArrayList<TaskSet>> map = getLevelMap();
-        for (Iterator it = map.values().iterator(); it.hasNext();) {
-            ArrayList<TaskSet> taskList = (ArrayList) it.next();
+        Map<Integer, List<TaskSet>> map = getLevelMap();
+        for (List<TaskSet> taskList : map.values()) {
             /**The reason why we don shuffle is very complicated. */
             long seed = System.nanoTime();
             Collections.shuffle(taskList, new Random(seed));
@@ -59,7 +57,7 @@ public class HorizontalRandomClustering extends BalancingMethod {
             Collections.shuffle(taskList, new Random(seed));
 
             if (taskList.size() > getClusterNum()) {
-                ArrayList<TaskSet> jobList = new ArrayList<TaskSet>();
+                List<TaskSet> jobList = new ArrayList<>();
                 for (int i = 0; i < getClusterNum(); i++) {
                     jobList.add(new TaskSet());
                 }
@@ -78,8 +76,7 @@ public class HorizontalRandomClustering extends BalancingMethod {
                     }
 
                 }
-
-                taskList.clear();//you sure?
+                taskList.clear();
             } else {
                 //do nothing since 
             }

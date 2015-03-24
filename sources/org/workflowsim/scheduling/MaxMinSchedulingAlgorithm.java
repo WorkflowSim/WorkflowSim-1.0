@@ -40,7 +40,7 @@ public class MaxMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
     /**
      * the check point list.
      */
-    private List hasChecked = new ArrayList<Boolean>();
+    private final List<Boolean> hasChecked = new ArrayList<>();
 
     @Override
     public void run() {
@@ -50,7 +50,6 @@ public class MaxMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
         int size = getCloudletList().size();
         hasChecked.clear();
         for (int t = 0; t < size; t++) {
-            boolean chk = false;
             hasChecked.add(false);
         }
         for (int i = 0; i < size; i++) {
@@ -58,8 +57,7 @@ public class MaxMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             Cloudlet maxCloudlet = null;
             for (int j = 0; j < size; j++) {
                 Cloudlet cloudlet = (Cloudlet) getCloudletList().get(j);
-                boolean chk = (Boolean) (hasChecked.get(j));
-                if (!chk) {
+                if (!hasChecked.get(j)) {
                     maxCloudlet = cloudlet;
                     maxIndex = j;
                     break;
@@ -69,17 +67,12 @@ public class MaxMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
                 break;
             }
 
-
             for (int j = 0; j < size; j++) {
                 Cloudlet cloudlet = (Cloudlet) getCloudletList().get(j);
-                boolean chk = (Boolean) (hasChecked.get(j));
-
-                if (chk) {
+                if (hasChecked.get(j)) {
                     continue;
                 }
-
                 long length = cloudlet.getCloudletLength();
-
                 if (length > maxCloudlet.getCloudletLength()) {
                     maxCloudlet = cloudlet;
                     maxIndex = j;

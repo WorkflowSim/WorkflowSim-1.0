@@ -60,9 +60,7 @@ public class RoundRobinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             cloudlet.setVmId(firstIdleVm.getId());
             getScheduledList().add(cloudlet);
             vmIndex = (vmIndex + 1) % vmList.size();
-
         }
-
     }
     /**
      * Sort it based on vm index
@@ -79,7 +77,6 @@ public class RoundRobinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
         public int compare(Cloudlet c1, Cloudlet c2){
             return Integer.compare(c1.getCloudletId(), c2.getCloudletId());
         }
-    }
-    
+    }    
 }
 

@@ -45,11 +45,11 @@ public class ClusteringParameters {
      * Used for balanced clustering to tell which specific balanced clustering
      * to use
      */
-    private String code;
+    private final String code;
     /**
      * Supported Clustering Method, by default it is none
      */
-    private ClusteringMethod method;
+    private final ClusteringMethod method;
 
     /**
      * Gets the code for balanced clustering Please refer to our balanced
@@ -98,7 +98,6 @@ public class ClusteringParameters {
      * @param code , balanced clustering code (used for research)
      */
     public ClusteringParameters(int cNum, int cSize, ClusteringMethod method, String code) {
-
         this.clusters_num = cNum;
         this.clusters_size = cSize;
         this.method = method;

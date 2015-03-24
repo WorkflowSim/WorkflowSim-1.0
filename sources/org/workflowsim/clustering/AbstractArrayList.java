@@ -32,11 +32,11 @@ public class AbstractArrayList {
     /**
      * The task list.
      */
-    private ArrayList taskList;
+    private final ArrayList taskList;
     /**
      * The depth of these tasks.
      */
-    private int depth;
+    private final int depth;
 
     /**
      * Initialize AbstractArrayList

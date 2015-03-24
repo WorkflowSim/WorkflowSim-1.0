@@ -81,7 +81,7 @@ public class FailureParameters {
     /**
      * Invalid return value
      */
-    private static int INVALID = -1;
+    private static final int INVALID = -1;
 
     /**
      * 
@@ -90,8 +90,7 @@ public class FailureParameters {
      * @param fMethod Fault Tolerant Clustering Algorithm
      * @param monitor Fault Tolerant Clustering Monitor mode
      * @param failure Failure generator mode
-     * @param failureRate Task Failure Rate (alpha)
-     * @param failureShape Task Failure Shape (beta)
+     * @param failureGenerators
      */
     public static void init(FTCluteringAlgorithm fMethod, FTCMonitor monitor, 
             FTCFailure failure, DistributionGenerator[][] failureGenerators) {
@@ -104,7 +103,11 @@ public class FailureParameters {
     /**
      * 
      * Init a FailureParameters with distibution
+     * @param fMethod
+     * @param monitor
      * @param dist 
+     * @param failureGenerators 
+     * @param failure 
      */
     public static void init(FTCluteringAlgorithm fMethod, FTCMonitor monitor, 
             FTCFailure failure, DistributionGenerator[][] failureGenerators, 

@@ -17,7 +17,6 @@ package org.workflowsim.clustering;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.workflowsim.Task;
@@ -34,19 +33,19 @@ public class BlockClustering extends BasicClustering {
     /**
      * The number of clustered jobs per level.
      */
-    private int clusterNum;
+    private final int clusterNum;
     /**
      * The size of a clustered job (number of tasks in a job).
      */
-    private int clusterSize;
+    private final int clusterSize;
     /**
      * The map stores whether a task has checked.
      */
-    private Map mHasChecked;
+    private final Map<Integer, Boolean> mHasChecked;
     /**
      * The map stores tasks per level.
      */
-    private Map mDepth2Task;
+    private final Map<Integer, List> mDepth2Task;
 
     /**
      * Initialize a BlockClustering object
@@ -58,8 +57,8 @@ public class BlockClustering extends BasicClustering {
         super();
         clusterNum = cNum;
         clusterSize = cSize;
-        this.mHasChecked = new HashMap<Integer, Boolean>();
-        this.mDepth2Task = new HashMap<Integer, Map>();
+        this.mHasChecked = new HashMap<>();
+        this.mDepth2Task = new HashMap<>();
 
     }
 
@@ -69,13 +68,10 @@ public class BlockClustering extends BasicClustering {
      * @param index id of a task
      */
     private void setCheck(int index) {
-
         if (mHasChecked.containsKey(index)) {
             mHasChecked.remove(index);
         }
         mHasChecked.put(index, true);
-
-
     }
 
     /**
@@ -85,9 +81,8 @@ public class BlockClustering extends BasicClustering {
      * @return
      */
     private boolean getCheck(int index) {
-
         if (mHasChecked.containsKey(index)) {
-            return (Boolean) mHasChecked.get(index);
+            return mHasChecked.get(index);
         }
         return false;
     }
@@ -100,17 +95,15 @@ public class BlockClustering extends BasicClustering {
 
         // level by level
         if (clusterNum > 0 || clusterSize > 0) {
-            for (Iterator it = getTaskList().iterator(); it.hasNext();) {
-                Task task = (Task) it.next();
+            for (Task task : getTaskList()) {
                 int depth = task.getDepth();
                 if (!mDepth2Task.containsKey(depth)) {
-                    mDepth2Task.put(depth, new ArrayList<Task>());
+                    mDepth2Task.put(depth, new ArrayList<>());
                 }
-                ArrayList list = (ArrayList) mDepth2Task.get(depth);
+                List list = mDepth2Task.get(depth);
                 if (!list.contains(task)) {
                     list.add(task);
                 }
-
             }
         }
 
@@ -134,22 +127,17 @@ public class BlockClustering extends BasicClustering {
      * @param taskList the seed tasks
      * @return candidate tasks
      */
-    private List searchList(List taskList) {
-        ArrayList sucList = new ArrayList<Task>();
-        for (Iterator it = taskList.iterator(); it.hasNext();) {
-            Task task = (Task) it.next();
-            if (getCheck(task.getCloudletId())) {
-                //do not process this task it's been checked
-            } else {
+    private List searchList(List<Task> taskList) {
+        List<Task> sucList = new ArrayList<>();
+        for (Task task : taskList) {
+            if (!getCheck(task.getCloudletId())) {
                 setCheck(task.getCloudletId());
                 sucList.add(task);
                 //add all of its successors
                 Task node = task;
                 while (node != null) {
-                    int pNum = node.getParentList().size();
-                    int cNum = node.getChildList().size();
-                    if (cNum == 1) {
-                        Task child = (Task) node.getChildList().get(0);
+                    if (node.getChildList().size() == 1) {
+                        Task child = node.getChildList().get(0);
                         if (!getCheck(child.getCloudletId()) && child.getParentList().size() == 1) {
                             setCheck(child.getCloudletId());
                             sucList.add(child);
@@ -157,16 +145,12 @@ public class BlockClustering extends BasicClustering {
                         } else {
                             node = null;
                         }
-
                     } else {
                         node = null;
-                        //cNum == 0, doesn't have to add
-                        //cNum > 0 might be a cross dependency issue
                     }
                 }
             }
         }
-
         return sucList;
     }
 
@@ -175,9 +159,8 @@ public class BlockClustering extends BasicClustering {
      */
     private void bundleClustering() {
 
-        for (Iterator it = mDepth2Task.entrySet().iterator(); it.hasNext();) {
-            Map.Entry pairs = (Map.Entry<Integer, ArrayList>) it.next();
-            ArrayList list = (ArrayList) pairs.getValue();
+        for (Map.Entry<Integer, List> pairs : mDepth2Task.entrySet()) {
+            List list = pairs.getValue();
             int num = list.size();
             int avg_a = num / this.clusterNum;
             int avg_b = avg_a;
@@ -221,9 +204,8 @@ public class BlockClustering extends BasicClustering {
      * Merges a fixed number of tasks into a job
      */
     private void collapseClustering() {
-        for (Iterator it = mDepth2Task.entrySet().iterator(); it.hasNext();) {
-            Map.Entry pairs = (Map.Entry<Integer, ArrayList>) it.next();
-            ArrayList list = (ArrayList) pairs.getValue();
+        for (Map.Entry<Integer, List> pairs : mDepth2Task.entrySet()) {
+            List list = pairs.getValue();
             int num = list.size();
             int avg = this.clusterSize;
 

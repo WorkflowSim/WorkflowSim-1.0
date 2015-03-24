@@ -21,9 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.cloudbus.cloudsim.Consts;
-import org.cloudbus.cloudsim.File;
 import org.cloudbus.cloudsim.Log;
 import org.workflowsim.CondorVM;
+import org.workflowsim.FileItem;
 import org.workflowsim.Task;
 import org.workflowsim.utils.Parameters;
 
@@ -89,7 +89,7 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
 
         for (Object vmObject : getVmList()) {
             CondorVM vm = (CondorVM) vmObject;
-            schedules.put(vm, new ArrayList<Event>());
+            schedules.put(vm, new ArrayList<>());
         }
 
         // Prioritization phase
@@ -120,11 +120,8 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
      * a task in a vm.
      */
     private void calculateComputationCosts() {
-        for (Object taskObject : getTaskList()) {
-            Task task = (Task) taskObject;
-
-            Map<CondorVM, Double> costsVm = new HashMap<CondorVM, Double>();
-
+        for (Task task : getTaskList()) {
+            Map<CondorVM, Double> costsVm = new HashMap<>();
             for (Object vmObject : getVmList()) {
                 CondorVM vm = (CondorVM) vmObject;
                 if (vm.getNumberOfPes() < task.getNumberOfPes()) {
@@ -144,21 +141,16 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
      */
     private void calculateTransferCosts() {
         // Initializing the matrix
-        for (Object taskObject1 : getTaskList()) {
-            Task task1 = (Task) taskObject1;
-            Map<Task, Double> taskTransferCosts = new HashMap<Task, Double>();
-
-            for (Object taskObject2 : getTaskList()) {
-                Task task2 = (Task) taskObject2;
+        for (Task task1 : getTaskList()) {
+            Map<Task, Double> taskTransferCosts = new HashMap<>();
+            for (Task task2 : getTaskList()) {
                 taskTransferCosts.put(task2, 0.0);
             }
-
             transferCosts.put(task1, taskTransferCosts);
         }
 
         // Calculating the actual values
-        for (Object parentObject : getTaskList()) {
-            Task parent = (Task) parentObject;
+        for (Task parent : getTaskList()) {
             for (Task child : parent.getChildList()) {
                 transferCosts.get(parent).put(child,
                         calculateTransferCost(parent, child));
@@ -175,18 +167,18 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
      * @return Transfer cost in seconds
      */
     private double calculateTransferCost(Task parent, Task child) {
-        List<File> parentFiles = (List<File>) parent.getFileList();
-        List<File> childFiles = (List<File>) child.getFileList();
+        List<FileItem> parentFiles = parent.getFileList();
+        List<FileItem> childFiles = child.getFileList();
 
         double acc = 0.0;
 
-        for (File parentFile : parentFiles) {
-            if (parentFile.getType() != Parameters.FileType.OUTPUT.value) {
+        for (FileItem parentFile : parentFiles) {
+            if (parentFile.getType() != Parameters.FileType.OUTPUT) {
                 continue;
             }
 
-            for (File childFile : childFiles) {
-                if (childFile.getType() == Parameters.FileType.INPUT.value
+            for (FileItem childFile : childFiles) {
+                if (childFile.getType() == Parameters.FileType.INPUT
                         && childFile.getName().equals(parentFile.getName())) {
                     acc += childFile.getSize();
                     break;
@@ -204,8 +196,7 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
      * Invokes calculateRank for each task to be scheduled
      */
     private void calculateRanks() {
-        for (Object taskObject : getTaskList()) {
-            Task task = (Task) taskObject;
+        for (Task task : getTaskList()) {
             calculateRank(task);
         }
     }
@@ -253,8 +244,8 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
 
         // Sorting in non-ascending order of rank
         Collections.sort(taskRank);
-        for (TaskRank tr : taskRank) {
-            allocateTask(tr.task);
+        for (TaskRank rank : taskRank) {
+            allocateTask(rank.task);
         }
 
     }
@@ -281,7 +272,6 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
                 if (parent.getVmId() != vm.getId()) {
                     readyTime += transferCosts.get(parent).get(task);
                 }
-
                 minReadyTime = Math.max(minReadyTime, readyTime);
             }
 
@@ -319,7 +309,7 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
         double start, finish;
         int pos;
 
-        if (sched.size() == 0) {
+        if (sched.isEmpty()) {
             if (occupySlot) {
                 sched.add(new Event(readyTime, readyTime + computationCost));
             }
@@ -362,13 +352,11 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
 
                 break;
             }
-
             if (previous.finish + computationCost <= current.start) {
                 start = previous.finish;
                 finish = previous.finish + computationCost;
                 pos = i;
             }
-
             i--;
             j--;
         }

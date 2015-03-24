@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.workflowsim.FileItem;
 import org.workflowsim.Job;
 import org.workflowsim.Task;
 import org.workflowsim.utils.Parameters;
@@ -27,7 +28,7 @@ import org.workflowsim.utils.Parameters.ClassType;
 import org.workflowsim.utils.Parameters.FileType;
 
 /**
- * The default clustering does no clustering at all, just map a task to a job
+ * The default clustering does no clustering at all, just map a task to a tasks
  *
  * @author Weiwei Chen
  * @since WorkflowSim Toolkit 1.0
@@ -40,17 +41,17 @@ public class BasicClustering implements ClusteringInterface {
      */
     private List<Task> taskList;
     /**
-     * The job list.
+     * The tasks list.
      */
-    private List<Job> jobList;
+    private final List<Job> jobList;
     /**
-     * maps from task to its job.
+     * maps from task to its tasks.
      */
-    private Map mTask2Job;
+    private final Map mTask2Job;
     /**
      * All the files.
      */
-    private List<org.cloudbus.cloudsim.File> allFileList;
+    private final List<FileItem> allFileList;
     /**
      * The root task.
      */
@@ -66,7 +67,7 @@ public class BasicClustering implements ClusteringInterface {
      * @return files
      */
     @Override
-    public final List<org.cloudbus.cloudsim.File> getTaskFiles() {
+    public final List<FileItem> getTaskFiles() {
         return this.allFileList;
     }
 
@@ -74,10 +75,10 @@ public class BasicClustering implements ClusteringInterface {
      * Initialize a BasicClustering object
      */
     public BasicClustering() {
-        this.jobList = new ArrayList<Job>();
-        this.taskList = new ArrayList<Task>();
-        this.mTask2Job = new HashMap<Task, Job>();
-        this.allFileList = new ArrayList<org.cloudbus.cloudsim.File>();
+        this.jobList = new ArrayList<>();
+        this.taskList = new ArrayList<>();
+        this.mTask2Job = new HashMap<>();
+        this.allFileList = new ArrayList<>();
         this.idIndex = 0;
         this.root = null;
     }
@@ -93,9 +94,9 @@ public class BasicClustering implements ClusteringInterface {
     }
 
     /**
-     * Gets the job list
+     * Gets the tasks list
      *
-     * @return job list
+     * @return tasks list
      */
     @Override
     public final List<Job> getJobList() {
@@ -113,7 +114,7 @@ public class BasicClustering implements ClusteringInterface {
     }
 
     /**
-     * Gets the map from task to job
+     * Gets the map from task to tasks
      *
      * @return map
      */
@@ -127,14 +128,12 @@ public class BasicClustering implements ClusteringInterface {
     @Override
     public void run() {
         getTask2Job().clear();
-        for (Iterator it = getTaskList().iterator(); it.hasNext();) {
-            Task task = (Task) it.next();
-            List taskList = new ArrayList();
-            taskList.add(task);
-            Job job = addTasks2Job(taskList);
+        for (Task task : getTaskList()) {
+            List<Task> list = new ArrayList<>();
+            list.add(task);
+            Job job = addTasks2Job(list);
             job.setVmId(task.getVmId());
             getTask2Job().put(task, job);
-
         }
         /**
          * Handle the dependencies issue.
@@ -144,24 +143,24 @@ public class BasicClustering implements ClusteringInterface {
     }
 
     /**
-     * Add a task to a new job
+     * Add a task to a new tasks
      *
      * @param task the task
-     * @return job the newly created job
+     * @return tasks the newly created tasks
      */
     protected final Job addTasks2Job(Task task) {
-        ArrayList job = new ArrayList();
-        job.add(task);
-        return addTasks2Job(job);
+        List<Task> tasks = new ArrayList<>();
+        tasks.add(task);
+        return addTasks2Job(tasks);
     }
 
     /**
-     * Add a list of task to a new job
+     * Add a list of task to a new tasks
      *
      * @param taskList the task list
-     * @return job the newly created job
+     * @return tasks the newly created tasks
      */
-    protected final Job addTasks2Job(List taskList) {
+    protected final Job addTasks2Job(List<Task> taskList) {
         if (taskList != null && !taskList.isEmpty()) {
             int length = 0;
 
@@ -171,47 +170,36 @@ public class BasicClustering implements ClusteringInterface {
             /// a bug of cloudsim makes it final of input file size and output file size
             Job job = new Job(idIndex, length/*, inputFileSize, outputFileSize*/);
             job.setClassType(ClassType.COMPUTE.value);
-            for (Iterator it = taskList.iterator(); it.hasNext();) {
-                Task task = (Task) it.next();
+            for (Task task : taskList) {
                 length += task.getCloudletLength();
 
                 userId = task.getUserId();
                 priority = task.getPriority();
                 depth = task.getDepth();
-                List fileList = task.getFileList();
+                List<FileItem> fileList = task.getFileList();
                 job.getTaskList().add(task);
 
                 getTask2Job().put(task, job);
-                for (Iterator itc = fileList.iterator(); itc.hasNext();) {
-                    org.cloudbus.cloudsim.File file = (org.cloudbus.cloudsim.File) itc.next();
-
-                    boolean hasFile = false;
-
-                    hasFile = job.getFileList().contains(file);
-
+                for (FileItem file : fileList) {
+                    boolean hasFile = job.getFileList().contains(file);
                     if (!hasFile) {
-
                         job.getFileList().add(file);
-                        if (file.getType() == FileType.INPUT.value) {
+                        if (file.getType() == FileType.INPUT) {
                             //for stag-in jobs to be used
                             if (!this.allFileList.contains(file)) {
                                 this.allFileList.add(file);
                             }
-                        } else if (file.getType() == FileType.OUTPUT.value) {
+                        } else if (file.getType() == FileType.OUTPUT) {
                             this.allFileList.add(file);
                         }
                     }
                 }
-                for (Iterator itc = task.getRequiredFiles().iterator(); itc.hasNext();) {
-                    String fileName = (String) itc.next();
-
+                for (String fileName : task.getRequiredFiles()) {
                     if (!job.getRequiredFiles().contains(fileName)) {
                         job.getRequiredFiles().add(fileName);
                     }
                 }
-
             }
-
 
             job.setCloudletLength(length);
             job.setUserId(userId);
@@ -227,21 +215,17 @@ public class BasicClustering implements ClusteringInterface {
     }
 
     /**
-     * For a clustered job, we should add clustering delay (by default it is
-     * zero)
+     * For a clustered tasks, we should add clustering delay (by default it is
+ zero)
      */
     public void addClustDelay() {
 
-        for (Iterator it = getJobList().iterator(); it.hasNext();) {
-            Job job = (Job) it.next();
-
-
+        for (Job job : getJobList()) {
             double delay = Parameters.getOverheadParams().getClustDelay(job);
             delay *= 1000; // the same ratio used when you parse a workflow
             long length = job.getCloudletLength();
             length += (long) delay;
             job.setCloudletLength(length);
-
         }
     }
 
@@ -249,25 +233,20 @@ public class BasicClustering implements ClusteringInterface {
      * Update the dependency issues between tasks/jobs
      */
     protected final void updateDependencies() {
-        for (Iterator it = getTaskList().iterator(); it.hasNext();) {
-            Task task = (Task) it.next();
-
+        for (Task task : getTaskList()) {
             Job job = (Job) getTask2Job().get(task);
-            for (Iterator itp = task.getParentList().iterator(); itp.hasNext();) {
-                Task parentTask = (Task) itp.next();
+            for (Task parentTask : task.getParentList()) {
                 Job parentJob = (Job) getTask2Job().get(parentTask);
                 if (!job.getParentList().contains(parentJob) && parentJob != job) {//avoid dublicate
                     job.addParent(parentJob);
                 }
             }
-            for (Iterator itc = task.getChildList().iterator(); itc.hasNext();) {
-                Task childTask = (Task) itc.next();
+            for (Task childTask : task.getChildList()) {
                 Job childJob = (Job) getTask2Job().get(childTask);
                 if (!job.getChildList().contains(childJob) && childJob != job) {//avoid dublicate
                     job.addChild(childJob);
                 }
             }
-
         }
         getTask2Job().clear();
         getTaskList().clear();
@@ -282,8 +261,7 @@ public class BasicClustering implements ClusteringInterface {
         if (root == null) {
             //bug maybe
             root = new Task(taskList.size() + 1, 0/*,0,0*/);
-            for (Iterator it = taskList.iterator(); it.hasNext();) {
-                Task node = (Task) it.next();
+            for (Task node : taskList) {
                 if (node.getParentList().isEmpty()) {
                     node.addParent(root);
                     root.addChild(node);
@@ -293,7 +271,6 @@ public class BasicClustering implements ClusteringInterface {
 
         }
         return root;
-
     }
 
     /**

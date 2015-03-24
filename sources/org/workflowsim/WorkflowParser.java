@@ -28,6 +28,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.workflowsim.utils.Parameters;
+import org.workflowsim.utils.Parameters.FileType;
 import org.workflowsim.utils.ReplicaCatalog;
 
 /**
@@ -56,7 +57,7 @@ public final class WorkflowParser {
      * User id. used to create a new task.
      */
     private final int userId;
-    
+
     /**
      * current job id. In case multiple workflow submission
      */
@@ -69,7 +70,7 @@ public final class WorkflowParser {
      */
     @SuppressWarnings("unchecked")
     public List<Task> getTaskList() {
-        return (List<Task>) taskList;
+        return taskList;
     }
 
     /**
@@ -97,7 +98,7 @@ public final class WorkflowParser {
         this.daxPath = Parameters.getDaxPath();
         this.daxPaths = Parameters.getDAXPaths();
         this.jobIdStartsFrom = 1;
-           
+
         setTaskList(new ArrayList<>());
     }
 
@@ -105,10 +106,10 @@ public final class WorkflowParser {
      * Start to parse a workflow which is a xml file(s).
      */
     public void parse() {
-        if(this.daxPath != null){
+        if (this.daxPath != null) {
             parseXmlFile(this.daxPath);
-        } else if(this.daxPaths != null){
-            for(String path: this.daxPaths){
+        } else if (this.daxPaths != null) {
+            for (String path : this.daxPaths) {
                 parseXmlFile(path);
             }
         }
@@ -124,8 +125,7 @@ public final class WorkflowParser {
         if (depth > task.getDepth()) {
             task.setDepth(depth);
         }
-        for (Iterator it = task.getChildList().iterator(); it.hasNext();) {
-            Task cTask = (Task) it.next();
+        for (Task cTask : task.getChildList()) {
             setDepth(cTask, task.getDepth() + 1);
         }
     }
@@ -141,161 +141,150 @@ public final class WorkflowParser {
             //parse using builder to get DOM representation of the XML file
             Document dom = builder.build(new File(path));
             Element root = dom.getRootElement();
-            List list = root.getChildren();
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                Element node = (Element) it.next();
-                if (node.getName().toLowerCase().equals("job")) {
+            List<Element> list = root.getChildren();
+            for (Element node : list) {
+                switch (node.getName().toLowerCase()) {
+                    case "job":
+                        long length = 0;
+                        String nodeName = node.getAttributeValue("id");
+                        String nodeType = node.getAttributeValue("name");
+                        /**
+                         * capture runtime. If not exist, by default the runtime
+                         * is 0.1. Otherwise CloudSim would ignore this task.
+                         * BUG/#11
+                         */
+                        double runtime;
+                        if (node.getAttributeValue("runtime") != null) {
+                            String nodeTime = node.getAttributeValue("runtime");
+                            runtime = 1000 * Double.parseDouble(nodeTime);
+                            if (runtime < 100) {
+                                runtime = 100;
+                            }
+                            length = (long) runtime;
+                        } else {
+                            Log.printLine("Cannot find runtime for " + nodeName + ",set it to be 0");
+                        }   //multiple the scale, by default it is 1.0
+                        length *= Parameters.getRuntimeScale();
+                        List<Element> fileList = node.getChildren();
+                        List<FileItem> mFileList = new ArrayList<>();
+                        for (Element file : fileList) {
+                            if (file.getName().toLowerCase().equals("uses")) {
+                                String fileName = file.getAttributeValue("name");//DAX version 3.3
+                                if (fileName == null) {
+                                    fileName = file.getAttributeValue("file");//DAX version 3.0
+                                }
+                                if (fileName == null) {
+                                    Log.print("Error in parsing xml");
+                                }
 
-                    long length = 0;
-                    String nodeName = node.getAttributeValue("id");
-                    String nodeType = node.getAttributeValue("name");
+                                String inout = file.getAttributeValue("link");
+                                double size = 0.0;
 
-                    /**
-                     * capture runtime. If not exist, by default the runtime is
-                     * 0.1. Otherwise CloudSim would ignore this task.
-                     * BUG/#11
-                     */
-                    double runtime = 0.1;
-                    if (node.getAttributeValue("runtime") != null) {
-                        String nodeTime = node.getAttributeValue("runtime");
-                        runtime = 1000 * Double.parseDouble(nodeTime);
-                        if (runtime < 100) {
-                            runtime = 100;
-                        }
-                        length = (long) runtime;
-                    } else {
-                        Log.printLine("Cannot find runtime for " + nodeName + ",set it to be 0");
-                    }
-                    //multiple the scale, by default it is 1.0
-                    length *= Parameters.getRuntimeScale();
-                    
-                    List fileList = node.getChildren();
+                                String fileSize = file.getAttributeValue("size");
+                                if (fileSize != null) {
+                                    size = Double.parseDouble(fileSize) /*/ 1024*/;
+                                } else {
+                                    Log.printLine("File Size not found for " + fileName);
+                                }
 
-                    List<org.cloudbus.cloudsim.File> mFileList = new ArrayList<>();
-
-                    for (Iterator itf = fileList.iterator(); itf.hasNext();) {
-                        Element file = (Element) itf.next();
-                        if (file.getName().toLowerCase().equals("uses")) {
-                            String fileName = file.getAttributeValue("name");//DAX version 3.3
-                            if (fileName == null) {
-                                fileName = file.getAttributeValue("file");//DAX version 3.0
-                            }
-                            if (fileName == null) {
-                                Log.print("Error in parsing xml");
-                            }
-
-                            String inout = file.getAttributeValue("link");
-                            double size = 0.0;
-                            
-                            String fileSize = file.getAttributeValue("size");
-                            if (fileSize != null) {
-                                size = Double.parseDouble(fileSize) /*/ 1024*/;
-                            } else {
-                                Log.printLine("File Size not found for " + fileName);
-                            }
-                            
-                            /**
-                             * a bug of cloudsim, size 0 causes a problem. 1 is
-                             * ok.
-                             */
-                            if (size == 0) {
-                                size++;
-                            }
-                            /**
-                             * Sets the file type 1 is input 2 is output
-                             */
-                            int type = 0;
-                            if (inout.equals("input")) {
-                                type = Parameters.FileType.INPUT.value;
-                            } else if (inout.equals("output")) {
-                                type = Parameters.FileType.OUTPUT.value;
-                            } else {
-                                Log.printLine("Parsing Error");
-                            }
-                            org.cloudbus.cloudsim.File tFile;
-                            /*
-                             * Already exists an input file (forget output file)
-                             */
-                            if (size < 0) {
-                                /*
-                                 * Assuming it is a parsing error
-                                 */
-                                size = 0 - size;
-                                Log.printLine("Size is negative, I assume it is a parser error");
-                            }
-                            /*
-                             * Note that CloudSim use size as MB, in this case we use it as Byte
-                             */
-                            if (type == Parameters.FileType.OUTPUT.value) {
                                 /**
-                                 * It is good that CloudSim does tell whether a
-                                 * size is zero
+                                 * a bug of cloudsim, size 0 causes a problem. 1
+                                 * is ok.
                                  */
-                                tFile = new org.cloudbus.cloudsim.File(fileName, (int) size);
-                            } else if (ReplicaCatalog.containsFile(fileName)) {
-                                tFile = ReplicaCatalog.getFile(fileName);
-                            } else {
+                                if (size == 0) {
+                                    size++;
+                                }
+                                /**
+                                 * Sets the file type 1 is input 2 is output
+                                 */
+                                FileType type = FileType.NONE;
+                                switch (inout) {
+                                    case "input":
+                                        type = FileType.INPUT;
+                                        break;
+                                    case "output":
+                                        type = FileType.OUTPUT;
+                                        break;
+                                    default:
+                                        Log.printLine("Parsing Error");
+                                        break;
+                                }
+                                FileItem tFile;
+                                /*
+                                 * Already exists an input file (forget output file)
+                                 */
+                                if (size < 0) {
+                                    /*
+                                     * Assuming it is a parsing error
+                                     */
+                                    size = 0 - size;
+                                    Log.printLine("Size is negative, I assume it is a parser error");
+                                }
+                                /*
+                                 * Note that CloudSim use size as MB, in this case we use it as Byte
+                                 */
+                                if (type == FileType.OUTPUT) {
+                                    /**
+                                     * It is good that CloudSim does tell
+                                     * whether a size is zero
+                                     */
+                                    tFile = new FileItem(fileName, size);
+                                } else if (ReplicaCatalog.containsFile(fileName)) {
+                                    tFile = ReplicaCatalog.getFile(fileName);
+                                } else {
 
-                                tFile = new org.cloudbus.cloudsim.File(fileName, (int) size);
-                                ReplicaCatalog.setFile(fileName, tFile);
+                                    tFile = new FileItem(fileName, size);
+                                    ReplicaCatalog.setFile(fileName, tFile);
+                                }
+
+                                tFile.setType(type);
+                                mFileList.add(tFile);
+
                             }
-
-                            tFile.setType(type);
-                            mFileList.add(tFile);
-
                         }
+                        Task task;
+                        //In case of multiple workflow submission. Make sure the jobIdStartsFrom is consistent.
+                        synchronized (this) {
+                            task = new Task(this.jobIdStartsFrom, length);
+                            this.jobIdStartsFrom++;
+                        }
+                        task.setType(nodeType);
+                        task.setUserId(userId);
+                        mName2Task.put(nodeName, task);
+                        for (FileItem file : mFileList) {
+                            task.addRequiredFile(file.getName());
+                        }
+                        task.setFileList(mFileList);
+                        this.getTaskList().add(task);
 
-                    }
-                    Task task;
-                    //In case of multiple workflow submission. Make sure the jobIdStartsFrom is consistent. 
-                    synchronized (this){
-                        task = new Task(this.jobIdStartsFrom, length);
-                        this.jobIdStartsFrom ++ ;
-                    }
-                    task.setType(nodeType);
+                        /**
+                         * Add dependencies info.
+                         */
+                        break;
+                    case "child":
+                        List<Element> pList = node.getChildren();
+                        String childName = node.getAttributeValue("ref");
+                        if (mName2Task.containsKey(childName)) {
 
-                    task.setUserId(userId);
-                    mName2Task.put(nodeName, task);
+                            Task childTask = (Task) mName2Task.get(childName);
 
-
-                    for (Iterator itm = mFileList.iterator(); itm.hasNext();) {
-                        org.cloudbus.cloudsim.File file = (org.cloudbus.cloudsim.File) itm.next();
-                        task.addRequiredFile(file.getName());
-                    }
-
-                    task.setFileList(mFileList);
-                    this.getTaskList().add(task);
-
-                    /**
-                     * Add dependencies info.
-                     */
-                } else if (node.getName().toLowerCase().equals("child")) {
-                    List pList = node.getChildren();
-                    String childName = node.getAttributeValue("ref");
-                    if (mName2Task.containsKey(childName)) {
-
-                        Task childTask = (Task) mName2Task.get(childName);
-
-                        for (Iterator itc = pList.iterator(); itc.hasNext();) {
-                            Element parent = (Element) itc.next();
-                            String parentName = parent.getAttributeValue("ref");
-                            if (mName2Task.containsKey(parentName)) {
-                                Task parentTask = (Task) mName2Task.get(parentName);
-                                parentTask.addChild(childTask);
-                                childTask.addParent(parentTask);
+                            for (Element parent : pList) {
+                                String parentName = parent.getAttributeValue("ref");
+                                if (mName2Task.containsKey(parentName)) {
+                                    Task parentTask = (Task) mName2Task.get(parentName);
+                                    parentTask.addChild(childTask);
+                                    childTask.addParent(parentTask);
+                                }
                             }
-
                         }
-                    }
+                        break;
                 }
-
             }
             /**
              * If a task has no parent, then it is root task.
              */
-            ArrayList roots = new ArrayList<Task>();
-            for (Iterator it = mName2Task.values().iterator(); it.hasNext();) {
-                Task task = (Task) it.next();
+            ArrayList roots = new ArrayList<>();
+            for (Task task : mName2Task.values()) {
                 task.setDepth(0);
                 if (task.getParentList().isEmpty()) {
                     roots.add(task);
@@ -310,7 +299,8 @@ public final class WorkflowParser {
                 setDepth(task, 1);
             }
             /**
-             * Clean them so as to save memory. Parsing workflow may take much memory
+             * Clean them so as to save memory. Parsing workflow may take much
+             * memory
              */
             this.mName2Task.clear();
 

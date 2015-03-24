@@ -46,7 +46,7 @@ public class Task extends Cloudlet {
     /*
      * The list of all files (input data and ouput data)
      */
-    private List<org.cloudbus.cloudsim.File> fileList;
+    private List<FileItem> fileList;
     /*
      * The priority used for research. Not used in current version. 
      */
@@ -71,7 +71,7 @@ public class Task extends Cloudlet {
      * The finish time of a task (Because cloudlet does not allow WorkflowSim to
      * update finish_time)
      */
-    private double task_finish_time;
+    private double taskFinishTime;
 
     /**
      * Allocates a new Task object. The task length should be greater than or
@@ -100,7 +100,7 @@ public class Task extends Cloudlet {
         this.parentList = new ArrayList<>();
         this.fileList = new ArrayList<>();
         this.impact = 0.0;
-        this.task_finish_time = -1.0;
+        this.taskFinishTime = -1.0;
     }
 
     /**
@@ -238,7 +238,7 @@ public class Task extends Cloudlet {
      * @pre $none
      * @post $none
      */
-    public List getFileList() {
+    public List<FileItem> getFileList() {
         return this.fileList;
     }
 
@@ -247,7 +247,7 @@ public class Task extends Cloudlet {
      *
      * @param file, the file to be added
      */
-    public void addFile(org.cloudbus.cloudsim.File file) {
+    public void addFile(FileItem file) {
         this.fileList.add(file);
     }
 
@@ -256,7 +256,7 @@ public class Task extends Cloudlet {
      *
      * @param list, the file list
      */
-    public void setFileList(List<org.cloudbus.cloudsim.File> list) {
+    public void setFileList(List<FileItem> list) {
         this.fileList = list;
     }
 
@@ -286,7 +286,7 @@ public class Task extends Cloudlet {
      * @param time finish time
      */
     public void setTaskFinishTime(double time) {
-        this.task_finish_time = time;
+        this.taskFinishTime = time;
     }
 
     /**
@@ -295,7 +295,7 @@ public class Task extends Cloudlet {
      * @return
      */
     public double getTaskFinishTime() {
-        return this.task_finish_time;
+        return this.taskFinishTime;
     }
 
     /**

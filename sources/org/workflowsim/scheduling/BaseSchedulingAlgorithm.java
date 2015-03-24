@@ -92,7 +92,9 @@ public abstract class BaseSchedulingAlgorithm implements SchedulingAlgorithmInte
 
     /**
      * The main function
+     * @throws java.lang.Exception
      */
+    @Override
     public abstract void run() throws Exception;
 
     /**

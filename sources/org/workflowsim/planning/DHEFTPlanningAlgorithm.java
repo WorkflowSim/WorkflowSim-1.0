@@ -16,10 +16,9 @@
 package org.workflowsim.planning;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import org.cloudbus.cloudsim.File;
 import org.cloudbus.cloudsim.Vm;
+import org.workflowsim.FileItem;
 import org.workflowsim.Task;
 import org.workflowsim.utils.Parameters;
 
@@ -64,8 +63,8 @@ public class DHEFTPlanningAlgorithm extends BasePlanningAlgorithm {
         double [][] earliestFinishTime = new double[taskNum + 1][vmNum];
         int [] allocation = new int[taskNum + 1];
         
-        List<Task> taskList = new ArrayList<Task>(getTaskList());
-        List<Task> readyList = new ArrayList<Task>();
+        List<Task> taskList = new ArrayList(getTaskList());
+        List<Task> readyList = new ArrayList<>();
         while(!taskList.isEmpty()){
             readyList.clear();
             for(Task task : taskList){
@@ -87,12 +86,10 @@ public class DHEFTPlanningAlgorithm extends BasePlanningAlgorithm {
                 int parentIndex = 0;
                 for(Task parent: task.getParentList()){
                     long fileSize = 0;
-                    for(Iterator fileIter = task.getFileList().iterator(); fileIter.hasNext();){
-                        File file = (File)fileIter.next();
-                        if(file.getType()==Parameters.FileType.INPUT.value){
-                            for(Iterator fileIter2 = parent.getFileList().iterator();fileIter2.hasNext();){
-                                File file2 = (File)fileIter2.next();
-                                if(file2.getType() == Parameters.FileType.OUTPUT.value && file2.getName().equals(file.getName()))
+                    for(FileItem file : task.getFileList()){
+                        if(file.getType()==Parameters.FileType.INPUT){
+                            for(FileItem file2 : parent.getFileList()){
+                                if(file2.getType() == Parameters.FileType.OUTPUT && file2.getName().equals(file.getName()))
                                 {
                                     fileSize += file.getSize();
                                 }

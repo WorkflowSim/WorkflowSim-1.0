@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import org.workflowsim.Task;
 import org.workflowsim.clustering.TaskSet;
@@ -50,35 +50,21 @@ public class HorizontalImpactBalancing extends BalancingMethod {
      */
     @Override
     public void run() {
-        Map<Integer, ArrayList<TaskSet>> map = getLevelMap();
-        for (Iterator it = map.values().iterator(); it.hasNext();) {
-            ArrayList<TaskSet> taskList = (ArrayList) it.next();
+        Map<Integer, List<TaskSet>> map = getLevelMap();
+        for (List<TaskSet> taskList : map.values()) {
             process(taskList);
-
-
         }
 
     }
-
-//    protected TaskSet getCandidateTastSet(ArrayList<TaskSet> taskList, TaskSet checkSet) {
-//        long min = taskList.get(0).getJobRuntime();
-//        for (TaskSet set : taskList) {
-//            if (set.getJobRuntime() == min && checkSet.getImpactFactor() == set.getImpactFactor()) {
-//                return set;
-//            }
-//        }
-//        return taskList.get(0);
-//
-//    }
 
     /**
      * Sort taskSet based on their impact factors and then merge similar taskSet together
      * @param taskList 
      */
-    public void process(ArrayList<TaskSet> taskList) {
+    public void process(List<TaskSet> taskList) {
 
         if (taskList.size() > getClusterNum()) {
-            ArrayList<TaskSet> jobList = new ArrayList<TaskSet>();
+            List<TaskSet> jobList = new ArrayList<>();
             for (int i = 0; i < getClusterNum(); i++) {
                 jobList.add(new TaskSet());
             }
@@ -87,10 +73,6 @@ public class HorizontalImpactBalancing extends BalancingMethod {
                 clusters_size ++;
             }
             sortListDecreasing(taskList);
-            //preprocessing(taskList, jobList);
-            
-            
-
             for (TaskSet set : taskList) {
                 //sortListIncreasing(jobList);
                 //Log.printLine(set.getJobRuntime());
@@ -106,34 +88,19 @@ public class HorizontalImpactBalancing extends BalancingMethod {
                 //update dependency
                 for (Task task : set.getTaskList()) {
                     getTaskMap().put(task, job);//this is enough
-                    //impact factor is not updated
                 }
-
             }
-
-//            Log.printLine("level");
-//            for(int i = 0; i < taskList.size();i++){
-//                TaskSet set = (TaskSet) (taskList.get(i));
-//                Log.printLine("TaskSet ");
-//                for(int j = 0; j < set.getTaskList().size(); j++){
-//                    Task task = set.getTaskList().get(j);
-//                    Log.printLine("Task: " + task.getImpact());
-//                }
-//            }
-            taskList.clear();//you sure?
-        } else {
-            //do nothing since 
-        }
-
-
+            taskList.clear();
+        } 
     }
 
     /**
      * Sort taskSet in an ascending order of impact factor
      * @param taskList taskSets to be sorted
      */
-    private void sortListIncreasing(ArrayList taskList) {
+    private void sortListIncreasing(List taskList) {
         Collections.sort(taskList, new Comparator<TaskSet>() {
+            @Override
             public int compare(TaskSet t1, TaskSet t2) {
                 //Decreasing order
                 return (int) (t1.getJobRuntime() - t2.getJobRuntime());
@@ -146,7 +113,7 @@ public class HorizontalImpactBalancing extends BalancingMethod {
      * Sort taskSet in a descending order of impact factor
      * @param taskList taskSets to be sorted
      */
-    private void sortListDecreasing(ArrayList taskList) {
+    private void sortListDecreasing(List taskList) {
         
         Collections.sort(taskList, new Comparator<TaskSet>() {
         @Override
@@ -176,90 +143,24 @@ public class HorizontalImpactBalancing extends BalancingMethod {
     
     }
     
-    
-//    private ArrayList preprocessing(ArrayList<TaskSet> taskList, ArrayList<TaskSet> jobList){
-//        int size = taskList.size();
-//        int [] record  = new int[size];
-//        for(int i = 0; i < size; i++){
-//            record[i]= -1;
-//        }
-//        int index_record = 0;
-//        
-//        int[][] distances = new int[size][size];
-//        
-//
-//        for(int i = 0; i < size; i++){
-//            for(int j = 0; j <i; j++){
-//                TaskSet setA = (TaskSet)taskList.get(i);
-//                TaskSet setB = (TaskSet)taskList.get(j);
-//                int distance ;//= calDistance(setA, setB);
-//                
-//                distances[i][j] = distance;
-//                
-//
-//                
-//                
-//
-//            }
-//        }
-//        int job_index = 0;
-//        //boolean [] popped = new boolean[size];
-//        ArrayList idList;// = sortDistanceIncreasing(distances, size, jobList.size());
-//        for(int i = 0; i < idList.size(); i++){
-//            int max_i = (Integer)idList.get(i);
-//                
-//                record[index_record] = max_i;
-//                index_record ++;
-//                TaskSet set = (TaskSet)taskList.get(max_i);
-//                TaskSet job = jobList.get(job_index);
-//                addTaskSet2TaskSet(set, job);
-//                job.addTask(set.getTaskList());
-//                job.setImpactFafctor(set.getImpactFactor());
-//                //update dependency
-//                for (Task task : set.getTaskList()) {
-//                    getTaskMap().put(task, job);//this is enough
-//                    //impact factor is not updated
-//                }
-//                job_index ++;
-//                if(job_index == jobList.size()){
-//                    break;
-//                }
-//            
-//        }
-//
-//
-//        /**
-//         * Actually not really necessary because record[i] is already empty
-//         */
-//        Arrays.sort(record);
-//        for(int i = size -1 ;i>=0 && record[i]>=0;i--){
-//            taskList.remove(record[i]);
-//            
-//            
-//        }
-//        
-//        return taskList;
-//        
-//    }
-//favor empty set
-    private ArrayList<TaskSet> getNextPotentialTaskSets(ArrayList<TaskSet> taskList, 
+    private List<TaskSet> getNextPotentialTaskSets(List<TaskSet> taskList, 
                                             TaskSet checkSet, int clusters_size){
 
-        HashMap map = new HashMap<Double, ArrayList>();
+        Map<Double, List<TaskSet>> map = new HashMap<>();
         
         for (TaskSet set : taskList) {
                 double factor = set.getImpactFactor();
 
                 if(!map.containsKey(factor)){
-                    map.put(factor, new ArrayList<TaskSet>());
+                    map.put(factor, new ArrayList<>());
                 }
-                ArrayList<TaskSet> list = (ArrayList)map.get(factor);
+                List<TaskSet> list = map.get(factor);
                 if(!list.contains(set)){
                     list.add(set);
                 }
         }
-        ArrayList returnList = new ArrayList<TaskSet> ();
-        ArrayList<TaskSet> mapSet = (ArrayList<TaskSet>)map.get(checkSet.getImpactFactor());
+        List<TaskSet> returnList = new ArrayList<> ();
+        List<TaskSet> mapSet = map.get(checkSet.getImpactFactor());
         if(mapSet!=null && !mapSet.isEmpty()){
             for(TaskSet set: mapSet){
                 if(set.getTaskList().size() < clusters_size){
@@ -269,7 +170,7 @@ public class HorizontalImpactBalancing extends BalancingMethod {
         }
         
         if(returnList.isEmpty()){
-            ArrayList<TaskSet> zeros = (ArrayList<TaskSet>)map.get(0.0);
+            List<TaskSet> zeros = map.get(0.0);
             if(zeros!=null && !zeros.isEmpty())
             {
                 returnList.addAll(zeros);
@@ -288,7 +189,7 @@ public class HorizontalImpactBalancing extends BalancingMethod {
             //no empty available
             while(returnList.isEmpty() ){
                 
-                ArrayList<Double> keys = new ArrayList(map.keySet());
+                List<Double> keys = new ArrayList(map.keySet());
                 double min = Double.MAX_VALUE;
                 
                 double min_i = -1;
@@ -300,7 +201,7 @@ public class HorizontalImpactBalancing extends BalancingMethod {
                     }
                 }
                 if(min_i>=0){
-                    for(TaskSet set: (ArrayList<TaskSet>)map.get(min_i)){
+                    for(TaskSet set: map.get(min_i)){
                         if(set.getTaskList().size() < clusters_size){
                             returnList.add(set);
                         }
@@ -310,14 +211,8 @@ public class HorizontalImpactBalancing extends BalancingMethod {
                 }
                 map.remove(min_i);
             }
-            
-            return returnList;
-            
-        }else{
-            
-            return returnList;
         }
-        
+        return returnList;            
 
     }
     
@@ -326,15 +221,16 @@ public class HorizontalImpactBalancing extends BalancingMethod {
      * Gets the potential candidate taskSets to merge
      * @param taskList
      * @param checkSet
+     * @param clusters_size
      * @return 
      */
-    protected TaskSet getCandidateTastSet(ArrayList<TaskSet> taskList, 
+    protected TaskSet getCandidateTastSet(List<TaskSet> taskList, 
                                             TaskSet checkSet, 
                                             int clusters_size) {
         
         
         
-        ArrayList<TaskSet> potential = null;
+        List<TaskSet> potential = null;
         try{
             potential=getNextPotentialTaskSets(taskList, checkSet,  clusters_size);
         }catch (Exception e)
@@ -355,9 +251,5 @@ public class HorizontalImpactBalancing extends BalancingMethod {
         } else {
             return taskList.get(0);
         }
-        
-
     }
-
-
 }

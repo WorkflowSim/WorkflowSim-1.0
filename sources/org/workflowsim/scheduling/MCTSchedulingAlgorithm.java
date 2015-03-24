@@ -60,7 +60,6 @@ public class MCTSchedulingAlgorithm extends BaseSchedulingAlgorithm {
                 if ((vm.getState() == WorkflowSimTags.VM_STATUS_IDLE)
                         && (vm.getCurrentRequestedTotalMips() > firstIdleVm.getCurrentRequestedTotalMips())) {
                     firstIdleVm = vm;
-
                 }
             }
             firstIdleVm.setState(WorkflowSimTags.VM_STATUS_BUSY);
@@ -69,9 +68,6 @@ public class MCTSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             Log.printLine("Schedules " + cloudlet.getCloudletId() + " with "
                     + cloudlet.getCloudletLength() + " to VM " + firstIdleVm.getId()
                     + " with " + firstIdleVm.getCurrentRequestedTotalMips());
-
-
-
         }
     }
 }

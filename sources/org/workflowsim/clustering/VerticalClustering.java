@@ -34,9 +34,9 @@ import org.workflowsim.utils.Parameters;
 public class VerticalClustering extends BasicClustering {
 
     /* The maximum depth to explore. */
-    private int mDepth;
+    private final int mDepth;
     /* The checkpoint map. */
-    private Map mHasChecked;
+    private final Map<Integer, Boolean> mHasChecked;
 
     /**
      * Initialize a VeriticalClustering object
@@ -46,7 +46,7 @@ public class VerticalClustering extends BasicClustering {
     public VerticalClustering(int depth) {
         super();
         this.mDepth = depth;
-        this.mHasChecked = new HashMap<Integer, Boolean>();
+        this.mHasChecked = new HashMap<>();
 
     }
 
@@ -73,7 +73,7 @@ public class VerticalClustering extends BasicClustering {
     private boolean getCheck(int index) {
 
         if (mHasChecked.containsKey(index)) {
-            return (Boolean) mHasChecked.get(index);
+            return mHasChecked.get(index);
         }
         return false;
     }
@@ -91,9 +91,9 @@ public class VerticalClustering extends BasicClustering {
                 removeDuplicateMontage();
             }
             Task root = super.addRoot();
-            Task node = root;
-            ArrayList taskList = new ArrayList<Task>();
-            Stack stack = new Stack<Task>();
+            Task node;
+            List<Task> taskList = new ArrayList<>();
+            Stack<Task> stack = new Stack<>();
             stack.push(root);
             while (!stack.empty()) {
                 node = (Task) stack.pop();
@@ -103,8 +103,7 @@ public class VerticalClustering extends BasicClustering {
                     int pNum = node.getParentList().size();
                     int cNum = node.getChildList().size();
 
-                    for (Iterator it = node.getChildList().iterator(); it.hasNext();) {
-                        Task cNode = (Task) it.next();
+                    for (Task cNode : node.getChildList()) {
                         stack.push(cNode);
                     }
 
@@ -112,7 +111,6 @@ public class VerticalClustering extends BasicClustering {
                         //root skip it
                     } else if (pNum > 1) {
                         if (cNum > 1 || cNum == 0) {
-
 
                             if (!taskList.isEmpty()) {
                                 addTasks2Job(taskList);
@@ -153,15 +151,10 @@ public class VerticalClustering extends BasicClustering {
                         taskList.clear();
                     }
                 }
-
-
-
             }
-
         }
         mHasChecked.clear();
-        super.clean();
-        
+        super.clean();        
         updateDependencies();
         addClustDelay();
     }
@@ -172,35 +165,34 @@ public class VerticalClustering extends BasicClustering {
     public void removeDuplicateMontage() {
 
         List jobList = this.getTaskList();
-        for (int i = 0; i < jobList.size(); i++) {
-            Task node = (Task) jobList.get(i);
+        for (Object jobList1 : jobList) {
+            Task node = (Task) jobList1;
             String name = node.getType();
-            if (name.equals("mBackground")) {
-                //remove all of its parents of mProjectPP
-
-                for (int j = 0; j < node.getParentList().size(); j++) {
-
-                    Task parent = (Task) node.getParentList().get(j);
-                    if (parent.getType().equals("mProjectPP")) {
-                        j--;
-                        node.getParentList().remove(parent);
-                        parent.getChildList().remove(node);
+            switch (name) {
+                case "mBackground":
+                    //remove all of its parents of mProjectPP
+                    
+                    for (int j = 0; j < node.getParentList().size(); j++) {
+                        
+                        Task parent = (Task) node.getParentList().get(j);
+                        if (parent.getType().equals("mProjectPP")) {
+                            j--;
+                            node.getParentList().remove(parent);
+                            parent.getChildList().remove(node);
+                        }
+                    }   break;
+                case "mAdd":
+                    for (int j = 0; j < node.getParentList().size(); j++) {
+                        
+                        Task parent = (Task) node.getParentList().get(j);
+                        String pName = parent.getType();
+                        if (pName.equals("mBackground") || pName.equals("mShrink")) {
+                            j--;
+                            node.getParentList().remove(parent);
+                            parent.getChildList().remove(node);
                     }
-                }
-
-            } else if (name.equals("mAdd")) {
-                for (int j = 0; j < node.getParentList().size(); j++) {
-
-                    Task parent = (Task) node.getParentList().get(j);
-                    String pName = parent.getType();
-                    if (pName.equals("mBackground") || pName.equals("mShrink")) {
-                        j--;
-                        node.getParentList().remove(parent);
-                        parent.getChildList().remove(node);
-                    }
-                }
+                }   break;
             }
         }
-
     }
 }

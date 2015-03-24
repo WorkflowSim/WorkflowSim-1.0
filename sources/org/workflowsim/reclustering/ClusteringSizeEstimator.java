@@ -17,8 +17,6 @@
  */
 package org.workflowsim.reclustering;
 
-import org.cloudbus.cloudsim.Log;
-
 /**
  * This ClusteringSizeEstimator estimates the optimal size of task clustering.
  *
@@ -35,7 +33,8 @@ public class ClusteringSizeEstimator {
      * @param t task runtime
      * @param s system overhead
      * @param theta parameter in estimating inter-arrival time
-     * @param phi parameter of Weibull
+     * @param phi_gamma
+     * @param phi_ts
      * @return the makespan
      */
     protected static double f(double k, double t, double s, double theta, double phi_gamma, double phi_ts) {
@@ -65,7 +64,8 @@ public class ClusteringSizeEstimator {
      * @param t task runtime
      * @param s system overhead
      * @param theta parameter in estimating inter-arrival time
-     * @param phi parameter of Weibull
+     * @param phi_gamma
+     * @param phi_ts
      * @return the optimal K
      */
     public static int estimateK(double t, double s, double theta, double phi_gamma, double phi_ts) {

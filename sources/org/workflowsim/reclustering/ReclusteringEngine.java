@@ -66,7 +66,6 @@ public class ReclusteringEngine {
                     cJob.addParent(newJob);
                 }
             }
-
             return newJob;
         } catch (Exception e) {
             e.printStackTrace();
@@ -139,16 +138,15 @@ public class ReclusteringEngine {
      * @param list, the list to process
      * @return a map with key equals to depth
      */
-    private static Map getDepthMap(List list) {
-        Map map = new HashMap<Integer, List>();
+    private static Map<Integer, List<Task>> getDepthMap(List<Task> list) {
+        Map<Integer, List<Task>> map = new HashMap<>();
 
-        for (Iterator it = list.iterator(); it.hasNext();) {
-            Task task = (Task) it.next();
+        for (Task task : list) {
             int depth = task.getDepth();
             if (!map.containsKey(depth)) {
-                map.put(depth, new ArrayList<Task>());
+                map.put(depth, new ArrayList<>());
             }
-            List dl = (List) map.get(depth);
+            List<Task> dl = map.get(depth);
             if (!dl.contains(task)) {
                 dl.add(task);
             }
@@ -164,11 +162,10 @@ public class ReclusteringEngine {
      * @param map
      * @return the minimum key in Map
      */
-    private static int getMin(Map map) {
+    private static int getMin(Map<Integer, List<Task>> map) {
         if (map != null && !map.isEmpty()) {
             int min = Integer.MAX_VALUE;
-            for (Iterator it = map.keySet().iterator(); it.hasNext();) {
-                int value = (Integer) it.next();
+            for (int value : map.keySet()) {
                 if (value < min) {
                     min = value;
                 }
@@ -184,10 +181,9 @@ public class ReclusteringEngine {
      * @param list
      * @return boolean whether this list has failed task
      */
-    private static boolean checkFailed(List list) {
+    private static boolean checkFailed(List<Task> list) {
         boolean all = false;
-        for (Iterator it = list.iterator(); it.hasNext();) {
-            Task task = (Task) it.next();
+        for (Task task : list) {
             if (task.getCloudletStatus() == Cloudlet.FAILED) {
                 all = true;
                 break;
@@ -204,8 +200,8 @@ public class ReclusteringEngine {
      * @param id, job id
      * @return
      */
-    private static List VerticalReclustering(List jobList, Job job, int id) {
-        Map map = getDepthMap(job.getTaskList());
+    private static List<Job> VerticalReclustering(List<Job> jobList, Job job, int id) {
+        Map<Integer, List<Task>> map = getDepthMap(job.getTaskList());
         
         /**
          * If it has just one level
@@ -219,17 +215,17 @@ public class ReclusteringEngine {
         int min = getMin(map);
         int max = min + map.size() - 1;
         int mid = (min + max) / 2;
-        List listUp = new ArrayList<Task>();
-        List listDown = new ArrayList<Task>();
+        List listUp = new ArrayList<>();
+        List listDown = new ArrayList<>();
         for (int i = min; i < min + map.size(); i++) {
-            List list = (List) map.get(i);
+            List<Task> list = map.get(i);
             if (i <= mid) {
                 listUp.addAll(list);
             } else {
                 listDown.addAll(list);
             }
         }
-        List newUpList = DCReclustering(new ArrayList(), job, id, listUp);
+        List<Job> newUpList = DCReclustering(new ArrayList(), job, id, listUp);
         id += newUpList.size();
         jobList.addAll(newUpList);
         jobList.addAll(DCReclustering(new ArrayList(), job, id, listDown));
@@ -280,9 +276,9 @@ public class ReclusteringEngine {
      * @param allTaskList, all the task List
      * @return
      */
-    private static List DCReclustering(List jobList, Job job, int id, List allTaskList) {
+    private static List<Job> DCReclustering(List<Job> jobList, Job job, int id, List<Task> allTaskList) {
 
-        Task firstTask = (Task) allTaskList.get(0);
+        Task firstTask = allTaskList.get(0);
         //Definition of FailureRecord(long length, int tasks, int depth, int all, int vm, int job, int workflow)
         /**
          * @TODO do not know why it is here
@@ -298,19 +294,19 @@ public class ReclusteringEngine {
         } else {
 
             int actualK = 0;
-            List taskList = new ArrayList();
-            List<Job> retryJobs = new ArrayList();
+            List<Task> taskList = new ArrayList<>();
+            List<Job> retryJobs = new ArrayList<>();
             long length = 0;
             Job newJob = createJob(id, job, 0, null, false);
-            for (int i = 0; i < allTaskList.size(); i++) {
-                Task task = (Task) allTaskList.get(i);
+            for (Task allTaskList1 : allTaskList) {
+                Task task = (Task) allTaskList1;
                 if (actualK < suggestedK) {
                     actualK++;
                     taskList.add(task);
                     length += task.getCloudletLength();
                 } else {
                     newJob.setTaskList(taskList);
-                    taskList = new ArrayList();
+                    taskList = new ArrayList<>();
                     newJob.setCloudletLength(length);
                     length = 0;
                     retryJobs.add(newJob);
@@ -341,19 +337,16 @@ public class ReclusteringEngine {
      * @param id, job id
      * @return
      */
-    private static List SRReclustering(List jobList, Job job, int id) {
-        int size = job.getTaskList().size();
-        List newTaskList = new ArrayList();
+    private static List<Job> SRReclustering(List<Job> jobList, Job job, int id) {
+        List<Task> newTaskList = new ArrayList<>();
         long length = 0;
-        for (int i = 0; i < size; i++) {
-            Task task = (Task) job.getTaskList().get(i);
+        for (Task task : job.getTaskList()) {
             if (task.getCloudletStatus() == Cloudlet.FAILED) {
                 newTaskList.add(task);
                 length += task.getCloudletLength();
             } else {
             }
         }
-        //Log.printLine("WARNING: Doesn't consider the data transfer problem");
         jobList.add(createJob(id, job, length, newTaskList, true));
         return jobList;
     }
@@ -432,8 +425,8 @@ public class ReclusteringEngine {
      * @param allTaskList, all task list
      * @return
      */
-    private static List DRReclustering(List jobList, Job job, int id, List allTaskList) {
-        Task firstTask = (Task) allTaskList.get(0);
+    private static List DRReclustering(List<Job> jobList, Job job, int id, List<Task> allTaskList) {
+        Task firstTask = allTaskList.get(0);
       
         /**
          * Do not know why it is here. It is hard-coded, right?
@@ -445,7 +438,7 @@ public class ReclusteringEngine {
         double phi_ts = getOverheadLikelihoodPrior(job.getDepth());
         double delay = getCumulativeDelay(job.getDepth());
         //record.delayLength = getCumulativeDelay(job.getDepth());
-        int suggestedK = 0;//FailureMonitor.getClusteringFactor(record);
+        int suggestedK;//FailureMonitor.getClusteringFactor(record);
         
         double theta = FailureParameters.getGenerator(job.getVmId(), job.getDepth()).getMLEMean();
         
@@ -460,12 +453,11 @@ public class ReclusteringEngine {
         } else {
 
             int actualK = 0;
-            List taskList = new ArrayList();
-            List<Job> retryJobs = new ArrayList();
+            List<Task> taskList = new ArrayList<>();
+            List<Job> retryJobs = new ArrayList<>();
             long length = 0;
             Job newJob = createJob(id, job, 0, null, false);
-            for (int i = 0; i < allTaskList.size(); i++) {
-                Task task = (Task) allTaskList.get(i);
+            for (Task task : allTaskList) {
                 if (task.getCloudletStatus() == Cloudlet.FAILED) {//This is the difference
                     if (actualK < suggestedK) {
                         actualK++;
@@ -512,6 +504,5 @@ public class ReclusteringEngine {
             Job childJob = (Job) childTask;
             childJob.getParentList().addAll(jobList);
         }
-        
     }
 }

@@ -16,6 +16,7 @@
 package org.workflowsim.clustering;
 
 import java.util.List;
+import org.workflowsim.FileItem;
 import org.workflowsim.Job;
 import org.workflowsim.Task;
 
@@ -30,16 +31,19 @@ public interface ClusteringInterface {
 
     /**
      * set the task list.
+     * @param list
      */
     public void setTaskList(List<Task> list);
 
     /**
      * get job list.
+     * @return 
      */
     public List<Job> getJobList();
 
     /**
      * get task list.
+     * @return 
      */
     public List<Task> getTaskList();
 
@@ -50,6 +54,7 @@ public interface ClusteringInterface {
 
     /**
      * get all the task files.
+     * @return 
      */
-    public List<org.cloudbus.cloudsim.File> getTaskFiles();
+    public List<FileItem> getTaskFiles();
 }

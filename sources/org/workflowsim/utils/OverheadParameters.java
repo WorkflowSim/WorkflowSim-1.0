@@ -33,27 +33,27 @@ public class OverheadParameters {
     /**
      * The interval of workflow engine delay
      */
-    private int WED_INTERVAL;
+    private final int WED_INTERVAL;
     /**
      * The bandwidth
      */
-    private double bandwidth;
+    private final double bandwidth;
     /**
      * The list of workflow engine delay key = level value = delay
      */
-    private Map<Integer, DistributionGenerator> WED_DELAY;
+    private final Map<Integer, DistributionGenerator> WED_DELAY;
     /**
      * The list of queue delay key = level value = delay
      */
-    private Map<Integer, DistributionGenerator> QUEUE_DELAY;
+    private final Map<Integer, DistributionGenerator> QUEUE_DELAY;
     /**
      * The list of postscript delay key = level value = delay
      */
-    private Map<Integer, DistributionGenerator> POST_DELAY;
+    private final Map<Integer, DistributionGenerator> POST_DELAY;
     /**
      * The list of clustering delay key = level value = delay
      */
-    private Map<Integer, DistributionGenerator> CLUST_DELAY;
+    private final Map<Integer, DistributionGenerator> CLUST_DELAY;
 
     /**
      * Created a new OverheadParameters object.
@@ -214,7 +214,7 @@ public class OverheadParameters {
     /**
      * Gets the postscript delay for a particular job based on the depth(level)
      *
-     * @param cl, the job
+     * @param job
      * @return the postscript delay
      * @pre $none
      * @post $none
@@ -246,7 +246,7 @@ public class OverheadParameters {
      * Gets the workflow engine delay for a particular job based on the
      * depth(level)
      *
-     * @param cl, the job
+     * @param list
      * @return the workflow engine delay
      * @pre $none
      * @post $none

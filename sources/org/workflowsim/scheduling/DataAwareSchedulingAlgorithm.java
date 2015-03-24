@@ -15,12 +15,10 @@
  */
 package org.workflowsim.scheduling;
 
-import java.util.Iterator;
 import java.util.List;
 import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.File;
-import org.cloudbus.cloudsim.Log;
 import org.workflowsim.CondorVM;
+import org.workflowsim.FileItem;
 import org.workflowsim.Job;
 import org.workflowsim.WorkflowSimTags;
 import org.workflowsim.utils.Parameters.FileType;
@@ -56,8 +54,6 @@ public class DataAwareSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             for (int j = 0; j < vmSize; j++) {
                 CondorVM vm = (CondorVM) getVmList().get(j);
                 if (vm.getState() == WorkflowSimTags.VM_STATUS_IDLE) {
-                   
-                    
                     Job job = (Job)cloudlet;
                     double time = dataTransferTime(job.getFileList(), cloudlet, vm.getId());
                     if(time < minTime){
@@ -72,18 +68,8 @@ public class DataAwareSchedulingAlgorithm extends BaseSchedulingAlgorithm {
                 closestVm.setState(WorkflowSimTags.VM_STATUS_BUSY);
                 cloudlet.setVmId(closestVm.getId());
                 getScheduledList().add(cloudlet);
-            
-            
-            
-            Log.printLine("Schedules " + cloudlet.getCloudletId() + " with "
-                    + cloudlet.getCloudletLength() + " to VM " + closestVm.getId() 
-                    +" with " + closestVm.getCurrentRequestedTotalMips() + " and data is " + minTime);
             }
-
-
-
         }
-
     }
     
        /**
@@ -98,15 +84,15 @@ public class DataAwareSchedulingAlgorithm extends BaseSchedulingAlgorithm {
      * @pre $none
      * @post $none
      */
-    private boolean isRealInputFile(List<File> list, File file) {
-        if (file.getType() == FileType.INPUT.value)//input file
+    private boolean isRealInputFile(List<FileItem> list, FileItem file) {
+        if (file.getType() == FileType.INPUT)//input file
         {
-            for (File another : list) {
+            for (FileItem another : list) {
                 if (another.getName().equals(file.getName())
                         /**
                          * if another file is output file
                          */
-                        && another.getType() == FileType.OUTPUT.value) {
+                        && another.getType() == FileType.OUTPUT) {
                     return false;
                 }
             }
@@ -122,39 +108,26 @@ public class DataAwareSchedulingAlgorithm extends BaseSchedulingAlgorithm {
      * @post $none
      */
 
-    protected double dataTransferTime(List<File> requiredFiles, Cloudlet cl, int vmId)  {
+    protected double dataTransferTime(List<FileItem> requiredFiles, Cloudlet cl, int vmId)  {
         double time = 0.0;
 
-        Iterator<File> iter = requiredFiles.iterator();
-        while (iter.hasNext()) {
-
-            File file = iter.next();
-
+        for (FileItem file : requiredFiles) {
             //The input file is not an output File 
             if (isRealInputFile(requiredFiles, file)) {
-                List siteList = ReplicaCatalog.getStorageList(file.getName());
-                if (siteList.isEmpty()) {
-                    
-                }
+                List<String> siteList = ReplicaCatalog.getStorageList(file.getName());
 
                 boolean hasFile = false;
-                for (Iterator it = siteList.iterator(); it.hasNext();) {
-                    //site is where one replica of this data is located at
-                    String site = (String) it.next();
-
+                for (String site : siteList) {
                     if(site.equals(Integer.toString(vmId))){
                         hasFile = true;
                         break;
                     }
-
                 }
                 if(!hasFile){
                     time += file.getSize() ;
                 }
-
             }
         }
-
         return time;
     }
 }

@@ -195,7 +195,6 @@ public class DistributionGenerator {
     /**
      * Merge two arrays
      *
-     * @param <T> array type
      * @param first first array
      * @param second second array
      * @return new array

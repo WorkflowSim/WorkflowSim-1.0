@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import org.workflowsim.Job;
@@ -36,15 +37,15 @@ public class HorizontalClustering extends BasicClustering {
     /**
      * The number of clustered jobs per level.
      */
-    private int clusterNum;
+    private final int clusterNum;
     /**
      * The number of tassk in a job.
      */
-    private int clusterSize;
+    private final int clusterSize;
     /**
      * The map from depth to tasks at that depth.
      */
-    private Map mDepth2Task;
+    private final Map<Integer, List> mDepth2Task;
 
     /**
      * Initialize a HorizontalClustering Either clusterNum or clusterSize should
@@ -57,7 +58,7 @@ public class HorizontalClustering extends BasicClustering {
         super();
         this.clusterNum = clusterNum;
         this.clusterSize = clusterSize;
-        this.mDepth2Task = new HashMap<Integer, Map>();
+        this.mDepth2Task = new HashMap<>();
 
     }
 
@@ -71,9 +72,9 @@ public class HorizontalClustering extends BasicClustering {
                 Task task = (Task) it.next();
                 int depth = task.getDepth();
                 if (!mDepth2Task.containsKey(depth)) {
-                    mDepth2Task.put(depth, new ArrayList<Task>());
+                    mDepth2Task.put(depth, new ArrayList<>());
                 }
-                ArrayList list = (ArrayList) mDepth2Task.get(depth);
+                List list = mDepth2Task.get(depth);
                 if (!list.contains(task)) {
                     list.add(task);
                 }
@@ -101,9 +102,8 @@ public class HorizontalClustering extends BasicClustering {
      */
     private void bundleClustering() {
 
-        for (Iterator it = mDepth2Task.entrySet().iterator(); it.hasNext();) {
-            Map.Entry pairs = (Map.Entry<Integer, ArrayList>) it.next();
-            ArrayList list = (ArrayList) pairs.getValue();
+        for (Map.Entry<Integer, List> pairs : mDepth2Task.entrySet()) {
+            List list = pairs.getValue();
 
             long seed = System.nanoTime();
             Collections.shuffle(list, new Random(seed));
@@ -154,9 +154,8 @@ public class HorizontalClustering extends BasicClustering {
      * Merges a fixed number of tasks into a job
      */
     private void collapseClustering() {
-        for (Iterator it = mDepth2Task.entrySet().iterator(); it.hasNext();) {
-            Map.Entry pairs = (Map.Entry<Integer, ArrayList>) it.next();
-            ArrayList list = (ArrayList) pairs.getValue();
+        for (Map.Entry<Integer, List> pairs : mDepth2Task.entrySet()) {
+            List list = pairs.getValue();
 
             long seed = System.nanoTime();
             Collections.shuffle(list, new Random(seed));

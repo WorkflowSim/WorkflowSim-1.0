@@ -31,10 +31,6 @@ import org.workflowsim.utils.ReplicaCatalog.FileSystem;
 public class CondorVM extends Vm {
 
     /*
-     * The local storage system a vm has if file.system=LOCAL
-     */
-    private ClusterStorage storage;
-    /*
      * The state of a vm. It should be either WorkflowSimTags.VM_STATUS_IDLE
      * or VM_STATUS_READY (not used in workflowsim) or VM_STATUS_BUSY
      */
@@ -97,15 +93,6 @@ public class CondorVM extends Vm {
          * At the beginning all vm status is idle. 
          */
         setState(WorkflowSimTags.VM_STATUS_IDLE);
-        /*
-         * If the file.system is LOCAL, we should add a clusterStorage to vm. 
-         */
-        if (ReplicaCatalog.getFileSystem() == FileSystem.LOCAL) {
-            try {
-                storage = new ClusterStorage(Integer.toString(id), 1e6);
-            } catch (Exception e) {
-            }
-        }
     }
 
     /**
@@ -209,45 +196,5 @@ public class CondorVM extends Vm {
      */
     public final int getState() {
         return this.state;
-    }
-
-    /**
-     * Adds a file to the local file system
-     *
-     * @param file to file to be added to the local
-     * @pre $none
-     * @post $none
-     */
-    public void addLocalFile(org.cloudbus.cloudsim.File file) {
-        if (this.storage != null) {
-            this.storage.addFile(file);
-        } else {
-        }
-    }
-
-    /**
-     * Removes a file from the local file system
-     *
-     * @param file to file to be removed to the local
-     * @pre $none
-     * @post $none
-     */
-    public void removeLocalFile(org.cloudbus.cloudsim.File file) {
-        if (this.storage != null) {
-            this.storage.deleteFile(file);
-        }
-    }
-
-    /**
-     * Tells whether a file is in the local file system
-     *
-     * @param file
-     * @return whether the file exists in the local file system
-     */
-    public boolean hasLocalFile(org.cloudbus.cloudsim.File file) {
-        if (this.storage != null) {
-            return this.storage.contains(file);
-        }
-        return false;
     }
 }

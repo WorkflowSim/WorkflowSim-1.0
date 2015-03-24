@@ -22,7 +22,6 @@ import org.cloudbus.cloudsim.CloudletScheduler;
 import org.cloudbus.cloudsim.Consts;
 import org.cloudbus.cloudsim.Datacenter;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
-import org.cloudbus.cloudsim.File;
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.Storage;
@@ -196,10 +195,9 @@ public class WorkflowDatacenter extends Datacenter {
      */
     private void stageInFile2FileSystem(Cloudlet cl) {
         Task t1 = (Task) cl;
-        List fList = t1.getFileList();
+        List<FileItem> fList = t1.getFileList();
 
-        for (Iterator it = fList.iterator(); it.hasNext();) {
-            org.cloudbus.cloudsim.File file = (org.cloudbus.cloudsim.File) it.next();
+        for (FileItem file : fList) {
             switch (ReplicaCatalog.getFileSystem()) {
                 /**
                  * For local file system, add it to local storage (data center
@@ -238,15 +236,15 @@ public class WorkflowDatacenter extends Datacenter {
      * @pre $none
      * @post $none
      */
-    private boolean isRealInputFile(List<File> list, File file) {
-        if (file.getType() == FileType.INPUT.value)//input file
+    private boolean isRealInputFile(List<FileItem> list, FileItem file) {
+        if (file.getType() == FileType.INPUT)//input file
         {
-            for (File another : list) {
+            for (FileItem another : list) {
                 if (another.getName().equals(file.getName())
                         /**
                          * if another file is output file
                          */
-                        && another.getType() == FileType.OUTPUT.value) {
+                        && another.getType() == FileType.OUTPUT) {
                     return false;
                 }
             }
@@ -262,11 +260,9 @@ public class WorkflowDatacenter extends Datacenter {
      * @post $none
      */
 
-    protected double processDataStageIn(List<File> requiredFiles, Cloudlet cl) throws Exception {
+    protected double processDataStageIn(List<FileItem> requiredFiles, Cloudlet cl) throws Exception {
         double time = 0.0;
-        Iterator<File> iter = requiredFiles.iterator();
-        while (iter.hasNext()) {
-            File file = iter.next();
+        for (FileItem file : requiredFiles) {
             //The input file is not an output File 
             if (isRealInputFile(requiredFiles, file)) {
                 double maxBwth = 0.0;
