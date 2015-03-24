@@ -288,8 +288,7 @@ public class WorkflowDatacenter extends Datacenter {
                             }
                         }
                         //Storage storage = getStorageList().get(0);
-                        time += file.getSize() / (double) Consts.MILLION / maxRate;
-                        
+                        time += file.getSize() / (double) Consts.MILLION / maxRate;                        
                         break;
                     case LOCAL:
                         int vmId = cl.getVmId();
