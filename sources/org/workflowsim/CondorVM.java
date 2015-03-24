@@ -17,8 +17,6 @@ package org.workflowsim;
 
 import org.cloudbus.cloudsim.CloudletScheduler;
 import org.cloudbus.cloudsim.Vm;
-import org.workflowsim.utils.ReplicaCatalog;
-import org.workflowsim.utils.ReplicaCatalog.FileSystem;
 
 /**
  * Condor Vm extends a VM: the difference is it has a locl storage system and it

@@ -59,7 +59,6 @@ public class BlockClustering extends BasicClustering {
         clusterSize = cSize;
         this.mHasChecked = new HashMap<>();
         this.mDepth2Task = new HashMap<>();
-
     }
 
     /**
