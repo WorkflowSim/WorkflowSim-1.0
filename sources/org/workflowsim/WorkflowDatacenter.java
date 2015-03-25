@@ -128,10 +128,9 @@ public class WorkflowDatacenter extends Datacenter {
             /**
              * Add data transfer time (communication cost
              */
-
             double fileTransferTime = 0.0;
-            if (job.getClassType() == ClassType.STAGE_IN.value) {
-                fileTransferTime = processDataStageIn(job.getFileList(), job);
+            if (job.getClassType() == ClassType.COMPUTE.value) {
+                fileTransferTime = processDataStageInForComputeJob(job.getFileList(), job);
             }
 
             CloudletScheduler scheduler = vm.getCloudletScheduler();
@@ -226,8 +225,7 @@ public class WorkflowDatacenter extends Datacenter {
      * @pre  $none
      * @post $none
      */
-
-    protected double processDataStageIn(List<FileItem> requiredFiles, Job job) throws Exception {
+    protected double processDataStageInForComputeJob(List<FileItem> requiredFiles, Job job) throws Exception {
         double time = 0.0;
         for (FileItem file : requiredFiles) {
             //The input file is not an output File 
@@ -251,7 +249,7 @@ public class WorkflowDatacenter extends Datacenter {
                             }
                         }
                         //Storage storage = getStorageList().get(0);
-                        time += file.getSize() / (double) Consts.MILLION / maxRate;                        
+                        time += file.getSize() / (double) Consts.MILLION / maxRate;
                         break;
                     case LOCAL:
                         int vmId = job.getVmId();
