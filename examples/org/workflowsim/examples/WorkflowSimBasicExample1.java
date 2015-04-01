@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.commons.math3.util.MultidimensionalCounter.Iterator;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletSchedulerSpaceShared;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
@@ -38,7 +36,6 @@ import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 import org.workflowsim.CondorVM;
-import org.workflowsim.Task;
 import org.workflowsim.WorkflowDatacenter;
 import org.workflowsim.Job;
 import org.workflowsim.WorkflowEngine;
@@ -98,7 +95,7 @@ public class WorkflowSimBasicExample1 {
             /**
              * Should change this based on real physical path
              */
-            String daxPath = "/Users/xyw/git/Montage_25.xml";
+            String daxPath = "/Users/chenweiwei/Work/WorkflowSim-1.0/config/dax/Montage_100.xml";
             File daxFile = new File(daxPath);
             if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
@@ -233,7 +230,6 @@ public class WorkflowSimBasicExample1 {
         int maxTransferRate = 15;// the number comes from the futuregrid site, you can specify your bw
 
         try {
-            // Here we set the bandwidth to be 15MB/s
             HarddriveStorage s1 = new HarddriveStorage(name, 1e12);
             s1.setMaxTransferRate(maxTransferRate);
             storageList.add(s1);
@@ -256,20 +252,13 @@ public class WorkflowSimBasicExample1 {
         String indent = "    ";
         Log.printLine();
         Log.printLine("========== OUTPUT ==========");
-        Log.printLine("Job ID" + indent + "Task ID" + indent +"STATUS" + indent
+        Log.printLine("Cloudlet ID" + indent + "STATUS" + indent
                 + "Data center ID" + indent + "VM ID" + indent + indent
                 + "Time" + indent + "Start Time" + indent + "Finish Time" + indent + "Depth");
         DecimalFormat dft = new DecimalFormat("###.##");
         for (int i = 0; i < size; i++) {
             job = list.get(i);
-            Log.print(indent + job.getCloudletId() + indent +indent);
-            if(job.getCloudletId()==size-1)
-            	Log.print("Stage-in");
-            for(java.util.Iterator<Task> it=job.getTaskList().iterator();it.hasNext();){
-            	Log.print(it.next().getCloudletId()+",");
-            }
-            Log.print(indent);
-            
+            Log.print(indent + job.getCloudletId() + indent + indent);
             if (job.getCloudletStatus() == Cloudlet.SUCCESS) {
                 Log.print("SUCCESS");
                 Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
