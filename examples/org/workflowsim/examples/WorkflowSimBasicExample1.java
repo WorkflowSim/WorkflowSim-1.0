@@ -202,10 +202,10 @@ public class WorkflowSimBasicExample1 {
                             storage,
                             peList1,
                             new VmSchedulerTimeShared(peList1))); // This is our first machine
-            hostId++;
+            //hostId++;
         }
 
-        // 5. Create a DatacenterCharacteristics object that stores the
+        // 4. Create a DatacenterCharacteristics object that stores the
         //    properties of a data center: architecture, OS, list of
         //    Machines, allocation policy: time- or space-shared, time zone
         //    and its price (G$/Pe time unit).
@@ -223,7 +223,7 @@ public class WorkflowSimBasicExample1 {
         DatacenterCharacteristics characteristics = new DatacenterCharacteristics(
                 arch, os, vmm, hostList, time_zone, cost, costPerMem, costPerStorage, costPerBw);
 
-        // 6. Finally, we need to create a storage object.
+        // 5. Finally, we need to create a storage object.
         /**
          * The bandwidth within a data center in MB/s.
          */
