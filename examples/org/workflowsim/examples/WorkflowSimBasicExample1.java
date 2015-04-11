@@ -36,6 +36,7 @@ import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 import org.workflowsim.CondorVM;
+import org.workflowsim.Task;
 import org.workflowsim.WorkflowDatacenter;
 import org.workflowsim.Job;
 import org.workflowsim.WorkflowEngine;
@@ -44,6 +45,7 @@ import org.workflowsim.utils.ClusteringParameters;
 import org.workflowsim.utils.OverheadParameters;
 import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
+import org.workflowsim.utils.Parameters.ClassType;
 
 /**
  * This WorkflowSimExample creates a workflow planner, a workflow engine, and
@@ -253,13 +255,20 @@ public class WorkflowSimBasicExample1 {
         String indent = "    ";
         Log.printLine();
         Log.printLine("========== OUTPUT ==========");
-        Log.printLine("Cloudlet ID" + indent + "STATUS" + indent
+        Log.printLine("Job ID" + indent + "Task ID" + indent +"STATUS" + indent
                 + "Data center ID" + indent + "VM ID" + indent + indent
                 + "Time" + indent + "Start Time" + indent + "Finish Time" + indent + "Depth");
         DecimalFormat dft = new DecimalFormat("###.##");
         for (int i = 0; i < size; i++) {
             job = list.get(i);
             Log.print(indent + job.getCloudletId() + indent + indent);
+            if(job.getClassType() == ClassType.STAGE_IN.value)
+            	Log.print("Stage-in");
+            for(Task task : job.getTaskList()){
+            	Log.print(task.getCloudletId() + ",");
+            }
+            Log.print(indent);
+            
             if (job.getCloudletStatus() == Cloudlet.SUCCESS) {
                 Log.print("SUCCESS");
                 Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
