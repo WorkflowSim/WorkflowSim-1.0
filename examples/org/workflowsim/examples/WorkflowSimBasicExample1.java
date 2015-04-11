@@ -262,10 +262,10 @@ public class WorkflowSimBasicExample1 {
         for (int i = 0; i < size; i++) {
             job = list.get(i);
             Log.print(indent + job.getCloudletId() + indent + indent);
-            if(job.getClassType()==ClassType.STAGE_IN.value)
+            if(job.getClassType() == ClassType.STAGE_IN.value)
             	Log.print("Stage-in");
-            for(Task task:job.getTaskList()){
-            	Log.print(task.getCloudletId()+",");
+            for(Task task : job.getTaskList()){
+            	Log.print(task.getCloudletId() + ",");
             }
             Log.print(indent);
             
