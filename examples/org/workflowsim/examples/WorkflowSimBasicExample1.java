@@ -249,26 +249,23 @@ public class WorkflowSimBasicExample1 {
      * @param list list of jobs
      */
     protected static void printJobList(List<Job> list) {
-        int size = list.size();
-        Job job;
-
         String indent = "    ";
         Log.printLine();
         Log.printLine("========== OUTPUT ==========");
-        Log.printLine("Job ID" + indent + "Task ID" + indent +"STATUS" + indent
+        Log.printLine("Job ID" + indent + "Task ID" + indent + "STATUS" + indent
                 + "Data center ID" + indent + "VM ID" + indent + indent
                 + "Time" + indent + "Start Time" + indent + "Finish Time" + indent + "Depth");
         DecimalFormat dft = new DecimalFormat("###.##");
-        for (int i = 0; i < size; i++) {
-            job = list.get(i);
+        for (Job job : list) {
             Log.print(indent + job.getCloudletId() + indent + indent);
-            if(job.getClassType() == ClassType.STAGE_IN.value)
-            	Log.print("Stage-in");
-            for(Task task : job.getTaskList()){
-            	Log.print(task.getCloudletId() + ",");
+            if (job.getClassType() == ClassType.STAGE_IN.value) {
+                Log.print("Stage-in");
+            }
+            for (Task task : job.getTaskList()) {
+                Log.print(task.getCloudletId() + ",");
             }
             Log.print(indent);
-            
+
             if (job.getCloudletStatus() == Cloudlet.SUCCESS) {
                 Log.print("SUCCESS");
                 Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
