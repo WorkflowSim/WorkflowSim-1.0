@@ -19,7 +19,7 @@ workflowsim/			-- top level WorkflowSim directory
 2. Software requirements: Java version 1.6 or newer
 ---------------------------------------------------
 
-WorkflowSim has been tested and ran on Sun's Java version 1.6.0 or newer.
+WorkflowSim has been tested and ran on Sun's Java version 1.8.0 or newer.
 If you have non-Sun Java version, such as gcj or J++, they may not be compatible.
 You can use Eclipse, NetBeans, or Ant to compile and run WorkflowSim
 
