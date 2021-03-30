@@ -28,6 +28,7 @@ import org.workflowsim.failure.FailureGenerator;
 import org.workflowsim.scheduling.DataAwareSchedulingAlgorithm;
 import org.workflowsim.scheduling.BaseSchedulingAlgorithm;
 import org.workflowsim.scheduling.FCFSSchedulingAlgorithm;
+import org.workflowsim.scheduling.IWDSchedulingAlgorithm;
 import org.workflowsim.scheduling.MCTSchedulingAlgorithm;
 import org.workflowsim.scheduling.MaxMinSchedulingAlgorithm;
 import org.workflowsim.scheduling.MinMinSchedulingAlgorithm;
@@ -162,6 +163,9 @@ public class WorkflowScheduler extends DatacenterBroker {
                 break;
             case ROUNDROBIN:
                 algorithm = new RoundRobinSchedulingAlgorithm();
+                break;
+            case IWD: 
+            	algorithm = new IWDSchedulingAlgorithm();
                 break;
             default:
                 algorithm = new StaticSchedulingAlgorithm();

@@ -36,7 +36,7 @@ public class Parameters {
     public enum SchedulingAlgorithm {
 
         MAXMIN, MINMIN, MCT, DATA, 
-        STATIC, FCFS, ROUNDROBIN, INVALID
+        STATIC, FCFS, ROUNDROBIN, IWD, INVALID
     }
     
     /**
@@ -44,7 +44,7 @@ public class Parameters {
      * 
      */
     public enum PlanningAlgorithm{
-        INVALID, RANDOM, HEFT, DHEFT
+        INVALID, RANDOM, HEFT, DHEFT, IWD
     }
     
     /**

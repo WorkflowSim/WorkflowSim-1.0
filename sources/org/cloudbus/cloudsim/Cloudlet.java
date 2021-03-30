@@ -450,6 +450,15 @@ public class Cloudlet {
 		this.cloudletLength = cloudletLength;
 		return true;
 	}
+	
+	private int priority;
+	
+	public void setCloudletPriority(int a) {
+		this.priority =a;
+	}
+	public int getCloudletPriority() {
+		return this.priority;
+	}
 
 	/**
 	 * Sets the network service level for sending this cloudlet over a network.
