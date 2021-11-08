@@ -1,3 +1,7 @@
+## NOTE: WorkflowSim IS NO LONGER MAINTAINED.
+
+---
+
 Table of Contents
 -----------------
 
