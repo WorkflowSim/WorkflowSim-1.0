@@ -250,8 +250,23 @@ public class WorkflowSimBasicExample1 {
      */
     protected static void printJobList(List<Job> list) {
         String indent = "    ";
+        /*double cost = 0.0;
+        double time = 0.0;
+        double length = 0.0;*/
         Log.printLine();
         Log.printLine("========== OUTPUT ==========");
+        /*
+         Log.printLine("Cloudlet Column=Task=>Length,WFType,Impact # Times of Task=>Actual,Exec,Finish.");//,CloudletOutputSize
+        Log.printLine();
+        Log.printLine(indent + "Row" + indent + "JOB ID" + indent + indent + "CLOUDLET" + indent + indent
+                + "STATUS" + indent
+                + "Data CENTER ID" + indent
+                //+ "HOST ID" + indent 
+                + "CONTAINER(ID" + indent + indent + "SIZE)" + indent + indent
+                + "TIME" + indent + indent + "START TIME" + indent + indent + "FINISH TIME" + indent + "DEPTH" + indent + indent + "COST");
+        DecimalFormat dft0 = new DecimalFormat("###.#");
+        DecimalFormat dft = new DecimalFormat("####.###");
+        */
         Log.printLine("Job ID" + indent + "Task ID" + indent + "STATUS" + indent
                 + "Data center ID" + indent + "VM ID" + indent + indent
                 + "Time" + indent + "Start Time" + indent + "Finish Time" + indent + "Depth");
@@ -263,22 +278,49 @@ public class WorkflowSimBasicExample1 {
             }
             for (Task task : job.getTaskList()) {
                 Log.print(task.getCloudletId() + ",");
+                /*
+                Log.print(task.getCloudletLength() + " ,");
+                Log.print(task.getType());
+
+                //Log.print(dft0.format(task.getImpact()));
+                Log.print("\n" + "\t\t\t (" + dft0.format(task.getActualCPUTime()) + " ,");
+                Log.print("\n" + "\t\t\t" + dft0.format(task.getExecStartTime()) + " ,");
+                Log.print("\n" + "\t\t\t" + dft0.format(task.getTaskFinishTime()) + " )");
+                */
             }
             Log.print(indent);
 
+            /*
+            cost += job.getProcessingCost();
+            time += job.getActualCPUTime();
+            length += job.getCloudletLength();
+            */
+            
             if (job.getCloudletStatus() == Cloudlet.SUCCESS) {
                 Log.print("SUCCESS");
                 Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
                         + indent + indent + indent + dft.format(job.getActualCPUTime())
                         + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
                         + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
+                //+ indent + indent + indent + dft.format(job.getProcessingCost())
             } else if (job.getCloudletStatus() == Cloudlet.FAILED) {
                 Log.print("FAILED");
                 Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
                         + indent + indent + indent + dft.format(job.getActualCPUTime())
                         + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
                         + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
+                ////+ indent + indent + indent + dft.format(job.getProcessingCost())
             }
         }
+        /*
+        Log.printLine();
+        Log.printLine("MinTimeBetweenEvents is " + dft.format(CloudSim.getMinTimeBetweenEvents()));        
+        Log.printLine("----------------------------------------");
+        Log.printLine("The total cost is " + dft.format(cost));
+        Log.printLine("The total actual cpu time is " + dft.format(time));
+        Log.printLine("The length cloudlets is " + dft.format(length));
+        Log.printLine("The total failed counter is " + dft.format(failed_counter));
+        Log.printLine("The total success counter is " + dft.format(success_counter));
+        */
     }
 }
