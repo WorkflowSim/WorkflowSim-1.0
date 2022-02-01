@@ -167,7 +167,7 @@ public class BasicClustering implements ClusteringInterface {
             int priority = 0;
             int depth = 0;
             /// a bug of cloudsim makes it final of input file size and output file size
-            Job job = new Job(idIndex, length/*, inputFileSize, outputFileSize*/);
+            Job job = new Job(idIndex + 1 , length/*, inputFileSize, outputFileSize*/);
             job.setClassType(ClassType.COMPUTE.value);
             for (Task task : taskList) {
                 length += task.getCloudletLength();
